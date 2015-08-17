@@ -49,6 +49,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # centrak apps
+    'enumeration',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,10 +82,6 @@ DATABASES = {
             'provider': 'SQLOLEDB',
             'use_mars': False,
         }
-    },
-    'default_': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
