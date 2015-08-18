@@ -1,0 +1,44 @@
+{% extends 'layout-cols-md-sm.html' %}
+{% load static %}
+
+{% block cols-md-content %}
+    <h1>Device Options</h1>
+  
+	<div class="tabbed-control">
+		<ul class="nav nav-flattabs">
+			<li class="active"><span>Manufacturers</span></li>
+			<li><a href="#mobile-os">Mobile OS</a></li>
+		</ul>
+        
+        <div class="tab-content">
+        	<div id="manufacturers" class="tab-pane active">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <form class="form-inline text-right" method="post">
+                            {% csrf_token %}
+                            {{ form.name }}
+                            <button type="submit" class="btn btn-primary">Add</button>
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                    
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr><th colspan="2">Manufacturer List</th></tr>
+                            </thead>
+                            <tbody>
+                            {% for item in manufacturer_list %}
+                                <tr><td><input type="checkbox" /></td>
+                                    <td>{{ item.name }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2">No records found.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        	</div>
+        </div>
+    </div>
+{% endblock %}

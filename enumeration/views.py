@@ -1,16 +1,23 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-from enumeration.models import Manufacturer, MobileOS
+from enumeration.models import Manufacturer
+from enumeration.forms import ManufacturerForm
+from django.core.urlresolvers import reverse
 
 
 
-def device_options(request):
-    mf_list = Manufacturer.objects.all()
-    os_list = MobileOS.objects.all()
+def manufacturers(request):
+    if request.method == 'POST':
+        form = ManufacturerForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('manufacturers'))
+    else:
+        form = ManufacturerForm()
     
+    manufacturers = Manufacturer.objects.all()
     return render(request,
-        'enumeration/device-options.html', {
-            'manufacturer_list': mf_list,
-            'mobile_os_list': os_list
-        }
-    )
+        'enumeration/manufacturer-list.html', {
+        'manufacturer_list': manufacturers,
+        'form': form
+    })

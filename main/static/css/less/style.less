@@ -2,6 +2,8 @@
 @import "../../bootstrap-3.3.5/less/variables.less";
 @import "../../bootstrap-3.3.5/less/mixins.less";
 
+@import "./components/navs.less";
+
 @font-face {
     font-family: 'Roboto';
     src: url('../fonts/Roboto-Regular.ttf') format('truetype');
@@ -79,5 +81,21 @@ h4 {
         li > a {
             color: @brand-primary;
         }
+    }
+}
+
+.tabbed-control {
+    padding-top: 20px;
+}
+
+.tab-pane {
+    padding: 25px 5px 5px 5px;
+    
+    table {
+        margin-left: 1px;
+    }
+    
+    td:nth-child(1) {
+        width: 10px;        
     }
 }

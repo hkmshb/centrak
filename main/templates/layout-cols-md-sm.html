@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+	<div class="row">
+	   <div {% block cols-md-class %}class="col-md-8"{% endblock %}>
+	       {% block cols-md-content %}{% endblock %}
+	   </div>
+       <div {% block cols-sm-class %}class="col-md-4"{% endblock %}>
+           {% block cols-sm-content %}{% endblock %}
+       </div>
+	</div>
+{% endblock %}

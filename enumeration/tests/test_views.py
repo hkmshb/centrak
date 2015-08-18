@@ -6,17 +6,23 @@ from enumeration.models import Manufacturer, MobileOS
 
 class DeviceOptionViewTest(TestCase):
     
-    def test_lists_manufacturers_and_mobile_oses(self):
+    def test_manufactuers_listing(self):
         create_test_manufacturers()
-        create_test_mobile_oses()
         
-        response = self.client.get('/enum/device-options/')
+        response = self.client.get('/enum/device-options/manufacturers/')
         self.assertEqual(200, response.status_code)
+        self.assertEqual(5, len(response.context['manufacturer_list']))    
+    
+    def test_saving_a_POST_request(self):
+        manufacturer = {'name': 'Samsung'}
+        url = '/enum/device-options/manufacturers/'
+        response = self.client.post(url, data=manufacturer)
+        self.assertEqual(302, response.status_code)
         
-        context = response.context
-        self.assertEqual(5, len(context['manufacturer_list']))
-        self.assertEqual(5, len(context['mobile_os_list']))
-
+        items = Manufacturer.objects.all()
+        self.assertEqual(1, len(items))
+    
+    
 
 def create_test_manufacturers():
     Manufacturer.objects.create(name='Apple')
