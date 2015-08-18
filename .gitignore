@@ -1,2 +1,6 @@
 *.py[co]
 .*project
+
+
+.settings/
+*/static/css/*.css
