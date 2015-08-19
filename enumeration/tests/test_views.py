@@ -116,6 +116,23 @@ class DeviceOptionViewTest(TestCase):
         self.assertNotContains(response, 'Samsung')
         self.assertContains(response, 'Lenovo')
     
+    def test_listing_truncated_to_page_size(self):
+        manufacturer_names = 'A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z'
+        for name in manufacturer_names.split('.'):
+            Manufacturer.objects.create(name=name)
+        
+        self.assertEqual(26, len(Manufacturer.objects.all()))
+        response = self.client.get(self.url_manufacturers)
+        self.assertEqual(20, len(response.context['manufacturer_list']))
+
+    def test_explicit_page_listing(self):
+        manufacturer_names = 'A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z'
+        for name in manufacturer_names.split('.'):
+            Manufacturer.objects.create(name=name)
+                
+        response = self.client.get(self.url_manufacturers + '?page=2')
+        self.assertEqual(6, len(response.context['manufacturer_list']))
+    
     def test_displays_error_when_updating_non_existing_record(self):
         self.fail('write test')
 

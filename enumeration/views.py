@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
@@ -8,6 +9,12 @@ from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from decimal import InvalidOperation
 
+
+# temp consts
+class Options:
+    PageSize = 20
+    
+    
 
 
 # string message consts
@@ -32,7 +39,17 @@ def manufacturers(request):
     else:
         form = ManufacturerForm()
     
-    manufacturers = Manufacturer.objects.all()
+    manufacturer_list = Manufacturer.objects.all()
+    page_size = request.GET.get('pageSize', Options.PageSize)
+    paginator = Paginator(manufacturer_list, page_size)
+    
+    page = request.GET.get('page')
+    try:
+        manufacturers = paginator.page(page)
+    except PageNotAnInteger:
+        manufacturers = paginator.page(1)
+    except EmptyPage:
+        manufacturers = paginator.page(paginator.num_pages)
     return render(request,
         'enumeration/manufacturer-list.html', {
         'manufacturer_list': manufacturers,

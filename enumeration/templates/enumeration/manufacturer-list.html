@@ -53,6 +53,32 @@
 	                                <tr><td colspan="2">No records found.</td></tr>
 	                            {% endfor %}
 	                            </tbody>
+	                            <tfoot>
+	                               <tr><td colspan="2">
+	                                   {% with p=manufacturer_list %}
+	                                       <div class="pagination-packed">
+	                                           <div class="summary">
+	                                               <span>{{ p.start_index }} - {{ p.end_index }} of {{ p.paginator.count }} items @</span>
+	                                               <select name="page_size">
+	                                                   <option>10</option>
+	                                                   <option>20</option>
+	                                                   <option>50</option>
+	                                               </select>
+	                                               <span>per page</span>
+	                                           </div>
+	                                           
+	                                           <div class="controls">
+	                                               <button type="submit"><span class="glyphicon glyphicon-fast-backward"></span></button>
+	                                               <button type="submit"><span class="glyphicon glyphicon-step-backward"></span></button>
+	                                               <input type="number" name="page" min="1" max="{{ p.paginator.num_pages }}" value="{{ p.number }}" />
+	                                                   / {{ p.paginator.num_pages }} 
+	                                               <button type="submit"><span class="glyphicon glyphicon-step-forward"></span></button>
+                                                   <button type="submit"><span class="glyphicon glyphicon-fast-forward"></span></button>
+	                                           </div>
+	                                       </div>
+	                                   {% endwith %}
+	                                   </td></tr>
+	                            </tfoot>
 	                        </table>
 	                    </div>
                     </form>

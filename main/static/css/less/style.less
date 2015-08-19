@@ -3,6 +3,7 @@
 @import "../../bootstrap-3.3.5/less/mixins.less";
 
 @import "./components/navs.less";
+@import "./components/pagination.less";
 
 @font-face {
     font-family: 'Roboto';
@@ -99,17 +100,26 @@ h4 {
 
 .tabbed-control {
     padding-top: 10px;
-}
 
-.tab-pane {
-    padding: 25px 5px 5px 5px;
-    
-    table {
-        margin-left: 1px;
+    .tab-pane {
+        padding: 25px 5px 5px 5px;
+        
+        table {
+            margin-left: 1px;
+        }
+        
+        td:nth-child(1) {
+            width: 10px;        
+        }
     }
     
-    td:nth-child(1) {
-        width: 10px;        
+    tfoot {
+        background-color: @table-bg-hover;
+        tr > td {        
+            font-weight: normal;
+            border-top: solid 4px @table-border-color;
+            border-bottom: solid 4px @table-border-color;
+        }    
     }
-}
-
+} 
+ 
