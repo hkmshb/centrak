@@ -25,25 +25,37 @@
                             {% csrf_token %}
                             {{ form.name }}
                             <button type="submit" class="btn btn-primary">Add</button>
-                            <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </div>
-                    
-                    <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr><th colspan="2">Manufacturer List</th></tr>
-                            </thead>
-                            <tbody>
-                            {% for item in manufacturer_list %}
-                                <tr><td><input type="checkbox" /></td>
-                                    <td>{{ item.name }}</td></tr>
-                            {% empty %}
-                                <tr><td colspan="2">No records found.</td></tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                </div>
+                
+                <div class="panel panel-default">
+                    <form method="post" action="{% url 'manufacturer-delete' %}">
+                        {% csrf_token %}
+	                    <div class="panel-body">
+	                        <table class="table table-striped">
+	                            <thead>
+	                                <tr><th colspan="2">
+	                                       <span>Manufacturer List</span>
+	                                       <div class="pull-right">
+	                                           <input type="checkbox" title="Toggle Selection" name="toggle-selection" />
+	                                           <button type="submit" title="Delete Selection" class="btn-link del-link">
+	                                               <span class="glyphicon glyphicon-remove"></span>
+	                                           </button>
+	                                       </div>
+	                                    </th></tr>
+	                            </thead>
+	                            <tbody>
+	                            {% for item in manufacturer_list %}
+	                                <tr><td><input type="checkbox" name="manufacturer_ids" value="{{ item.id }}" /></td>
+	                                    <td>{{ item.name }}</td></tr>
+	                            {% empty %}
+	                                <tr><td colspan="2">No records found.</td></tr>
+	                            {% endfor %}
+	                            </tbody>
+	                        </table>
+	                    </div>
+                    </form>
                 </div>
         	</div>
         </div>

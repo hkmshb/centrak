@@ -1,12 +1,19 @@
+from django.contrib.messages.api import get_messages
 from django.test import TestCase
 
 from enumeration.models import Manufacturer, MobileOS
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
+from enumeration.views import MSG_SUCCESS_MANUFACTURER_ADD, \
+    MSG_SUCCESS_MANUFACTURER_DELETE, MSG_ERROR_MANUFACTURER_DELETE, \
+    MSG_WARN_MANUFACTURER_DELETE
+
+
 
 class DeviceOptionViewTest(TestCase):
     url_manufacturers = '/enum/device-options/manufacturers/'
-    url_manufacturer_edit = '/enum/device-options/manufacturers/update'
+    url_manufacturer_update = '/enum/device-options/manufacturers/update'
+    url_manufacturer_delete = '/enum/device-options/manufacturers/delete'
     
     def test_manufactuers_listing(self):
         create_test_manufacturers()
@@ -29,7 +36,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(302, response.status_code)
         
         response = self.client.get(self.url_manufacturers)
-        self.assertContains(response, 'Manufacturer added successfully.')
+        self.assertContains(response, MSG_SUCCESS_MANUFACTURER_ADD)
     
     def test_displays_blank_name_validation_error(self):
         response = self.client.post(self.url_manufacturers, data={'name':''})
@@ -43,13 +50,67 @@ class DeviceOptionViewTest(TestCase):
         response = self.client.post(self.url_manufacturers, data=data)
         self.assertEqual(200, response.status_code)
         self.assertContains(response, UNIQUE_MANUFACTURER_NAME_ERROR)
-
+    
+    def test_deleting_single_item_via_POST_request(self):
+        manufacturer = Manufacturer.objects.create(name='Samsung')
+        data = {'manufacturer_ids': manufacturer.id }
+        
+        response = self.client.post(self.url_manufacturer_delete, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(0, len(Manufacturer.objects.all()))
+        
+        response = self.client.get(self.url_manufacturers)
+        self.assertContains(response, MSG_SUCCESS_MANUFACTURER_DELETE)
+        
+    def test_deleting_multiple_items_via_POST_request(self):
+        manufacturer1 = Manufacturer.objects.create(name='Samsung')
+        manufacturer2 = Manufacturer.objects.create(name='Motorola')
+        Manufacturer.objects.create(name='Apple')
+        
+        self.assertEqual(3, len(Manufacturer.objects.all()))
+        
+        data = {'manufacturer_ids': [manufacturer1.id, manufacturer2.id]}        
+        response = self.client.post(self.url_manufacturer_delete, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(1, len(Manufacturer.objects.all()))
+        
+        response = self.client.get(self.url_manufacturers)
+        self.assertContains(response, MSG_SUCCESS_MANUFACTURER_DELETE)
+        
+    def test_displays_warning_for_partial_items_deletion(self):
+        manufacturer1 = Manufacturer.objects.create(name='Samsung')
+        Manufacturer.objects.create(name='Motorola')
+        
+        self.assertEqual(2, len(Manufacturer.objects.all()))
+        
+        data = {'manufacturer_ids': [manufacturer1.id, 201508]}        
+        response = self.client.post(self.url_manufacturer_delete, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(1, len(Manufacturer.objects.all()))
+        
+        response = self.client.get(self.url_manufacturers)
+        self.assertContains(response, MSG_WARN_MANUFACTURER_DELETE % (1,))
+    
+    def test_displays_error_for_no_item_deletion(self):
+        Manufacturer.objects.create(name='Samsung')
+        Manufacturer.objects.create(name='Motorola')
+        
+        self.assertEqual(2, len(Manufacturer.objects.all()))
+        
+        data = {'manufacturer_ids': [2015081, 2015082]}        
+        response = self.client.post(self.url_manufacturer_delete, data=data)
+        self.assertEqual(302, response.status_code)
+        self.assertEqual(2, len(Manufacturer.objects.all()))
+        
+        response = self.client.get(self.url_manufacturers)
+        self.assertContains(response, MSG_ERROR_MANUFACTURER_DELETE)                
+    
     def test_updating_via_POST_request(self):
         manufacturer = Manufacturer.objects.create(name='Samsung')
         self.assertEqual(1, len(Manufacturer.objects.all()))
         
         data = {'id': manufacturer.id, 'name': 'Lenovo'}
-        response = self.client.post(self.url_manufacturer_edit, data=data)
+        response = self.client.post(self.url_manufacturer_update, data=data)
     
         self.assertEqual(200, response.status_code)
         self.assertNotContains(response, 'Samsung')
