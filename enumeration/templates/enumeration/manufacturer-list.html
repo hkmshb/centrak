@@ -2,8 +2,15 @@
 {% load static %}
 
 {% block cols-md-content %}
+    {% if form.errors %}
+    <div class="alert alert-messages alert-danger">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        {{ form.errors.name |striptags }}
+    </div>
+    {% endif %}
+
     <h1>Device Options</h1>
-  
+
 	<div class="tabbed-control">
 		<ul class="nav nav-flattabs">
 			<li class="active"><span>Manufacturers</span></li>

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from enumeration.models import Manufacturer
 from enumeration.forms import ManufacturerForm
@@ -11,6 +12,11 @@ def manufacturers(request):
         form = ManufacturerForm(data=request.POST)
         if form.is_valid():
             form.save()
+            
+            messages.success(request,
+                'Manufacturer added successfully.',  
+                extra_tags='success')
+            
             return redirect(reverse('manufacturers'))
     else:
         form = ManufacturerForm()
