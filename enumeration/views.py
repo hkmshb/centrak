@@ -5,7 +5,6 @@ from django.contrib import messages
 from enumeration.models import Manufacturer
 from enumeration.forms import ManufacturerForm
 from django.core.urlresolvers import reverse
-from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from decimal import InvalidOperation
 
@@ -13,7 +12,8 @@ from decimal import InvalidOperation
 # temp consts
 class Options:
     PageSize = 20
-    
+    PageSizes = [10, 20, 50, 100, 200] 
+
     
 
 
@@ -24,6 +24,27 @@ MSG_ERROR_MANUFACTURER_DELETE = 'None of the selected manufacturer(s) were delet
 MSG_WARN_MANUFACTURER_DELETE = (
     'Some of the selected manufacturer(s) were delete successfully. '
     'However %s of the selection could not be deleted.')
+
+
+
+def extend_page(page, size):
+    page.current_size = str(size)
+    page.page_sizes = [str(x) for x in Options.PageSizes]
+    
+    num_pages = page.paginator.num_pages
+    page.paging_numbers = [
+        1,
+        1 if not page.has_previous() else page.previous_page_number(),
+        num_pages if not page.has_next() else page.next_page_number(),
+        num_pages
+    ]
+    return page
+
+def _device_options_tabs():
+    return (
+        ('Manufacturers', reverse('manufacturers'), 'manufacturers'),
+        ('Mobile OS', 'mobile-os', 'mobile-os'),
+    )
 
 
 def manufacturers(request):
@@ -51,15 +72,18 @@ def manufacturers(request):
     except EmptyPage:
         manufacturers = paginator.page(paginator.num_pages)
     return render(request,
-        'enumeration/manufacturer-list.html', {
-        'manufacturer_list': manufacturers,
-        'form': form
+        'enumeration/device-options.html', {
+        'record_list': extend_page(manufacturers, page_size),
+        'delete_url': reverse('manufacturer-delete'),
+        'tabs': _device_options_tabs(),
+        'model_name': 'Manufacturer',
+        'form': form,
     })
 
 
 def manufacturer_delete(request, id=None):
     if request.method == 'POST':
-        target_ids = list(id or request.POST.getlist('manufacturer_ids'))
+        target_ids = list(id or request.POST.getlist('record_ids'))
         if not target_ids:
             return redirect(reverse('manufacturers'))
         
@@ -86,7 +110,4 @@ def manufacturer_delete(request, id=None):
         )
         return redirect(reverse('manufacturers'))
     raise InvalidOperation('Method type not supported')
-
-
-
     

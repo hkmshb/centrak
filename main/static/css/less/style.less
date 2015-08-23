@@ -39,10 +39,10 @@ h4 {
 .btn-link {
     border: none;
     background-color: none;
+}
     
-    .del-link {
-        color: @brand-danger;
-    }
+.del-link {
+    color: @brand-danger;
 }
 
 .navbar-default {
@@ -113,13 +113,28 @@ h4 {
         }
     }
     
-    tfoot {
-        background-color: @table-bg-hover;
-        tr > td {        
-            font-weight: normal;
-            border-top: solid 4px @table-border-color;
-            border-bottom: solid 4px @table-border-color;
-        }    
+    .result-listing {
+        .panel-default {
+            padding-right: 1px;
+        }
+        
+        .btn-controls {
+            .btn-group {
+                margin-top: -5px;
+            }
+            .btn-link {
+                padding: 0px;
+            }
+            .caret {
+                margin-left: -2px;
+            }
+        }
+    
+        thead, tfoot {
+            background-color: @table-bg-hover;
+            tr > td, tr > th {
+                font-weight: normal;
+            }
+        }
     }
-} 
- 
+}
