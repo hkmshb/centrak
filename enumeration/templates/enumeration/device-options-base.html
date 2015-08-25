@@ -22,7 +22,7 @@
         </ul>
         
         <div class="tab-content">
-            <div class="tab-pane active">
+            <div class="table-listing" style="padding: 10px 5px 5px 5px;">
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         {% block insert-form %}
@@ -36,11 +36,11 @@
                 </div>
                 
                 {% with p=record_list %}
-                <form data-bind="table" method="post" action="{{ delete_url }}"
+                <form data-bind="table" method="post" action="{% block delete-url %}{% endblock %}"
                       data-paging-numbers="{{ p.paging_numbers }}">
-                    <div class="panel panel-default table-control">
+                    <div class="panel panel-default">
                         <div class="panel-heading">
-                            {{ model_name }} Listing
+                            {% block listing-title %}{% endblock %}
                             
                             <div class="btn-controls pull-right">
                                 <button type="button" class="btn-link del-link" name="btn_delete" title="Delete Selection">
@@ -63,15 +63,10 @@
                             <thead>
                                 <tr><th><input type="checkbox" title="Toggle Selection"
                                                data-toggle="checked" data-target="record_ids" /></th>
-                                    <th>{{ model_name }} Name</th></tr>
+                                    <th>{% block column-name %}{% endblock %}</th></tr>
                             </thead>
                             <tbody>
-                            {% for item in p %}
-                                <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
-                                    <td>{{ item.name }}</td></tr>
-                            {% empty %}
-                                <tr><td colspan="2">No Data Available.</td></tr>
-                            {% endfor %}
+                            {% block tbody-rows %}{% endblock %}
                             </tbody>
                             <tfoot>
                                 <tr><td colspan="2">

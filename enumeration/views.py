@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
 from enumeration.models import Manufacturer, MobileOS
@@ -26,6 +26,7 @@ MSG_WARN_MANUFACTURER_DELETE = (
     'However %s of the selection could not be deleted.')
 
 MSG_FMT_SUCCESS_ADD = '%s added successfully.'
+MSG_FMT_SUCCESS_EDIT = '%s updated successfully.'
 MSG_FMT_SUCCESS_DELETE = 'Selected %s delete successfully.'
 MSG_FMT_ERROR_DELETE = 'None of the selected %s were deleted';
 MSG_FMT_WARN_DELETE = (
@@ -79,14 +80,32 @@ def manufacturers(request):
     except EmptyPage:
         manufacturers = paginator.page(paginator.num_pages)
     return render(request,
-        'enumeration/device-options.html', {
+        'enumeration/manufacturer-list.html', {
         'record_list': extend_page(manufacturers, page_size),
-        'delete_url': reverse('manufacturer-delete'),
         'tabs': _device_options_tabs(),
-        'model_name': 'Manufacturer',
         'form': form,
     })
 
+
+def manufacturer_update(request, id):
+    manufacturer = get_object_or_404(Manufacturer, pk=id)
+    model_name = 'Manufacturer'
+    
+    if request.method == 'POST':
+        form = ManufacturerForm(request.POST, instance=manufacturer)
+        if form.is_valid():
+            form.save()
+            
+            messages.success(request, MSG_FMT_SUCCESS_EDIT % model_name,
+                extra_tags='success')
+    else:
+        form = ManufacturerForm(instance=manufacturer)
+    return render(request,
+        'enumeration/manufacturer-form.html', {
+        'model_name': model_name,
+        'form': form
+    })
+    
 
 def manufacturer_delete(request, id=None):
     if request.method == 'POST':
@@ -144,15 +163,35 @@ def mobile_os(request):
     except EmptyPage:
         oses = paginator.page(paginator.num_pages)
     return render(request,
-        'enumeration/device-options.html', {
+        'enumeration/mobileos-list.html', {
         'record_list': extend_page(oses, page_size),
-        'delete_url': reverse('mobile-os-delete'),
         'tabs': _device_options_tabs(),
-        'model_name': 'Mobile OS',
         'form': form
     })
+
+
+def mobile_os_update(request, id):
+    os = get_object_or_404(MobileOS, pk=id)
+    model_name = 'Mobile OS'
     
-    
+    if request.method == 'POST':
+        form = MobileOSForm(request.POST, instance=os)
+        if form.is_valid():
+            form.save()
+            
+            messages.success(request, MSG_FMT_SUCCESS_EDIT % model_name,
+                extra_tags='success')
+            
+            return redirect(reverse('mobile-os'))
+    else:
+        form = MobileOSForm(instance=os)
+    return render(request,
+        'enumeration/mobileos-form.html', {
+        'model_name': model_name,
+        'form': form
+    })
+
+
 def mobile_os_delete(request, id=None):
     if request.method != 'POST':
         raise InvalidOperation('Method type not supported')

@@ -98,25 +98,26 @@ h4 {
     margin-top: 20px;
 }
 
-.tabbed-control {
-    padding-top: 10px;
-
-    .tab-pane {
-        padding: 25px 5px 5px 5px;
+.table-listing {
+    
+    .panel {
+        padding-right: 1px;
         
         table {
             margin-left: 1px;
         }
         
+        th:nth-child(1),
         td:nth-child(1) {
             width: 10px;        
         }
-    }
-    
-    .result-listing {
-        .panel-default {
-            padding-right: 1px;
-        }
+        
+        thead, tfoot {
+            background-color: @table-bg-hover;
+            tr > td, tr > th {
+                font-weight: normal;
+            }
+        }        
         
         .btn-controls {
             .btn-group {
@@ -129,12 +130,21 @@ h4 {
                 margin-left: -2px;
             }
         }
+    }
+}
+
+.form-horizontal {
+    .form-group {
+        margin-bottom: 7px;
+    }
     
-        thead, tfoot {
-            background-color: @table-bg-hover;
-            tr > td, tr > th {
-                font-weight: normal;
-            }
-        }
+    .control-label {
+        font-size: 11pt;
+        padding-top: 3px;
+        padding-right: 0px;
+    }
+    
+    .btn-controls {
+        margin-top: 15px;
     }
 }

@@ -1,0 +1,37 @@
+{% extends 'layout-cols-md-sm.html' %}
+
+{% block cols-md-content %}
+    {% if form.errors %}
+    <div class="alert alert-messages alert-danger">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        {{ form.errors.name |striptags }}
+    </div>
+    {% endif %}
+    
+    <h1>Device Options</h1>
+    <br/>    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Manufacturer Update
+        </div>
+        
+        <div class="panel-body">
+            <form method="post" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name" class="col-sm-2 control-label">Name: </label>
+                    <div class="col-sm-8">
+                        {{ form.name }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-default" name="btn_cancel"
+                                data-action="{% url 'manufacturers' %}">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'enumeration/device-options-base.html' %}
+
+{% block delete-url %}{% url 'manufacturer-delete' %}{% endblock %}
+{% block listing-title %}Manufacturer Listing{% endblock %}
+{% block column-name %}Manufacturer Name{% endblock %}
+
+{% block tbody-rows %}
+    {% for item in p %}
+    <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
+        <td><a href="{% url 'manufacturer-update' item.id %}">{{ item.name }}</a></td></tr>
+    {% empty %}
+    <tr><td colspan="2">No Data Available.</td></tr>
+    {% endfor %}
+{% endblock %}
