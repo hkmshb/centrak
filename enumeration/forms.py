@@ -1,5 +1,5 @@
 from django import forms
-from enumeration.models import Manufacturer, MobileOS
+from enumeration.models import Manufacturer, MobileOS, Device
 
 
 
@@ -38,3 +38,35 @@ class MobileOSForm(forms.models.ModelForm):
             'name': {'unique': UNIQUE_MOBILEOS_NAME_ERROR}
         }
 
+
+class DeviceForm(forms.models.ModelForm):
+    
+    class Meta:
+        model = Device
+        fields = ('form_factor', 'serialno', 'label', 'brand', 'model', 
+                  'mobile_os', 'os_version', 'notes')
+        
+        _attrs = {'class': 'form-control input-sm'}
+        widgets = {
+            'form_factor': forms.fields.Select(attrs=_attrs),
+            'serialno': forms.fields.TextInput(attrs=_attrs),
+            'label': forms.fields.TextInput(attrs=_attrs),
+            'brand': forms.fields.Select(attrs=_attrs),
+            'model': forms.fields.TextInput(attrs=_attrs),
+            'mobile_os': forms.fields.Select(attrs=_attrs),
+            'os_version': forms.fields.TextInput(attrs=_attrs),
+            'notes': forms.Textarea(attrs={ 
+                        'class': 'form-control input-sm', 'rows': '3'}),
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        

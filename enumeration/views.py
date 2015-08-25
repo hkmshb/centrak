@@ -2,8 +2,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-from enumeration.models import Manufacturer, MobileOS
-from enumeration.forms import ManufacturerForm, MobileOSForm
+from enumeration.models import Manufacturer, MobileOS, Device
+from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from decimal import InvalidOperation
@@ -34,7 +34,7 @@ MSG_FMT_WARN_DELETE = (
     'However %s of the selection could not be deleted.')
 
 
-def extend_page(page, size):
+def _extend_page(page, size):
     page.current_size = str(size)
     page.page_sizes = [str(x) for x in Options.PageSizes]
     
@@ -53,6 +53,44 @@ def _device_options_tabs():
         ('Manufacturers', reverse('manufacturers'), 'manufacturers'),
         ('Mobile OS', reverse('mobile-os'), 'mobile-os'),
     )
+
+
+def _get_paged_object_list(request, model, qsPage='page', qsPageSize='pageSize'):
+    page_size = request.GET.get(qsPageSize, Options.PageSize)
+    page = request.GET.get(qsPage)
+    
+    object_list = model.objects.all()
+    paginator = Paginator(object_list, page_size)
+    try:
+        objects = paginator.page(page)
+    except PageNotAnInteger:
+        objects = paginator.page(1)
+    except EmptyPage:
+        objects = paginator.page(paginator.num_pages)
+    return _extend_page(objects, page_size)
+    
+
+def devices(request):
+    devices = _get_paged_object_list(request, Device)
+    return render(request,
+        'enumeration/device-list.html', {
+        'record_list': devices
+    })
+
+def device_insert(request):
+    if request.method == 'POST':
+        form = DeviceForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            
+            messages.success(request, MSG_FMT_SUCCESS_ADD % 'Device',
+                extra_tags='success')
+            return redirect(reverse('devices'))
+    else:
+        form = DeviceForm()
+    return render(request, 'enumeration/device-form.html', {
+        'mode': 'insert', 'form': form
+    })
 
 
 def manufacturers(request):
@@ -81,7 +119,7 @@ def manufacturers(request):
         manufacturers = paginator.page(paginator.num_pages)
     return render(request,
         'enumeration/manufacturer-list.html', {
-        'record_list': extend_page(manufacturers, page_size),
+        'record_list': _extend_page(manufacturers, page_size),
         'tabs': _device_options_tabs(),
         'form': form,
     })
@@ -164,7 +202,7 @@ def mobile_os(request):
         oses = paginator.page(paginator.num_pages)
     return render(request,
         'enumeration/mobileos-list.html', {
-        'record_list': extend_page(oses, page_size),
+        'record_list': _extend_page(oses, page_size),
         'tabs': _device_options_tabs(),
         'form': form
     })

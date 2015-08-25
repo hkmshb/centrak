@@ -20,7 +20,7 @@ class MobileOS(models.Model):
         db_table = 'enum_mobileos'
     
     def __str__(self):
-        return "%s (by %s)" % (self.name, self.provider)
+        return self.name
 
 
 class Device(models.Model):
@@ -31,14 +31,16 @@ class Device(models.Model):
         (TABLET, 'Tablet')
     )
     
+    label = models.CharField(max_length=10, unique=True)
     brand = models.ForeignKey(Manufacturer)
-    model = models.CharField(max_length=50)
+    model = models.CharField(max_length=50, blank=True)
     mobile_os   = models.ForeignKey(MobileOS)
-    os_version  = models.CharField(max_length=25)
+    os_version  = models.CharField(max_length=25, blank=True)
     form_factor = models.CharField(max_length=1, 
                     choices=FORM_FACTOR_CHOICES,
                     default=PHONE)
-    serialno = models.CharField(max_length=25, blank=True)
+    serialno = models.CharField(max_length=25, unique=True, blank=True)
+    notes    = models.TextField(blank=True)
     
     class Meta:
         db_table = 'enum_device'

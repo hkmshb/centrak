@@ -1,0 +1,66 @@
+{% extends 'layout-cols-md-sm.html' %}
+
+{% block cols-md-content %}
+    {% if form.errors %}
+    <div class="alert alert-messages alert-danger">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        {{ form.errors }}
+    </div>
+    {% endif %}
+    
+    <h1>Device</h1>
+     
+    <div class="input-form panel panel-default">
+        <div class="panel-heading">
+            Add Device
+        </div>
+        
+        <div class="panel-body">
+        {% with lblclass='class="col-sm-3 control-label"' %}
+            <form method="post" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="form_factor" {{lblclass}}>Form Factor: </label>
+                    <div class="col-sm-3">{{ form.form_factor }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="serialno" {{lblclass}}>Serial #:</label>
+                    <div class="col-sm-5">{{ form.serialno }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="label" {{lblclass}}>Label: </label>
+                    <div class="col-sm-5">{{ form.label }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="brand" {{lblclass}}>Brand: </label>
+                    <div class="col-sm-3">{{ form.brand }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="model" {{lblclass}}>Model: </label>
+                    <div class="col-sm-5">{{ form.model }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="mobile_os" {{lblclass}}>OS: </label>
+                    <div class="col-sm-3">{{ form.mobile_os }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="os_version" {{lblclass}}>OS Version: </label>
+                    <div class="col-sm-3">{{ form.os_version }}</div>
+                </div>
+                <div class="form-group">
+                    <label for="notes" {{lblclass}}>Notes: </label>
+                    <div class="col-sm-5">{{ form.notes }}</div>
+                </div>
+                <div class="form-group btn-controls">
+                    <div class="col-sm-offset-3 col-sm-5">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">Save & New</button>
+                        <button type="button" class="btn btn-default name="btn_cancel"
+                                data-action-url="">Cancel</button>
+                    </div>
+                </div>               
+            </form>
+        {% endwith %}
+        </div>
+    </div>
+{% endblock %}
