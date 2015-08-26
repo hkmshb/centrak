@@ -1,12 +1,14 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import inlineformset_factory
+from django.core.urlresolvers import reverse
+from django.forms.utils import ErrorList
 from django.contrib import messages
 
-from enumeration.models import Manufacturer, MobileOS, Device
+from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm
-from django.core.urlresolvers import reverse
-from django.core.exceptions import ObjectDoesNotExist
-from decimal import InvalidOperation
+
 
 
 # temp consts
@@ -78,20 +80,41 @@ def devices(request):
     })
 
 def device_insert(request):
+    device = Device()
+    device_form = DeviceForm(instance=device)
+    IMEIInlineFormSet = inlineformset_factory(Device, DeviceIMEI, extra=2, max_num=2)
+        
     if request.method == 'POST':
-        form = DeviceForm(data=request.POST)
-        if form.is_valid():
-            form.save()
+        device_form = DeviceForm(data=request.POST)
+        formset = IMEIInlineFormSet(request.POST, request.FILES)
+        
+        if device_form.is_valid():
+            created_device = device_form.save(commit=False)
+            formset = IMEIInlineFormSet(request.POST, request.FILES, instance=created_device)
             
-            messages.success(request, MSG_FMT_SUCCESS_ADD % 'Device',
-                extra_tags='success')
+            if formset.is_valid():
+                created_device.save()
+                formset.save()
+                
+                messages.success(request, MSG_FMT_SUCCESS_ADD % 'Device',
+                    extra_tags='success')
             
-            urlname = ('devices' if 'btn_save' in request.POST else 'device-insert')
-            return redirect(reverse(urlname))
+                urlname = ('devices' if 'btn_save' in request.POST else 'device-insert')
+                return redirect(reverse(urlname))
     else:
-        form = DeviceForm()
+        device_form = DeviceForm(instance=device)
+        formset = IMEIInlineFormSet()
+        
+    # transfer formset errors to device_form errors because only these are
+    # rendered in the template.
+    if formset.errors:
+        current = device_form.errors.get('__all__', ErrorList())
+        current.append('A device with the IMEI already exists.');
+        device_form.errors['__all__'] = current
+    
     return render(request, 'enumeration/device-form.html', {
-        'mode': 'insert', 'form': form
+        'mode': 'insert', 'form': device_form,
+        'imei_formset': formset,
     })
 
 
