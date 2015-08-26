@@ -1,4 +1,9 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+
+
+# const error messages
+UNIQUE_SERIALNO_ERROR  = "Serial # already exist."
 
 
 
@@ -39,13 +44,19 @@ class Device(models.Model):
     form_factor = models.CharField(max_length=1, 
                     choices=FORM_FACTOR_CHOICES,
                     default=PHONE)
-    serialno = models.CharField(max_length=25, unique=True, blank=True)
+    serialno = models.CharField(max_length=25, blank=True)
     notes    = models.TextField(blank=True)
     
     class Meta:
         db_table = 'enum_device'
     
-    
+    def validate_unique(self, exclude=None):
+        super(Device, self).validate_unique(exclude=exclude)
+        serialno = (self.serialno or '')
+        if serialno and Device.objects.filter(serialno=serialno).exists():
+            raise ValidationError({'serialno': UNIQUE_SERIALNO_ERROR}, code='unique')
+
+
 class DeviceIMEI(models.Model):
     device = models.ForeignKey(Device)
     imei = models.CharField(max_length=25, unique=True)

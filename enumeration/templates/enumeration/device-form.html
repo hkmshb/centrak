@@ -4,7 +4,7 @@
     {% if form.errors %}
     <div class="alert alert-messages alert-danger">
         <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-        {{ form.errors }}
+        {{ form.non_field_errors }}
     </div>
     {% endif %}
     
@@ -23,15 +23,15 @@
                     <label for="form_factor" {{lblclass}}>Form Factor: </label>
                     <div class="col-sm-3">{{ form.form_factor }}</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group{%if form.serialno.errors %} has-error{% endif %}">
                     <label for="serialno" {{lblclass}}>Serial #:</label>
                     <div class="col-sm-5">{{ form.serialno }}</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group{%if form.label.errors %} has-error{% endif %}" >
                     <label for="label" {{lblclass}}>Label: </label>
                     <div class="col-sm-5">{{ form.label }}</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group{%if form.brand.errors %} has-error{% endif %}">
                     <label for="brand" {{lblclass}}>Brand: </label>
                     <div class="col-sm-3">{{ form.brand }}</div>
                 </div>
@@ -39,7 +39,7 @@
                     <label for="model" {{lblclass}}>Model: </label>
                     <div class="col-sm-5">{{ form.model }}</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group{%if form.mobile_os.errors %} has-error{% endif %}">
                     <label for="mobile_os" {{lblclass}}>OS: </label>
                     <div class="col-sm-3">{{ form.mobile_os }}</div>
                 </div>
@@ -53,8 +53,8 @@
                 </div>
                 <div class="form-group btn-controls">
                     <div class="col-sm-offset-3 col-sm-5">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="submit" class="btn btn-primary">Save & New</button>
+                        <button type="submit" class="btn btn-primary" name="btn_save">Save</button>
+                        <button type="submit" class="btn btn-primary" name="btn_save_new">Save & New</button>
                         <button type="button" class="btn btn-default name="btn_cancel"
                                 data-action-url="">Cancel</button>
                     </div>

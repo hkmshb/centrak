@@ -85,7 +85,9 @@ def device_insert(request):
             
             messages.success(request, MSG_FMT_SUCCESS_ADD % 'Device',
                 extra_tags='success')
-            return redirect(reverse('devices'))
+            
+            urlname = ('devices' if 'btn_save' in request.POST else 'device-insert')
+            return redirect(reverse(urlname))
     else:
         form = DeviceForm()
     return render(request, 'enumeration/device-form.html', {

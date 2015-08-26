@@ -1,11 +1,17 @@
 from django import forms
 from enumeration.models import Manufacturer, MobileOS, Device
+from django.core.exceptions import ValidationError
 
 
 
 # const error messages
 UNIQUE_MANUFACTURER_NAME_ERROR = 'Manufacturer name already exist.'
 UNIQUE_MOBILEOS_NAME_ERROR     = 'Mobile OS name already exists.'
+
+REQUIRED_FIELD_ERROR   = 'This field is required.'
+REQUIRED_INVALID_ERROR = "Required fields and invalid entries are in red."
+UNIQUE_SERIALNO_ERROR  = "Serial # already exist."
+UNIQUE_LABEL_ERROR     = "Label already exist."
 
 
 
@@ -58,15 +64,24 @@ class DeviceForm(forms.models.ModelForm):
             'notes': forms.Textarea(attrs={ 
                         'class': 'form-control input-sm', 'rows': '3'}),
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        error_messages = {
+            'serialno': {'unique': UNIQUE_SERIALNO_ERROR },
+            'label':    {'unique': UNIQUE_LABEL_ERROR },
+        }
+    
+    def clean(self):
+        data = super(DeviceForm, self).clean()
+        if self.errors:
+            self.add_error(None, REQUIRED_INVALID_ERROR)
+
+    def validate_unique(self):
+        super(DeviceForm, self).validate_unique()
+        if self.errors:
+            if '__all__' not in self.errors:
+                self.add_error(None, REQUIRED_INVALID_ERROR)
+            
+            for message in [m for f,m in self.errors.items() if f != '__all__']:
+                if str(message).find(REQUIRED_FIELD_ERROR) == -1:
+                    self.add_error(None, message)
+            
+            
