@@ -1,0 +1,15 @@
+<ul class="menu-nav nav nav-pills pull-right" role="tablist">
+    <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            Devices <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li><a href="{% url 'devices' %}">Device List</a></li>
+            <li role="separator" class="divider"></li>
+            <li class="disabled"><span>DEVICE OPTIONS</span></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'manufacturers' %}">Manufacturers</a></li>
+            <li><a href="{% url 'mobile-os' %}">Mobile OS</a></li>
+        </ul>
+    </li>
+</ul>

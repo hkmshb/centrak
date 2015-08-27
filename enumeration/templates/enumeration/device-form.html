@@ -21,39 +21,39 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="form_factor" {{lblclass}}>Form Factor: </label>
-                    <div class="col-sm-3">{{ form.form_factor }}</div>
+                    <div class="col-sm-4">{{ form.form_factor }}</div>
                 </div>
                 <div class="form-group{%if form.serialno.errors %} has-error{% endif %}">
                     <label for="serialno" {{lblclass}}>Serial #:</label>
-                    <div class="col-sm-5">{{ form.serialno }}</div>
+                    <div class="col-sm-7">{{ form.serialno }}</div>
                 </div>
                 <div class="form-group{%if form.label.errors %} has-error{% endif %}" >
                     <label for="label" {{lblclass}}>Label: </label>
-                    <div class="col-sm-5">{{ form.label }}</div>
+                    <div class="col-sm-7">{{ form.label }}</div>
                 </div>
                 <div class="form-group{%if form.brand.errors %} has-error{% endif %}">
                     <label for="brand" {{lblclass}}>Brand: </label>
-                    <div class="col-sm-3">{{ form.brand }}</div>
+                    <div class="col-sm-4">{{ form.brand }}</div>
                 </div>
                 <div class="form-group">
                     <label for="model" {{lblclass}}>Model: </label>
-                    <div class="col-sm-5">{{ form.model }}</div>
+                    <div class="col-sm-7">{{ form.model }}</div>
                 </div>
                 <div class="form-group{%if form.mobile_os.errors %} has-error{% endif %}">
                     <label for="mobile_os" {{lblclass}}>OS: </label>
-                    <div class="col-sm-3">{{ form.mobile_os }}</div>
+                    <div class="col-sm-4">{{ form.mobile_os }}</div>
                 </div>
                 <div class="form-group">
                     <label for="os_version" {{lblclass}}>OS Version: </label>
-                    <div class="col-sm-3">{{ form.os_version }}</div>
+                    <div class="col-sm-4">{{ form.os_version }}</div>
                 </div>
                 <div class="form-group">
                     <label for="notes" {{lblclass}}>Notes: </label>
-                    <div class="col-sm-5">{{ form.notes }}</div>
+                    <div class="col-sm-7">{{ form.notes }}</div>
                 </div>
                 
                 <div class="form-group hr-line">
-                    <div class="col-sm-offset-1 col-sm-8"><hr /></div>
+                    <div class="col-sm-offset-1 col-sm-10"><hr /></div>
                 </div>
                 
                 <div class="inline-form" id="imei_forms">
@@ -61,7 +61,7 @@
                     {% for fs in imei_formset %}
 	                <div class="form-group{%if fs.imei.errors %} has-error{% endif %}">
 	                    <label for="deviceimei_set-{{forloop.counter0}}-imei" {{lblclass}}>IMEI #: </label>
-	                    <div class="col-sm-5">
+	                    <div class="col-sm-7">
 	                       <input class="form-control" name="deviceimei_set-{{forloop.counter0}}-imei"
 	                              value="{{ fs.imei.value|default:"" }}" />
 	                    </div>
@@ -70,11 +70,11 @@
                 </div>
                 
                 <div class="form-group hr-line">
-                    <div class="col-sm-offset-1 col-sm-8"><hr /></div>
+                    <div class="col-sm-offset-1 col-sm-10"><hr /></div>
                 </div>                
                 
                 <div class="form-group btn-controls">
-                    <div class="col-sm-offset-3 col-sm-5">
+                    <div class="col-sm-offset-3 col-sm-7">
                         <button type="submit" class="btn btn-primary" name="btn_save">Save</button>
                     {%if not form.instance.id %}                        
                         <button type="submit" class="btn btn-primary" name="btn_save_new">Save & New</button>

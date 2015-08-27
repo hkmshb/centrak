@@ -29,18 +29,22 @@
                 <a class="navbar-brand">CENTrak</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse navbar-right">
-            </div>
+                <ul class="nav navbar-nav">
+                {%if not request.user.is_authenticated %}
+                    <li><a class="btn btn-block" href="#">Login</a></li>
+                {% endif %}
+                </ul>
+            </div>            
         </div>
     </nav>
     {% block header %}
-    <div class="header light-shadow">
+    <div class="header light-shadow header-fixed-top">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h1 class="small">{% block header-title %}{% endblock %}</h1>
-                </div>
-                <div class="col-md-6 header-controls">
-                </div>
+            <div class="header-title">
+                <h1 class="small">{% block header-title %}{% endblock %}</h1>
+            </div>
+            <div class="header-controls">
+                {% include 'menu-list.html' %}
             </div>
         </div>
     </div>
