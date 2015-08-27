@@ -6,7 +6,7 @@
     
     <div class="table-listing">
     {% with p=record_list %}
-        <form data-bind="table" method="post" action=""
+        <form data-bind="table" method="post" action="{% url 'device-delete' %}"
               data-paging-numbers="{{ p.paging_numbers }}">
             <div class="panel panel-default">
                 <div class="panel-heading">

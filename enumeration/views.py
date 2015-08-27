@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import inlineformset_factory
 from django.core.urlresolvers import reverse
 from django.forms.utils import ErrorList
+from django.http.response import Http404
 from django.contrib import messages
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI
@@ -57,6 +58,18 @@ def _device_options_tabs():
     )
 
 
+def _update_query_string(request, exclude_list=None, include_qs=None):
+    qs = request.GET
+    if exclude_list:
+        for entry in exclude_list:
+            if entry in qs:
+                del qs[entry]
+    
+    if include_qs:
+        qs.update(include_qs)
+    return qs
+
+
 def _get_paged_object_list(request, model, qsPage='page', qsPageSize='pageSize'):
     page_size = request.GET.get(qsPageSize, Options.PageSize)
     page = request.GET.get(qsPage)
@@ -70,6 +83,38 @@ def _get_paged_object_list(request, model, qsPage='page', qsPageSize='pageSize')
     except EmptyPage:
         objects = paginator.page(paginator.num_pages)
     return _extend_page(objects, page_size)
+    
+
+def _handle_object_deletion(request, model, model_name, model_list_url_name, id=None):
+    if request.method != 'POST':
+        raise Http404('Method type not supported.')
+    
+    target_ids = list(id or request.POST.getlist('record_ids'))
+    if not target_ids:
+        return redirect(reverse(model_list_url_name))
+    
+    failed_ids = []
+    for item_id in target_ids:
+        try:
+            item = model.objects.get(pk=item_id)
+            item.delete()
+        except ObjectDoesNotExist:
+            failed_ids.append(item_id)
+    
+    target_count = len(target_ids)
+    failed_count = len(failed_ids)
+    messages.add_message(request,
+        level=(messages.SUCCESS if failed_count == 0 else
+            messages.WARNING if failed_count < target_count else messages.ERROR),
+        message = (MSG_FMT_SUCCESS_DELETE % model_name
+            if failed_count == 0 else
+                MSG_FMT_WARN_DELETE % (model_name, target_count - failed_count)
+                    if failed_count < target_count else
+                        MSG_FMT_ERROR_DELETE % model_name),
+        extra_tags=('success' if failed_count == 0 else 'warning'
+            if failed_count < target_count else 'danger')
+    )
+    return redirect(reverse(model_list_url_name))
     
 
 def devices(request):
@@ -116,6 +161,10 @@ def manage_device(request, id=None):
         'form': device_form, 'imei_formset': formset,
     })
 
+
+def delete_device(request, id=None):
+    return _handle_object_deletion(request, Device, 'device(s)', 'devices', id)
+    
 
 def manufacturers(request):
     if request.method == 'POST':
@@ -197,7 +246,7 @@ def manufacturer_delete(request, id=None):
                 if failed_count < target_count else 'danger')
         )
         return redirect(reverse('manufacturers'))
-    raise InvalidOperation('Method type not supported')
+    return Http404('Method type not supported')
 
 
 def mobile_os(request):
@@ -256,7 +305,7 @@ def mobile_os_update(request, id):
 
 def mobile_os_delete(request, id=None):
     if request.method != 'POST':
-        raise InvalidOperation('Method type not supported')
+        raise Http404('Method type not supported')
     
     target_ids = list(id or request.POST.getlist('record_ids'))
     if not target_ids:
