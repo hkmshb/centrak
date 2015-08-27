@@ -35,7 +35,7 @@
                     <tbody>
                     {% for item in p %}
                         <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
-                            <td><a href="#">{{ item.label }}</a></td>
+                            <td><a href="{% url 'device-update' item.id %}">{{ item.label }}</a></td>
                             <td>{{ item.get_form_factor_display }}</td>
                             <td>{{ item.deviceimei_set.first.imei }}</td>
                             <td>{{ item.brand }}</td>

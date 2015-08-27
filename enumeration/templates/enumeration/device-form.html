@@ -12,7 +12,7 @@
      
     <div class="input-form panel panel-default">
         <div class="panel-heading">
-            Add Device
+            {%if form.instance.id %}Update{% else %}Add{% endif %} Device
         </div>
         
         <div class="panel-body">
@@ -76,9 +76,11 @@
                 <div class="form-group btn-controls">
                     <div class="col-sm-offset-3 col-sm-5">
                         <button type="submit" class="btn btn-primary" name="btn_save">Save</button>
+                    {%if not form.instance.id %}                        
                         <button type="submit" class="btn btn-primary" name="btn_save_new">Save & New</button>
-                        <button type="button" class="btn btn-default name="btn_cancel"
-                                data-action-url="">Cancel</button>
+                    {% endif %}
+                        <button type="button" class="btn btn-default" name="btn_cancel"
+                                data-action-url="{% url 'devices' %}">Cancel</button>
                     </div>
                 </div>               
             </form>

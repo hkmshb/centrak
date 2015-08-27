@@ -7,7 +7,7 @@
     // form cancel button
     $('form button[name="btn_cancel"]').on('click', function(){
         var $this = $(this)
-          , cancel_url = $this.data('action');
+          , cancel_url = $this.data('action-url');
         
         if (!cancel_url) {
             var $form = $this.parentsUntil('form').slice('-1');

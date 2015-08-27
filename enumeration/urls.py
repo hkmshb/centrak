@@ -3,7 +3,8 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('enumeration.views',
     url(r'^devices/$', 'devices', name='devices'),
-    url(r'^devices/new$', 'device_insert', name='device-insert'),
+    url(r'^devices/create$', 'manage_device', name='device-insert'),
+    url(r'^devices/update/(?P<id>[0-9]+)', 'manage_device', name='device-update'),
                        
     url(r'^device-options/manufacturers/$', 'manufacturers', name='manufacturers'),
     url(r'^device-options/manufacturers/update/(?P<id>[0-9]+)',

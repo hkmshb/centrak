@@ -28,7 +28,7 @@ MSG_WARN_MANUFACTURER_DELETE = (
     'However %s of the selection could not be deleted.')
 
 MSG_FMT_SUCCESS_ADD = '%s added successfully.'
-MSG_FMT_SUCCESS_EDIT = '%s updated successfully.'
+MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
 MSG_FMT_SUCCESS_DELETE = 'Selected %s delete successfully.'
 MSG_FMT_ERROR_DELETE = 'None of the selected %s were deleted';
 MSG_FMT_WARN_DELETE = (
@@ -79,42 +79,41 @@ def devices(request):
         'record_list': devices
     })
 
-def device_insert(request):
-    device = Device()
-    device_form = DeviceForm(instance=device)
+def manage_device(request, id=None):
+    device = (Device() if not id else Device.objects.get(pk=id))
     IMEIInlineFormSet = inlineformset_factory(Device, DeviceIMEI, extra=2, max_num=2)
         
     if request.method == 'POST':
-        device_form = DeviceForm(data=request.POST)
-        formset = IMEIInlineFormSet(request.POST, request.FILES)
-        
+        device_form = DeviceForm(data=request.POST, instance=device)
+        formset = IMEIInlineFormSet(request.POST, request.FILES, instance=device)        
+                
         if device_form.is_valid():
-            created_device = device_form.save(commit=False)
-            formset = IMEIInlineFormSet(request.POST, request.FILES, instance=created_device)
+            target_device = device_form.save(commit=False)
+            formset = IMEIInlineFormSet(request.POST, request.FILES, instance=target_device)
             
             if formset.is_valid():
-                created_device.save()
+                target_device.save()
                 formset.save()
                 
-                messages.success(request, MSG_FMT_SUCCESS_ADD % 'Device',
-                    extra_tags='success')
+                msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
+                messages.success(request, msg_fmt % 'Device', extra_tags='success')
             
                 urlname = ('devices' if 'btn_save' in request.POST else 'device-insert')
                 return redirect(reverse(urlname))
     else:
         device_form = DeviceForm(instance=device)
-        formset = IMEIInlineFormSet()
+        formset = IMEIInlineFormSet(instance=device)
         
     # transfer formset errors to device_form errors because only these are
     # rendered in the template.
-    if formset.errors:
+    formset_errors = [d for d in formset.errors if d]
+    if formset_errors:
         current = device_form.errors.get('__all__', ErrorList())
         current.append('A device with the IMEI already exists.');
         device_form.errors['__all__'] = current
     
     return render(request, 'enumeration/device-form.html', {
-        'mode': 'insert', 'form': device_form,
-        'imei_formset': formset,
+        'form': device_form, 'imei_formset': formset,
     })
 
 
@@ -159,7 +158,7 @@ def manufacturer_update(request, id):
         if form.is_valid():
             form.save()
             
-            messages.success(request, MSG_FMT_SUCCESS_EDIT % model_name,
+            messages.success(request, MSG_FMT_SUCCESS_UPD % model_name,
                 extra_tags='success')
     else:
         form = ManufacturerForm(instance=manufacturer)
@@ -242,7 +241,7 @@ def mobile_os_update(request, id):
         if form.is_valid():
             form.save()
             
-            messages.success(request, MSG_FMT_SUCCESS_EDIT % model_name,
+            messages.success(request, MSG_FMT_SUCCESS_UPD % model_name,
                 extra_tags='success')
             
             return redirect(reverse('mobile-os'))
