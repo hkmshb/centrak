@@ -163,7 +163,8 @@ def manage_device(request, id=None):
 
 
 def delete_device(request, id=None):
-    return _handle_object_deletion(request, Device, 'device(s)', 'devices', id)
+    return _handle_object_deletion(request, 
+        Device, 'device(s)', 'devices', id)
     
 
 def manufacturers(request):
@@ -179,20 +180,10 @@ def manufacturers(request):
     else:
         form = ManufacturerForm()
     
-    manufacturer_list = Manufacturer.objects.all()
-    page_size = request.GET.get('pageSize', Options.PageSize)
-    paginator = Paginator(manufacturer_list, page_size)
-    
-    page = request.GET.get('page')
-    try:
-        manufacturers = paginator.page(page)
-    except PageNotAnInteger:
-        manufacturers = paginator.page(1)
-    except EmptyPage:
-        manufacturers = paginator.page(paginator.num_pages)
+    manufacturers = _get_paged_object_list(request, Manufacturer)
     return render(request,
         'enumeration/manufacturer-list.html', {
-        'record_list': _extend_page(manufacturers, page_size),
+        'record_list': manufacturers,
         'tabs': _device_options_tabs(),
         'form': form,
     })
@@ -219,34 +210,8 @@ def manufacturer_update(request, id):
     
 
 def manufacturer_delete(request, id=None):
-    if request.method == 'POST':
-        target_ids = list(id or request.POST.getlist('record_ids'))
-        if not target_ids:
-            return redirect(reverse('manufacturers'))
-        
-        failed_ids = []
-        for item_id in target_ids:
-            try:
-                manufacturer = Manufacturer.objects.get(pk=item_id)
-                manufacturer.delete()
-            except ObjectDoesNotExist:
-                failed_ids.append(item_id)
-        
-        target_count = len(target_ids)
-        failed_count = len(failed_ids)
-        messages.add_message(request,
-            level=(messages.SUCCESS if failed_count == 0 else
-                messages.WARNING if failed_count < target_count else messages.ERROR),
-            message= (MSG_SUCCESS_MANUFACTURER_DELETE
-                if failed_count == 0 else 
-                    MSG_WARN_MANUFACTURER_DELETE % (target_count - failed_count)
-                        if failed_count < target_count else
-                            MSG_ERROR_MANUFACTURER_DELETE),
-            extra_tags=('success' if failed_count == 0 else 'warning'
-                if failed_count < target_count else 'danger')
-        )
-        return redirect(reverse('manufacturers'))
-    return Http404('Method type not supported')
+    return _handle_object_deletion(request, 
+        Manufacturer, 'manufacturer(s)', 'manufacturers', id)
 
 
 def mobile_os(request):
@@ -262,20 +227,10 @@ def mobile_os(request):
     else:
         form = MobileOSForm()
     
-    os_list = MobileOS.objects.all()
-    page_size = request.GET.get('pageSize', Options.PageSize)
-    paginator = Paginator(os_list, page_size)
-    
-    page = request.GET.get('page')
-    try:
-        oses = paginator.page(page)
-    except PageNotAnInteger:
-        oses = paginator.page(1)
-    except EmptyPage:
-        oses = paginator.page(paginator.num_pages)
+    os_list = _get_paged_object_list(request, MobileOS)
     return render(request,
         'enumeration/mobileos-list.html', {
-        'record_list': _extend_page(oses, page_size),
+        'record_list': os_list,
         'tabs': _device_options_tabs(),
         'form': form
     })
@@ -304,33 +259,6 @@ def mobile_os_update(request, id):
 
 
 def mobile_os_delete(request, id=None):
-    if request.method != 'POST':
-        raise Http404('Method type not supported')
-    
-    target_ids = list(id or request.POST.getlist('record_ids'))
-    if not target_ids:
-        return redirect(reverse('mobile-os'))
-    
-    failed_ids = []
-    for item_id in target_ids:
-        try:
-            os = MobileOS.objects.get(pk=item_id)
-            os.delete()
-        except ObjectDoesNotExist:
-            failed_ids.append(item_id)
-    
-    target_count = len(target_ids)
-    failed_count = len(failed_ids)
-    messages.add_message(request,
-        level=(messages.SUCCESS if failed_count == 0 else
-            messages.WARNING if failed_count < target_count else messages.ERROR),
-        message=(MSG_FMT_SUCCESS_DELETE % 'mobile os'
-            if failed_count == 0 else
-                MSG_FMT_WARN_DELETE % ('mobile os', target_count - failed_count)
-                    if failed_count < target_count else
-                        MSG_FMT_ERROR_DELETE % 'mobile os'),
-        extra_tags=('success' if failed_count == 0 else 'warning'
-            if failed_count < target_count else 'danger')
-    )
-    return redirect(reverse('mobile-os'))
-        
+    return _handle_object_deletion(request, 
+        MobileOS, 'mobile os', 'mobile-os', id)
+
