@@ -63,12 +63,17 @@ class DeviceIMEITest(TestCase):
     def test_returns_meaningful_string_repr(self):
         imei = DeviceIMEI(build_device(), imei='35010203040506070809')
         self.assertEqual('imei=35010203040506070809', str(imei))
-        
+       
+
+class ParticipantTest(TestCase):
+    pass
+
 
 def build_device():
     brand = Manufacturer.objects.create(name='Samsung')
     mobile_os = MobileOS.objects.create(name='Android')
     return Device(
+        label = 'T01D01',
         brand = brand,
         model = 'Device Model',
         mobile_os = mobile_os,

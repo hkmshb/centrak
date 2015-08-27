@@ -33,7 +33,7 @@ class ManufacturerForm(forms.models.ModelForm):
 class MobileOSForm(forms.models.ModelForm):
     class Meta:
         model = MobileOS
-        fiels = ('name',)
+        fields = ('name',)
         
         widgets = {
             'name': forms.fields.TextInput(attrs={
