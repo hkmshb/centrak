@@ -4,7 +4,12 @@
 
 @import "./components/navs.less";
 @import "./components/pagination.less";
+@import "./components/panel-flat.less"; 
 
+
+/*****************************************************************************
+ * Main Style
+ *****************************************************************************/
 @font-face {
     font-family: 'Roboto';
     src: url('../fonts/Roboto-Regular.ttf') format('truetype');
@@ -41,6 +46,10 @@ h4 {
 
 .container {
     width: 860px;
+}
+
+.pad-top {
+    padding-top: 20px;
 }
 
 .dropdown-menu {
@@ -186,3 +195,38 @@ h4 {
     }
 }
 
+ 
+/*****************************************************************************
+ * Label Group
+ *****************************************************************************/
+
+.label-group {
+    padding-left: 7px;
+    padding-right: 7px;
+    
+    &.divider {
+        border-bottom: solid 1px @panel-default-border;
+        margin-bottom: 7px;
+    }
+}
+
+.label-row {
+    &.col-xs-6 {
+        padding: 0px;
+    }
+    
+    .label-name {
+        display: inline-block;
+        width: 60px;
+        font-size: 10pt;
+        font-weight: bold;
+        text-transform: upper;
+        border-right: dotted 1px #ddd;
+    }
+    
+    .label-value {
+        display: inline-block;
+        margin-left: 3px;
+        font-weight: normal;
+    }
+}

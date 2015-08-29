@@ -1,0 +1,138 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="pad-top">
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            Organization Information
+        </div>    
+        <div class="panel-body">
+            {% with org=organization %}        
+            <div class="label-group divider">
+                <div class="label-row">
+	                <label class="label-name">Name</label>
+	                <label class="label-value">{{ org.name }}</label>
+                </div>
+            </div>
+            <div class="label-group divider">
+                <div class="label-row-group">
+	                <div class="label-row col-xs-6">
+	                    <label class="label-name">Email</label>
+	                    <label class="label-value">{{ org.email }}</label>
+	                </div>
+	                <div class="label-row col-xs-6">
+	                    <label class="label-name">Url</label>
+	                    <label class="label-value">{{ org.url }}</label>
+	                </div>
+                </div>
+                <div class="label-row-group">
+	                <div class="label-row col-xs-6">
+	                    <label class="label-name">Phone</label>
+	                    <label class="label-value">{{ org.phone }}</label>
+	                </div>
+                </div>
+                <div class="clearfix"></div>                
+            </div>
+            <div class="label-group divider">
+                <div class="label-row-group">
+                    <div class="label-row col-xs-6">
+                        <label class="label-name">Street 1</label>
+                        <label class="label-value">{{ org.street1 }}</label>
+                    </div>
+                    <div class="label-row col-xs-6">
+                        <label class="label-name">Street 2</label>
+                        <label class="label-value">{{ org.street2 }}</label>
+                    </div>
+                </div>
+                <div class="label-row-group">
+                    <div class="label-row col-xs-6">
+                        <label class="label-name">City</label>
+                        <label class="label-value">{{ org.city }}</label>
+                    </div>
+                    <div class="label-row col-xs-6">
+                        <label class="label-name">State</label>
+                        <label class="label-value">{{ org.state }}</label>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="label-group">
+	            <div class="label-row">
+	                <label class="label-name">Note</label>
+	                <label class="label-value">{{ org.note }}</label>                
+	            </div>
+            </div>
+            {% endwith %}
+        </div>
+    </div>
+    
+    <div class="table-listing">
+    {% with p=biz_offices %}
+    <form data-bind="table" method="post" action=""
+          data-paging-numbers="{{ p.paging_numbers }}">
+	    <div class="panel panel-flat">
+	        <div class="panel-heading">
+	            Business Offices
+	            
+	            <div class="btn-controls pull-right">
+	                <div class="btn-group">
+	                    <button type="button" class="btn-link" name="btn_add" title="Add Office" data-action-url="">
+	                        <span class="glyphicon glyphicon-plus"></span>
+	                    </button>
+	                </div>
+	                <button type="button" class="btn-link del-link" name="btn_delete" title="Delete Selection" data-action-url="">
+	                    <span class="glyphicon glyphicon-remove"></span>
+	                </button>
+	            </div>
+	        </div>
+           {% csrf_token %}
+            <table class="table table-condensed">
+                <thead>
+                    <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
+                        <th>Name</th>
+                        <th>Location</th></tr>
+                </thead>
+                <tbody>
+                {% for item in p %}
+                    <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
+                        <td><a href="">{{ item.name }}</a></td>
+                        <td>{{ item.display_state_name }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="3" style="text-align: center">No Data Available</td></tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="3">
+                          <div class="pagination-packed">
+                               <div class="summary">
+                                   <span>{{ p.start_index }} - {{ p.end_index }} of {{ p.paginator.count }} items @</span>
+                                   <select name="pageSize">
+                                   {% for size in p.page_sizes %}
+                                       <option{% ifequal p.current_size size %} selected{% endifequal %}>{{ size }}</option>
+                                   {% endfor %}
+                                   </select>
+                                   <span>per page</span>
+                               </div>
+                               
+                               <div class="controls">
+                                   <span name="first" class="btn btn-default glyphicon glyphicon-fast-backward"></span>
+                                   <span name="prev" class="btn btn-default glyphicon glyphicon-step-backward"></span>
+                                   <input type="number" name="page" min="1" max="{{ p.paginator.num_pages }}" value="{{ p.number }}" />
+                                       / {{ p.paginator.num_pages }} 
+                                   <span name="next" class="btn btn-default glyphicon glyphicon-step-forward"></span>
+                                   <span name="last" class="btn btn-default glyphicon glyphicon-fast-forward"></span>
+                               </div>
+                           </div>                          
+                        </td></tr>                
+                </tfoot>
+            </table>
+	    </div>
+	</form>
+    {% endwith %}
+    </div>
+</div>    
+{% endblock %}
+{% block extra-scripts %}
+    <script src="{% static "js/datatable.js" %}"></script>
+{% endblock %}

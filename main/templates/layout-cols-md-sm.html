@@ -1,13 +1,12 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-	<div class="row">
+	<div class="row {% block extra-content-class %}{% endblock %}">
         <div {% block cols-md-class %}class="col-md-8"{% endblock %}>
 	    {% if messages %}
             {% for message in messages %}
 	        <div class="alert alert-messages alert-{{ message.extra_tags }}">
                 <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-	            
 	            {{ message }}
 	        </div>
             {% endfor %}
