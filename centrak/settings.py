@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     
     # centrak apps
     'main',
+    'core',
     'enumeration',
 )
 
