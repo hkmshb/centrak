@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 from core.utils import MSG_FMT_SUCCESS_UPD, MSG_FMT_SUCCESS_ADD
-from core.utils import get_paged_object_list
+from core.utils import get_paged_object_list, manage_object_deletion
 from core.models import Organization, BusinessOffice
 from core.forms import OrganizationForm, BusinessOfficeForm
 
@@ -66,3 +66,9 @@ def manage_office(request, id=None):
         'form': office_form
     })
 
+
+def delete_office(request, id=None):
+    return manage_object_deletion(request, 
+        BusinessOffice, 'business office(s)', 'org-info', id)
+
+    

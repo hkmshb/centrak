@@ -10,7 +10,7 @@ from django.contrib import messages
 # string const :: view messages
 MSG_FMT_SUCCESS_ADD = '%s added successfully.'
 MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
-MSG_FMT_SUCCESS_DELETE = 'Selected %s delete successfully.'
+MSG_FMT_SUCCESS_DELETE = 'Selected %s deleted successfully.'
 MSG_FMT_ERROR_DELETE = 'None of the selected %s were deleted';
 MSG_FMT_WARN_DELETE = (
     'Some of the selected %s were delete successfully. '

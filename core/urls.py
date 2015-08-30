@@ -7,5 +7,7 @@ urlpatterns = patterns('core.views',
     url(r'^org/update$', 'manage_org', name='org-update'),
     url(r'^org/offices/create', 'manage_office', name='office-create'),
     url(r'^org/offices/update/(?P<id>[0-9]+)', 'manage_office',
-        name='office-update')
+        name='office-update'),
+    url(r'^org/offices/delete(/(?P<id>[0-9]+))?', 'delete_office',
+        name='office-delete'),
 )

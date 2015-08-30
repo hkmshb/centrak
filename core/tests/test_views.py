@@ -8,6 +8,7 @@ from core.models import Organization, State, BusinessOffice
 class OrganizationViewTest(TestCase):
     url_org_info = reverse('org-info')
     url_org_upd = reverse('org-update')
+    url_office_del = reverse('office-delete')
     
     def test_org_page_displays_info_and_offices(self):
         self.create_organization()
@@ -35,6 +36,23 @@ class OrganizationViewTest(TestCase):
         for key in [k for k in  data.keys() if k != 'state']:
             self.assertNotEqual(org1_data[key], org2_data[key])
             self.assertEqual(org2_data[key], data[key])
+
+    def test_deleting_bisuiness_offices_via_POST_request(self):
+        # prepare records
+        state=State.objects.create(code='ST', name='State', capcity='CapCity')
+        create = BusinessOffice.objects.create
+        off1 = create(name='Office1', city='City1', state=state)
+        off2 = create(name='Office2', city='City1', state=state)
+        off3 = create(name='Office3', city='City2', state=state)
+        self.assertEqual(3, BusinessOffice.objects.count())
+        
+        data = {'record_ids': [off1.id, off3.id]}
+        resp = self.client.post(self.url_office_del, data=data)
+        self.assertEqual(302, resp.status_code)
+        self.assertEqual(1, BusinessOffice.objects.count())
+        
+        resp = self.client.get(self.url_org_info)
+        self.assertContains(resp, 'deleted successfully')
         
     def create_organization(self):
         org = self.build_organization()
@@ -56,6 +74,7 @@ class OrganizationViewTest(TestCase):
             'street1': org.street1, 'street2': org.street2,
             'city': org.city, 'state': org.state
         }
+
 
 class BusinessOfficeViewTest(TestCase):
     url_office_new = reverse('office-create')
