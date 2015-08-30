@@ -6,6 +6,20 @@
     <div class="panel panel-flat">
         <div class="panel-heading">
             Organization Information
+            
+            <div class="btn-controls pull-right">
+                <div class="btn-group">
+                    <button type="button" class="btn-link" name="btn_action" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'org-update' %}">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                &nbsp; Update Organization
+                            </a></li>
+                    </ul>
+                </div>
+            </div>            
         </div>    
         <div class="panel-body">
             {% with org=organization %}        

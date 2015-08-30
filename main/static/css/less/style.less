@@ -200,7 +200,8 @@ h4 {
  * Label Group
  *****************************************************************************/
 
-.label-group {
+.label-group,
+.form-group-ext {
     padding-left: 7px;
     padding-right: 7px;
     
@@ -220,7 +221,6 @@ h4 {
         width: 60px;
         font-size: 10pt;
         font-weight: bold;
-        text-transform: upper;
         border-right: dotted 1px #ddd;
     }
     
@@ -230,3 +230,52 @@ h4 {
         font-weight: normal;
     }
 }
+   
+.form-row-group {
+    padding-bottom: 7px;
+    display: block;
+}
+
+.form-row {
+    
+    &.col-sm-6 {
+        padding: 0px;
+    }
+    
+    &.has-error {
+        .form-label {
+            color: @brand-danger;
+        }
+    }
+    
+    .form-label {
+        display: inline-block;
+        width: 60px;
+        font-size: 10pt;
+        font-weight: bold;
+        text-align: right;
+        padding-right: 7px;
+        border-right: dotted 1px #ddd;
+    }
+    
+    .form-control {
+        display: inline;
+    }
+    
+    .form-value,
+    .form-value-md {
+        display: inline-block;
+        margin-left: 3px;
+        margin-bottom: 7px;
+        width: 80%;
+    }
+    
+    .form-value-md {
+        width: 40%;
+    }
+    
+    .valign-top {
+        vertical-align: top;
+    }    
+}
+

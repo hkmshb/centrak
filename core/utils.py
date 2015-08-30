@@ -7,7 +7,7 @@ from django.contrib import messages
 
 
 
-# string const messages
+# string const :: view messages
 MSG_FMT_SUCCESS_ADD = '%s added successfully.'
 MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
 MSG_FMT_SUCCESS_DELETE = 'Selected %s delete successfully.'
@@ -15,6 +15,10 @@ MSG_FMT_ERROR_DELETE = 'None of the selected %s were deleted';
 MSG_FMT_WARN_DELETE = (
     'Some of the selected %s were delete successfully. '
     'However %s of the selection could not be deleted.')
+
+# string consts :: form messages
+REQUIRED_FIELD_ERROR   = 'This field is required.'
+REQUIRED_INVALID_ERROR = "Required fields and invalid entries are in red."
 
 
 # temp constants

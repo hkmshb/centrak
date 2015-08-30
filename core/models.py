@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 class State(models.Model):
     code    = models.CharField(max_length=2, primary_key=True)
     name    = models.CharField(max_length=50, unique=True)
+    capcity = models.CharField(max_length=50, blank=False)
     
     class Meta:
         db_table = 'state'
