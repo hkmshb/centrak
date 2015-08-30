@@ -10,45 +10,9 @@ from django.contrib import messages
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm
 
+from core.utils import get_paged_object_list, manage_object_deletion
+from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
 
-
-# temp consts
-class Options:
-    PageSize = 20
-    PageSizes = [10, 20, 50, 100, 200] 
-
-    
-
-
-# string message consts
-MSG_SUCCESS_MANUFACTURER_ADD = 'Manufacturer added successfully.'
-MSG_SUCCESS_MANUFACTURER_DELETE = 'Selected manufacturer(s) delete successfully.'
-MSG_ERROR_MANUFACTURER_DELETE = 'None of the selected manufacturer(s) were deleted';
-MSG_WARN_MANUFACTURER_DELETE = (
-    'Some of the selected manufacturer(s) were delete successfully. '
-    'However %s of the selection could not be deleted.')
-
-MSG_FMT_SUCCESS_ADD = '%s added successfully.'
-MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
-MSG_FMT_SUCCESS_DELETE = 'Selected %s delete successfully.'
-MSG_FMT_ERROR_DELETE = 'None of the selected %s were deleted';
-MSG_FMT_WARN_DELETE = (
-    'Some of the selected %s were delete successfully. '
-    'However %s of the selection could not be deleted.')
-
-
-def _extend_page(page, size):
-    page.current_size = str(size)
-    page.page_sizes = [str(x) for x in Options.PageSizes]
-    
-    num_pages = page.paginator.num_pages
-    page.paging_numbers = [
-        1,
-        1 if not page.has_previous() else page.previous_page_number(),
-        num_pages if not page.has_next() else page.next_page_number(),
-        num_pages
-    ]
-    return page
 
 
 def _device_options_tabs():
@@ -58,7 +22,7 @@ def _device_options_tabs():
     )
 
 
-def _update_query_string(request, exclude_list=None, include_qs=None):
+def _update_query_string_fix(request, exclude_list=None, include_qs=None):
     qs = request.GET
     if exclude_list:
         for entry in exclude_list:
@@ -68,61 +32,15 @@ def _update_query_string(request, exclude_list=None, include_qs=None):
     if include_qs:
         qs.update(include_qs)
     return qs
-
-
-def _get_paged_object_list(request, model, qsPage='page', qsPageSize='pageSize'):
-    page_size = request.GET.get(qsPageSize, Options.PageSize)
-    page = request.GET.get(qsPage)
-    
-    object_list = model.objects.all()
-    paginator = Paginator(object_list, page_size)
-    try:
-        objects = paginator.page(page)
-    except PageNotAnInteger:
-        objects = paginator.page(1)
-    except EmptyPage:
-        objects = paginator.page(paginator.num_pages)
-    return _extend_page(objects, page_size)
-    
-
-def _handle_object_deletion(request, model, model_name, model_list_url_name, id=None):
-    if request.method != 'POST':
-        raise Http404('Method type not supported.')
-    
-    target_ids = list(id or request.POST.getlist('record_ids'))
-    if not target_ids:
-        return redirect(reverse(model_list_url_name))
-    
-    failed_ids = []
-    for item_id in target_ids:
-        try:
-            item = model.objects.get(pk=item_id)
-            item.delete()
-        except ObjectDoesNotExist:
-            failed_ids.append(item_id)
-    
-    target_count = len(target_ids)
-    failed_count = len(failed_ids)
-    messages.add_message(request,
-        level=(messages.SUCCESS if failed_count == 0 else
-            messages.WARNING if failed_count < target_count else messages.ERROR),
-        message = (MSG_FMT_SUCCESS_DELETE % model_name
-            if failed_count == 0 else
-                MSG_FMT_WARN_DELETE % (model_name, target_count - failed_count)
-                    if failed_count < target_count else
-                        MSG_FMT_ERROR_DELETE % model_name),
-        extra_tags=('success' if failed_count == 0 else 'warning'
-            if failed_count < target_count else 'danger')
-    )
-    return redirect(reverse(model_list_url_name))
     
 
 def devices(request):
-    devices = _get_paged_object_list(request, Device)
+    devices = get_paged_object_list(request, Device)
     return render(request,
         'enumeration/device-list.html', {
         'record_list': devices
     })
+
 
 def manage_device(request, id=None):
     device = (Device() if not id else Device.objects.get(pk=id))
@@ -163,7 +81,7 @@ def manage_device(request, id=None):
 
 
 def delete_device(request, id=None):
-    return _handle_object_deletion(request, 
+    return manage_object_deletion(request, 
         Device, 'device(s)', 'devices', id)
     
 
@@ -173,14 +91,14 @@ def manufacturers(request):
         if form.is_valid():
             form.save()
             
-            messages.success(request, MSG_SUCCESS_MANUFACTURER_ADD,
+            messages.success(request, MSG_FMT_SUCCESS_ADD % 'Manufacturer',
                 extra_tags='success')
             
             return redirect(reverse('manufacturers'))
     else:
         form = ManufacturerForm()
     
-    manufacturers = _get_paged_object_list(request, Manufacturer)
+    manufacturers = get_paged_object_list(request, Manufacturer)
     return render(request,
         'enumeration/manufacturer-list.html', {
         'record_list': manufacturers,
@@ -210,7 +128,7 @@ def manufacturer_update(request, id):
     
 
 def manufacturer_delete(request, id=None):
-    return _handle_object_deletion(request, 
+    return manage_object_deletion(request, 
         Manufacturer, 'manufacturer(s)', 'manufacturers', id)
 
 
@@ -227,7 +145,7 @@ def mobile_os(request):
     else:
         form = MobileOSForm()
     
-    os_list = _get_paged_object_list(request, MobileOS)
+    os_list = get_paged_object_list(request, MobileOS)
     return render(request,
         'enumeration/mobileos-list.html', {
         'record_list': os_list,
@@ -259,6 +177,6 @@ def mobile_os_update(request, id):
 
 
 def mobile_os_delete(request, id=None):
-    return _handle_object_deletion(request, 
+    return manage_object_deletion(request, 
         MobileOS, 'mobile os', 'mobile-os', id)
 

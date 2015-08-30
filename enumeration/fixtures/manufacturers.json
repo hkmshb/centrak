@@ -1,0 +1,72 @@
+[
+    {
+        "pk": 1,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Apple"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "BlackBerry"
+        }
+    },
+            {
+        "pk": 3,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Gionee"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "HTC"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Lenovo"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Motorola"
+        }
+    },
+    {
+        "pk": 7,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Nokia"
+        }
+    },
+    {
+        "pk": 8,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Samsung"
+        }
+    },
+    {
+        "pk": 9,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Sony"
+        }
+    },
+    {
+        "pk": 10,
+        "model": "enumeration.Manufacturer",
+        "fields": {
+            "name": "Tecno"
+        }
+    }
+]

@@ -5,9 +5,8 @@ from django.test import TestCase
 from enumeration.models import Manufacturer, MobileOS
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
-from enumeration.views import MSG_SUCCESS_MANUFACTURER_ADD, \
-    MSG_SUCCESS_MANUFACTURER_DELETE, MSG_ERROR_MANUFACTURER_DELETE, \
-    MSG_WARN_MANUFACTURER_DELETE
+from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
+    MSG_FMT_ERROR_DELETE, MSG_FMT_WARN_DELETE
 
 
 
@@ -17,7 +16,7 @@ class DeviceOptionViewTest(TestCase):
     url_manufacturer_delete = '/enum/device-options/manufacturers/delete'
     
     def test_manufacturers_listing(self):
-        create_test_manufacturers()
+        self.create_test_manufacturers()
         
         response = self.client.get(self.url_manufacturers)
         self.assertEqual(200, response.status_code)
@@ -37,7 +36,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(302, response.status_code)
         
         response = self.client.get(self.url_manufacturers)
-        self.assertContains(response, MSG_SUCCESS_MANUFACTURER_ADD)
+        self.assertContains(response, MSG_FMT_SUCCESS_ADD % 'Manufacturer')
     
     def test_displays_blank_name_validation_error(self):
         response = self.client.post(self.url_manufacturers, data={'name':''})
@@ -61,7 +60,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(0, len(Manufacturer.objects.all()))
         
         response = self.client.get(self.url_manufacturers)
-        self.assertContains(response, MSG_SUCCESS_MANUFACTURER_DELETE)
+        self.assertContains(response, MSG_FMT_SUCCESS_DELETE % 'manufacturer(s)')
         
     def test_deleting_multiple_items_via_POST_request(self):
         manufacturer1 = Manufacturer.objects.create(name='Samsung')
@@ -76,7 +75,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(1, len(Manufacturer.objects.all()))
         
         response = self.client.get(self.url_manufacturers)
-        self.assertContains(response, MSG_SUCCESS_MANUFACTURER_DELETE)
+        self.assertContains(response, MSG_FMT_SUCCESS_DELETE % 'manufacturer(s)')
         
     def test_displays_warning_for_partial_items_deletion(self):
         manufacturer1 = Manufacturer.objects.create(name='Samsung')
@@ -90,7 +89,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(1, len(Manufacturer.objects.all()))
         
         response = self.client.get(self.url_manufacturers)
-        self.assertContains(response, MSG_WARN_MANUFACTURER_DELETE % (1,))
+        self.assertContains(response, MSG_FMT_WARN_DELETE % ('manufacturer(s)', 1))
     
     def test_displays_error_for_no_item_deletion(self):
         Manufacturer.objects.create(name='Samsung')
@@ -104,7 +103,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(2, len(Manufacturer.objects.all()))
         
         response = self.client.get(self.url_manufacturers)
-        self.assertContains(response, MSG_ERROR_MANUFACTURER_DELETE)                
+        self.assertContains(response, MSG_FMT_ERROR_DELETE % 'manufacturer(s)')                
 
     def test_listing_truncated_to_page_size(self):
         manufacturer_names = 'A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z'
@@ -144,19 +143,17 @@ class DeviceOptionViewTest(TestCase):
         response = self.client.post(update_url, data=data)
         self.assertEqual(404, response.status_code)
 
-
-def create_test_manufacturers():
-    Manufacturer.objects.create(name='Apple')
-    Manufacturer.objects.create(name='BlackBerry')
-    Manufacturer.objects.create(name='LG')
-    Manufacturer.objects.create(name='Samsung')
-    Manufacturer.objects.create(name='Sony')
-
-
-def create_test_mobile_oses():
-    MobileOS.objects.create(name='Android')
-    MobileOS.objects.create(name='BlackBerry')
-    MobileOS.objects.create(name='iOS')
-    MobileOS.objects.create(name='Windows Phone')
-    MobileOS.objects.create(name='Tizen')
+    def create_test_manufacturers(self):
+        Manufacturer.objects.create(name='Apple')
+        Manufacturer.objects.create(name='BlackBerry')
+        Manufacturer.objects.create(name='LG')
+        Manufacturer.objects.create(name='Samsung')
+        Manufacturer.objects.create(name='Sony')
+    
+    def create_test_mobile_oses(self):
+        MobileOS.objects.create(name='Android')
+        MobileOS.objects.create(name='BlackBerry')
+        MobileOS.objects.create(name='iOS')
+        MobileOS.objects.create(name='Windows Phone')
+        MobileOS.objects.create(name='Tizen')
     
