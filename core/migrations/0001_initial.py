@@ -14,13 +14,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='BusinessOffice',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('name', models.CharField(unique=True, max_length=50)),
-                ('email', models.EmailField(blank=True, max_length=50)),
-                ('phone', models.CharField(blank=True, max_length=20)),
-                ('url', models.URLField(blank=True, max_length=50)),
-                ('street1', models.CharField(blank=True, max_length=50)),
-                ('street2', models.CharField(blank=True, max_length=50)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50, unique=True)),
+                ('email', models.EmailField(max_length=50, blank=True)),
+                ('phone', models.CharField(max_length=20, blank=True)),
+                ('url', models.URLField(max_length=50, blank=True)),
+                ('street1', models.CharField(max_length=50, blank=True)),
+                ('street2', models.CharField(max_length=50, blank=True)),
                 ('city', models.CharField(max_length=20)),
                 ('note', models.TextField(blank=True)),
             ],
@@ -32,13 +32,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Organization',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('name', models.CharField(unique=True, max_length=50)),
-                ('email', models.EmailField(blank=True, max_length=50)),
-                ('phone', models.CharField(blank=True, max_length=20)),
-                ('url', models.URLField(blank=True, max_length=50)),
-                ('street1', models.CharField(blank=True, max_length=50)),
-                ('street2', models.CharField(blank=True, max_length=50)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50, unique=True)),
+                ('email', models.EmailField(max_length=50, blank=True)),
+                ('phone', models.CharField(max_length=20, blank=True)),
+                ('url', models.URLField(max_length=50, blank=True)),
+                ('street1', models.CharField(max_length=50, blank=True)),
+                ('street2', models.CharField(max_length=50, blank=True)),
                 ('city', models.CharField(max_length=20)),
                 ('note', models.TextField(blank=True)),
             ],
@@ -50,8 +50,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='State',
             fields=[
-                ('code', models.CharField(serialize=False, max_length=2, primary_key=True)),
-                ('name', models.CharField(unique=True, max_length=50)),
+                ('code', models.CharField(max_length=2, serialize=False, primary_key=True)),
+                ('name', models.CharField(max_length=50, unique=True)),
+                ('capcity', models.CharField(max_length=50)),
             ],
             options={
                 'db_table': 'state',
