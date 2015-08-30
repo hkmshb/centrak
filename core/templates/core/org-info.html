@@ -91,7 +91,7 @@
 	            
 	            <div class="btn-controls pull-right">
 	                <div class="btn-group">
-	                    <button type="button" class="btn-link" name="btn_add" title="Add Office" data-action-url="">
+	                    <button type="button" class="btn-link" name="btn_add" title="Add Office" data-action-url="{% url 'office-create' %}">
 	                        <span class="glyphicon glyphicon-plus"></span>
 	                    </button>
 	                </div>
@@ -110,8 +110,8 @@
                 <tbody>
                 {% for item in p %}
                     <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
-                        <td><a href="">{{ item.name }}</a></td>
-                        <td>{{ item.display_state_name }}</td></tr>
+                        <td><a href="{% url 'office-update' item.id %}">{{ item.name }}</a></td>
+                        <td>{{item.city}}, {{ item.state }}</td></tr>
                 {% empty %}
                     <tr><td colspan="3" style="text-align: center">No Data Available</td></tr>
                 {% endfor %}

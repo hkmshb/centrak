@@ -51,4 +51,5 @@ class BusinessOffice(BusinessEntity):
     
     class Meta:
         db_table = 'business_office'
+        ordering = ['name']
 

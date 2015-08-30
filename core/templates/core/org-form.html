@@ -11,11 +11,10 @@
 	<div class="pad-top">
 	    <div class="panel panel-flat">
             <div class="panel-heading">
-                Update Organization Information
+                {% block heading %}Update Organization Information{% endblock %}
             </div>
             
             <div class="panel-body">
-            {% with lblclass='class="col-sm-3 label-name"' %}
                 <form method="post" class="form-horizontal">
                     {% csrf_token %}
                     <div class="form-group-ext divider">
@@ -86,13 +85,15 @@
                         <div class="form-row-group">
                             <div class="form-row col-sm-6">
                                 <label class="form-label">&nbsp;</label>
+                                {% block form-buttons %}
                                 <button type="submit" class="btn btn-primary" name="btn_save">Save</button>
-                                <button type="button" class="btn btn-default"  name="btn_cancel">Cancel</button>
+                                <button type="button" class="btn btn-default"  name="btn_cancel"
+                                        data-action-url="{% url 'org-info' %}">Cancel</button>
+                                {% endblock %}
                             </div>
                         </div>
                     </div>
                 </form>
-            {% endwith %}
             </div>
 	    </div>
 	</div>    
