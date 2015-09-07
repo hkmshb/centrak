@@ -18,4 +18,7 @@ urlpatterns = patterns('enumeration.views',
         'mobile_os_update', name='mobile-os-update'),
     url(r'^device-options/mobile-os/delete(/(?P<id>[0-9]+))?',
         'mobile_os_delete', name='mobile-os-delete'),
+                       
+    url(r'^persons/create$', 'manage_person', name='person-insert'),
+    url(r'^persons/update/(?P<id>[0-9]+)', 'manage_person', name='person-update'),
 )

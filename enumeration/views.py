@@ -7,8 +7,10 @@ from django.forms.utils import ErrorList
 from django.http.response import Http404
 from django.contrib import messages
 
-from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI
-from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm
+from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
+     Person
+from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
+     PersonForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
@@ -180,3 +182,21 @@ def mobile_os_delete(request, id=None):
     return manage_object_deletion(request, 
         MobileOS, 'mobile os', 'mobile-os', id)
 
+
+def manage_person(request, id=None):
+    person = Person() if not id else get_object_or_404(Person, pk=id)
+    if request.method == 'POST':
+        person_form = PersonForm(data=request.POST, instance=person)
+        if person_form.is_valid():
+            person_form.save()
+            
+            msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
+            messages.success(request, msg_fmt % 'Person', extra_tags='success')
+            
+            urlname = ('persons' if 'btn_save' in request.POST else 'person-insert')
+            return redirect(reverse(urlname))
+    else:
+        person_form = PersonForm(instance=person)
+    return render(request, 'enumeration/person-form.html', {
+        'form': person_form
+    })

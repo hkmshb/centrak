@@ -1,7 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI
+from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
+     Person
+from core.models import State, BusinessOffice
+
 
 
 
@@ -21,30 +24,66 @@ class MobileOSTest(TestCase):
         with self.assertRaises(ValidationError):
             os = MobileOS(name='Android')
             os.full_clean()
-    
 
-class DeviceTest(TestCase):
+
+class DeviceBaseTestCase(TestCase):
+    
+    def build_device(self):
+        brand = Manufacturer.objects.create(name='Samsung')
+        mobile_os = MobileOS.objects.create(name='Android')
+        return Device(
+            label = 'T01D01',
+            brand = brand,
+            model = 'Device Model',
+            mobile_os = mobile_os,
+            os_version = '1.0.0 (whatever)',
+            form_factor = Device.PHONE,
+            serialno = ''
+        )
+    
+    def build_device_without_brand(self):
+        mobile_os = MobileOS.objects.create(name='Android')
+        return Device(
+            model = 'Device Model',
+            mobile_os = mobile_os,
+            os_version = '1.0.0 (whatever)',
+            form_factor = Device.PHONE,
+            serialno = ''
+        )
+    
+    def build_device_without_mobile_os(self):
+        brand = Manufacturer.objects.create(name='Samsung')
+        return Device(
+            brand = brand,
+            model = 'Device Model',
+            os_version = '1.0.0 (whatever)',
+            form_factor = Device.PHONE,
+            serialno = ''
+        )
+
+
+class DeviceTest(DeviceBaseTestCase):
     
     def test_cannot_save_without_brand(self):
-        device = build_device_without_brand()
+        device = self.build_device_without_brand()
         with self.assertRaises(ValidationError):
             device.full_clean()
      
     def test_cannot_save_without_mobile_os(self):
-        device = build_device_without_mobile_os()
+        device = self.build_device_without_mobile_os()
         with self.assertRaises(ValidationError):
             device.full_clean()
     
     def test_blank_serialno_allowed(self):
-        device = build_device()
+        device = self.build_device()
         device.serial_no = ''
-        device.full_clean()        
+        device.full_clean()
 
 
-class DeviceIMEITest(TestCase):
+class DeviceIMEITest(DeviceBaseTestCase):
     
     def test_duplicate_imei_are_invalid(self):
-        device = build_device()
+        device = self.build_device()
         device.save()
         
         DeviceIMEI.objects.create(device=device, imei='35010203040506070809')
@@ -53,7 +92,7 @@ class DeviceIMEITest(TestCase):
             imei.full_clean()
     
     def test_blank_imei_not_allowed(self):
-        device = build_device()
+        device = self.build_device()
         device.save()
         
         with self.assertRaises(ValidationError):
@@ -61,45 +100,52 @@ class DeviceIMEITest(TestCase):
             imei.full_clean()
     
     def test_returns_meaningful_string_repr(self):
-        imei = DeviceIMEI(build_device(), imei='35010203040506070809')
+        imei = DeviceIMEI(self.build_device(), imei='35010203040506070809')
         self.assertEqual('imei=35010203040506070809', str(imei))
-       
-
-class ParticipantTest(TestCase):
-    pass
 
 
-def build_device():
-    brand = Manufacturer.objects.create(name='Samsung')
-    mobile_os = MobileOS.objects.create(name='Android')
-    return Device(
-        label = 'T01D01',
-        brand = brand,
-        model = 'Device Model',
-        mobile_os = mobile_os,
-        os_version = '1.0.0 (whatever)',
-        form_factor = Device.PHONE,
-        serialno = ''
-    )
+class EntityBaseTestCase(TestCase):
+    
+    def build_person(self):
+        office = self.create_business_office()
+        return Person(
+            first_name='First.Name', last_name='Last.Name',
+            gender=Person.MALE, official_status=Person.FULL_STAFF,
+            location=office, mobile='080-2222-1111',
+            email='info@example.org')
+    
+    @staticmethod
+    def create_business_office():
+        office = EntityBaseTestCase.get_business_office()
+        office.save()
+        return office
+    
+    @staticmethod
+    def get_business_office():
+        state = State.objects.create(code='ST', name='State')
+        return BusinessOffice(name='Biz.Office', city='City',
+                state=state)
+    
+
+class PersonTest(EntityBaseTestCase):
+    
+    def test_cannot_save_without_nonblank_fields(self):
+        office = self.create_business_office()
+        person = Person(gender=Person.MALE, official_status=Person.FULL_STAFF,
+                        location=office)
+        with self.assertRaises(ValidationError):
+            person.full_clean()
+    
+    def test_duplicate_first_last_names_are_invalid(self):
+        office = self.create_business_office()
+        Person.objects.create(first_name='First.Name', last_name='Last.Name',
+                              official_status=Person.FULL_STAFF, location=office,
+                              mobile='080-2222-1111', email='info@example.org')
+        with self.assertRaises(ValidationError):
+            p = Person(first_name='First.Name', last_name='Last.Name',
+                       official_status=Person.INDUSTRIAL_TRAINEE,
+                       location=office, mobile='080-3333-2222',
+                       email='info@example.org')
+            p.full_clean()
 
 
-def build_device_without_brand():
-    mobile_os = MobileOS.objects.create(name='Android')
-    return Device(
-        model = 'Device Model',
-        mobile_os = mobile_os,
-        os_version = '1.0.0 (whatever)',
-        form_factor = Device.PHONE,
-        serialno = ''
-    )
-
-
-def build_device_without_mobile_os():
-    brand = Manufacturer.objects.create(name='Samsung')
-    return Device(
-        brand = brand,
-        model = 'Device Model',
-        os_version = '1.0.0 (whatever)',
-        form_factor = Device.PHONE,
-        serialno = ''
-    )    

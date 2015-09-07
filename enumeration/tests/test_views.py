@@ -2,18 +2,20 @@ from django.contrib.messages.api import get_messages
 from django.http.response import Http404
 from django.test import TestCase
 
-from enumeration.models import Manufacturer, MobileOS
+from enumeration.models import Manufacturer, MobileOS, Person
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
     MSG_FMT_ERROR_DELETE, MSG_FMT_WARN_DELETE
 
+from .test_models import EntityBaseTestCase
+from django.core.urlresolvers import reverse
 
 
 class DeviceOptionViewTest(TestCase):
-    url_manufacturers = '/enum/device-options/manufacturers/'
-    url_manufacturer_update = '/enum/device-options/manufacturers/update'
-    url_manufacturer_delete = '/enum/device-options/manufacturers/delete'
+    url_manufacturers = reverse('manufacturers')
+    url_manufacturer_update = reverse('manufacturer-update', args=[0])
+    url_manufacturer_delete = reverse('manufacturer-delete', args=[0])    
     
     def test_manufacturers_listing(self):
         self.create_test_manufacturers()
@@ -127,7 +129,7 @@ class DeviceOptionViewTest(TestCase):
         self.assertEqual(1, len(Manufacturer.objects.all()))
         
         data = {'id': manufacturer.id, 'name': 'Lenovo'}
-        update_url = "%s/%s" % (self.url_manufacturer_update, data['id'])
+        update_url = self.url_manufacturer_update.replace('/0', "/%s" % data['id'])
         response = self.client.post(update_url, data=data)
     
         self.assertEqual(200, response.status_code)
@@ -157,3 +159,75 @@ class DeviceOptionViewTest(TestCase):
         MobileOS.objects.create(name='Windows Phone')
         MobileOS.objects.create(name='Tizen')
     
+
+class PersonViewTest(TestCase):
+    url_persons = reverse('persons')    
+    url_person_create = reverse('person-insert')
+    url_person_update = reverse('person-update', args=[0])
+    
+    def test_saving_a_POST_request(self):
+        office = EntityBaseTestCase.create_business_office()
+        data = dict(first_name='First.Name', last_name='Last.Name',
+                    gender=Person.MALE, official_status=Person.FULL_STAFF,
+                    location=office.id, mobile='080-3322-1100',
+                    email='info@example.org')
+        resp = self.client.post(self.url_person_create, data=data)
+        self.assertEqual(302, resp.status_code)        
+        self.assertEqual(1, Person.objects.count())
+        
+    def test_updating_via_POST_request(self):
+        person = self.create_person()
+        data = {'id': person.id, 'first_name': 'Jane', 'last_name': 'Doe',
+                'gender': Person.FEMALE, 'email': 'jane.doe@example.org', 
+                'mobile': '080-2222-1111', 'location': person.location.id,
+                'official_status': Person.CONTRACT_STAFF}
+        update_url = self.url_person_update.replace('/0', "/%s" % data['id'])
+        resp = self.client.post(update_url, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        adjusted = Person.objects.get(pk=person.id)
+        self.assertTrue(person.first_name != adjusted.first_name
+                    and person.last_name == adjusted.last_name
+                    and person.gender != adjusted.gender
+                    and person.email != adjusted.email
+                    and person.id == adjusted.id
+                    and adjusted.first_name == 'Jane'
+                    and adjusted.email == 'jane.doe@example.org')
+    
+    def test_persons_listing(self):
+        self.create_persons()
+        
+        resp = self.client.get(self.url_persons)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(3, resp.context['record_list'])    
+    
+    @staticmethod
+    def create_person():
+        office = EntityBaseTestCase.create_business_office()
+        return Person.objects.create(first_name='John', last_name='Doe',
+            gender=Person.MALE, official_status=Person.FULL_STAFF,
+            location=office, email='john.doe@example.org',
+            mobile='080-3332-4441'
+        )
+    
+    @staticmethod
+    def create_persons():
+        office = EntityBaseTestCase.create_business_office()
+        # person 1
+        Person.objects.create(first_name='John', last_name='Doe', 
+            gender=Person.MALE, official_status=Person.FULL_STAFF, 
+            location=office.id, email='john.doe@example.org', 
+            mobile='080-2222-1111')
+        
+        # person 2
+        Person.objects.create(first_name='Jane', last_name='Doe', 
+            gender=Person.FEMALE, official_status=Person.FULL_STAFF, 
+            location=office.id, email='jane.doe@example.org', 
+            mobile='080-2222-3333')
+        
+        # person 3
+        Person.objects.create(first_name='Bobby', last_name='Fisher', 
+            gender=Person.MALE, official_status=Person.CONTRACT_STAFF, 
+            location=office.id, email='b.fisher@chess.org', 
+            mobile='080-9995-8884')
+

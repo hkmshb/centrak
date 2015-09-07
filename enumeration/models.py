@@ -1,5 +1,10 @@
-from django.db import models
+from datetime import datetime
+
 from django.core.exceptions import ValidationError
+from django.db import models
+
+from core.models import BusinessOffice
+
 
 
 # const error messages
@@ -66,4 +71,54 @@ class DeviceIMEI(models.Model):
     
     def __str__(self):
         return "imei=%s" % self.imei
+
+
+class EntityBase(models.Model):
+    is_active    = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        abstract = True
+
+
+class NamedEntityBase(EntityBase):
+    name = models.CharField(max_length=50)
+    
+    class Meta:
+        abstract = True
+
+
+class Person(EntityBase):
+    MALE   = 'M'
+    FEMALE = 'F'
+    GENDER_CHOICES = (
+        (MALE,   'Male'),
+        (FEMALE, 'Female')
+    )
+    
+    FULL_STAFF         = 'FS'
+    CONTRACT_STAFF     = 'CS'
+    YOUTH_CORPER       = 'YC'
+    INDUSTRIAL_TRAINEE = 'IT'
+    STATUS_CHOICES = (
+        (FULL_STAFF,         'Full Staff'),
+        (CONTRACT_STAFF,     'Contract Staff'),
+        (YOUTH_CORPER,       'Youth Corper'),
+        (INDUSTRIAL_TRAINEE, 'Industrial Trainee')
+    )
+    
+    first_name = models.CharField(max_length=50)
+    last_name  = models.CharField(max_length=50)
+    gender     = models.CharField(max_length=1, choices=GENDER_CHOICES, 
+                    default=MALE)
+    official_status = models.CharField(max_length=2, choices=STATUS_CHOICES, 
+                    default=FULL_STAFF)
+    location  = models.ForeignKey(BusinessOffice, on_delete=models.PROTECT)
+    mobile    = models.CharField(max_length=20)
+    mobile2   = models.CharField(max_length=20, blank=True)
+    email     = models.EmailField(max_length=50)
+    
+    class Meta:
+        db_table = 'enum_person'
+        unique_together = ('first_name', 'last_name')
 

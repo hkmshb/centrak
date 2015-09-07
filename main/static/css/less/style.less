@@ -243,12 +243,14 @@ h4 {
     }
     
     &.has-error {
-        .form-label {
+        .form-label,
+        .form-label-lg {
             color: @brand-danger;
         }
     }
     
-    .form-label {
+    .form-label,
+    .form-label-lg {
         display: inline-block;
         width: 60px;
         font-size: 10pt;
@@ -258,12 +260,17 @@ h4 {
         border-right: dotted 1px #ddd;
     }
     
+    .form-label-lg {
+        width: 80px;
+    }
+    
     .form-control {
         display: inline;
     }
     
     .form-value,
-    .form-value-md {
+    .form-value-md,
+    .form-value-sm {
         display: inline-block;
         margin-left: 3px;
         margin-bottom: 7px;
@@ -271,6 +278,10 @@ h4 {
     }
     
     .form-value-md {
+        width: 70%;
+    }
+    
+    .form-value-sm {
         width: 40%;
     }
     

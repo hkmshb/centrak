@@ -1,5 +1,5 @@
 from django import forms
-from enumeration.models import Manufacturer, MobileOS, Device
+from enumeration.models import Manufacturer, MobileOS, Device, Person
 from django.core.exceptions import ValidationError
 
 
@@ -45,7 +45,25 @@ class MobileOSForm(forms.models.ModelForm):
         }
 
 
-class DeviceForm(forms.models.ModelForm):
+class ModelForm(forms.models.ModelForm):
+    
+    def clean(self):
+        super(ModelForm, self).clean()
+        if self.errors:
+            self.add_error(None, REQUIRED_INVALID_ERROR)
+
+    def validate_unique(self):
+        super(ModelForm, self).validate_unique()
+        if self.errors:
+            if '__all__' not in self.errors:
+                self.add_error(None, REQUIRED_INVALID_ERROR)
+            
+            for message in [m for f,m in self.errors.items() if f != '__all__']:
+                if str(message).find(REQUIRED_FIELD_ERROR) == -1:
+                    self.add_error(None, message)
+
+
+class DeviceForm(ModelForm):
     
     class Meta:
         model = Device
@@ -68,20 +86,23 @@ class DeviceForm(forms.models.ModelForm):
             'serialno': {'unique': UNIQUE_SERIALNO_ERROR },
             'label':    {'unique': UNIQUE_LABEL_ERROR },
         }
+            
+            
+class PersonForm(ModelForm):
     
-    def clean(self):
-        data = super(DeviceForm, self).clean()
-        if self.errors:
-            self.add_error(None, REQUIRED_INVALID_ERROR)
+    class Meta:
+        model = Person
+        fields = ('first_name', 'last_name', 'gender', 'official_status',
+                  'location', 'mobile', 'mobile2', 'email')
+        _attrs = {'class': 'form-control input-sm'}
+        widgets = {
+            'first_name': forms.fields.TextInput(attrs=_attrs),
+            'last_name':  forms.fields.TextInput(attrs=_attrs),
+            'gender':     forms.fields.Select(attrs=_attrs),
+            'official_status': forms.fields.Select(attrs=_attrs),
+            'location':   forms.fields.Select(attrs=_attrs),
+            'mobile':     forms.fields.TextInput(attrs=_attrs),
+            'mobile2':    forms.fields.TextInput(attrs=_attrs),
+            'email':      forms.fields.EmailInput(attrs=_attrs),
+        }
 
-    def validate_unique(self):
-        super(DeviceForm, self).validate_unique()
-        if self.errors:
-            if '__all__' not in self.errors:
-                self.add_error(None, REQUIRED_INVALID_ERROR)
-            
-            for message in [m for f,m in self.errors.items() if f != '__all__']:
-                if str(message).find(REQUIRED_FIELD_ERROR) == -1:
-                    self.add_error(None, message)
-            
-            
