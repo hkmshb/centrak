@@ -183,6 +183,14 @@ def mobile_os_delete(request, id=None):
         MobileOS, 'mobile os', 'mobile-os', id)
 
 
+def persons(request):
+    persons = get_paged_object_list(request, Person)
+    return render(request,
+        'enumeration/person-list.html', {
+        'record_list': persons
+    })
+
+
 def manage_person(request, id=None):
     person = Person() if not id else get_object_or_404(Person, pk=id)
     if request.method == 'POST':
@@ -200,3 +208,9 @@ def manage_person(request, id=None):
     return render(request, 'enumeration/person-form.html', {
         'form': person_form
     })
+
+
+def delete_person(request, id=None):
+    return manage_object_deletion(request, 
+        Person, 'person(s)', 'persons', id)
+

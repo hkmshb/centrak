@@ -75,9 +75,11 @@
                             <div class="form-row col-sm-6">
                                 <label class="form-label-lg">&nbsp;</label>
                                 <button type="submit" class="btn btn-primary" name="btn_save">Save</button>
+                            {%if not form.instance.id %}
                                 <button type="submit" class="btn btn-primary" name="btn_save_new">Save & New</button>
+                            {% endif %}
                                 <button type="button" class="btn btn-default" name="btn_cancel"
-                                        data-action-url="">Cancel</button>
+                                        data-action-url="{% url 'persons' %}">Cancel</button>
                             </div>
                         </div>
                     </div>

@@ -135,8 +135,8 @@ h4 {
     margin-top: 20px;
 }
 
-.table-listing {
-    
+.table-listing,
+.table-listing-ext {    
     .panel {
         padding-right: 1px;
         
@@ -149,13 +149,6 @@ h4 {
             width: 10px;        
         }
         
-        thead, tfoot {
-            background-color: @table-bg-hover;
-            tr > td, tr > th {
-                font-weight: normal;
-            }
-        }        
-        
         .btn-controls {
             .btn-group {
                 margin-top: -5px;
@@ -166,7 +159,18 @@ h4 {
             .caret {
                 margin-left: -2px;
             }
-        }
+        }        
+    }
+}
+
+.table-listing {
+    .panel {
+        thead, tfoot {
+            background-color: @table-bg-hover;
+            tr > td, tr > th {
+                font-weight: normal;
+            }
+        }        
     }
 }
 
