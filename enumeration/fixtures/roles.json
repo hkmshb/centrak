@@ -1,0 +1,38 @@
+[
+    {
+        "pk": 1,
+        "model": "enumeration.MemberRole",
+        "fields": {
+            "name": "Team Lead",
+            "description": "Leader of a team",
+            "date_created": "2015-09-12"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "enumeration.MemberRole",
+        "fields": {
+            "name": "Enumerator",
+            "description": "Member of a team expected to be assigned a device.",
+            "date_created": "2015-09-12"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "enumeration.MemberRole",
+        "fields": {
+            "name": "Marker",
+            "description": "Member of a team responsible for marking consumer/customer premises.",
+            "date_created": "2015-09-12"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "enumeration.MemberRole",
+        "fields": {
+            "name": "Member",
+            "description": "Member of a team playing a supporting role performing miscellaneous tasks.",
+            "date_created": "2015-09-12"
+        }
+    }
+]

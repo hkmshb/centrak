@@ -82,7 +82,7 @@ class EntityBase(models.Model):
 
 
 class NamedEntityBase(EntityBase):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     
     class Meta:
         abstract = True
@@ -121,4 +121,31 @@ class Person(EntityBase):
     class Meta:
         db_table = 'enum_person'
         unique_together = ('first_name', 'last_name')
+
+
+class MemberRole(NamedEntityBase):
+    description = models.TextField(blank=True)
+    
+    class Meta:
+        db_table = 'enum_member_role'
+
+
+class Team(NamedEntityBase):
+    code = models.CharField(max_length=20, unique=True)
+    devices = models.ManyToManyField(Device)
+    members = models.ManyToManyField(Person, through='TeamMembership')
+    
+    class Meta:
+        db_table = 'enum_team'
+
+
+class TeamMembership(models.Model):
+    team    = models.ForeignKey(Team)
+    person  = models.ForeignKey(Person)
+    device  = models.ForeignKey(Device)
+    role    = models.ForeignKey(MemberRole)
+    date_joined = models.DateField()
+
+    class Meta:
+        db_table = 'enum_team_membership'
 

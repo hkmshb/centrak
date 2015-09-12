@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="pad-top">
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            Team Information
+            
+            <div class="btn-controls pull-right">
+                <div class="btn-group">
+                    <button type="button" class="btn-link" name="btn_action" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'team-update' team.id %}">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                &nbsp; Update Team
+                            </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="label-group">
+                <div class="label-row-group">
+	                <div class="label-row col-xs-6">
+	                    <label class="label-name">Code</label>
+	                    <label class="label-value">{{ team.code }}</label>
+	                </div>
+                    <div class="label-row col-xs-6">
+                        <label class="label-name">Name</label>
+                        <label class="label-value">{{ team.name }}</label>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabbed-control table-listing">
+        <ul class="nav nav-flattabs">
+            <li class="active"><a href="#members" data-toggle="tab">Members</a></li>
+            <li><a href="#devices" data-toggle="tab">Devices</a></li>
+        </ul>
+        
+        <div class="tab-content table-listing pad-top">
+            <div id="members" class="tab-pane fade in active">
+	            <div class="panel panel-flat">
+		            <table class="table table-condensed">
+		                <thead>
+		                    <tr><th><input type="checkbox" /></th>
+		                        <th>Name</th><th>Gender</th><th>Role</th>
+		                        <th>Status</th><th>Device</th></tr>
+		                </thead>
+		                <tbody>
+		                {% for m in members %}
+		                {% empty %}
+		                    <tr><td colspan="6">No Data Available.</td></tr>
+		                {% endfor %}
+		                </tbody>
+		            </table>
+	            </div>
+            </div>
+            
+            <div id="devices" class="tab-pane fade">      
+            
+                <div class="panel panel-flat">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr><th><input type="checkbox" /></th>
+                                <th>Label</th><th>Form Factor</th><th>Brand</th>
+                        </thead>
+                        <tbody>
+                        {% for d in devices %}
+                        {% empty %}
+                            <tr><td colspan="4">No Data Available.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>                
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

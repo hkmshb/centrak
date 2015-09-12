@@ -23,4 +23,15 @@ urlpatterns = patterns('enumeration.views',
     url(r'^persons/create$', 'manage_person', name='person-insert'),
     url(r'^persons/update/(?P<id>[0-9]+)', 'manage_person', name='person-update'),
     url(r'^persons/delete(/(?P<id>[0-9]+))?', 'delete_person', name='person-delete'),
+    
+    url(r'^roles$', 'role_list', name='roles'),
+    url(r'^roles/create$', 'manage_role', name='role-insert'),
+    url(r'^roles/update/(?P<id>[0-9]+)$', 'manage_role', name='role-update'),
+    url(r'^roles/delete(/(?P<id>[0-9]+))?', 'delete_role', name='role-delete'),
+    
+    url(r'^teams/$', 'team_list', name='teams'),
+    url(r'^teams/create$', 'manage_team', name='team-insert'),
+    url(r'^teams/update/(?P<id>[0-9]+)$', 'manage_team', name='team-update'),
+    url(r'^teams/view/(?P<id>[0-9]+)', 'view_team', name='team-view'),
+    url(r'^teams/delete(/(?P<id>[0-9]+))?', 'delete_team', name='team-delete'),    
 )

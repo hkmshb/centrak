@@ -1,5 +1,6 @@
 from django import forms
-from enumeration.models import Manufacturer, MobileOS, Device, Person
+from enumeration.models import Manufacturer, MobileOS, Device, Person, Team, \
+        MemberRole
 from django.core.exceptions import ValidationError
 
 
@@ -104,5 +105,29 @@ class PersonForm(ModelForm):
             'mobile':     forms.fields.TextInput(attrs=_attrs),
             'mobile2':    forms.fields.TextInput(attrs=_attrs),
             'email':      forms.fields.EmailInput(attrs=_attrs),
+        }
+
+class TeamForm(ModelForm):
+    
+    class Meta:
+        model = Team
+        fields = ('code', 'name')
+        _attrs = {'class': 'form-control input-sm'}
+        widgets = {
+            'code': forms.fields.TextInput(attrs=_attrs),
+            'name': forms.fields.TextInput(attrs=_attrs)
+        }
+
+        
+class MemberRoleForm(ModelForm):
+    
+    class Meta:
+        model = MemberRole
+        fields = ('name', 'description')
+        _attrs = {'class': 'form-control input-sm'}
+        widgets = {
+            'name': forms.fields.TextInput(attrs=_attrs),
+            'description': forms.Textarea(attrs={
+                    'class': 'form-control input-sm', 'rows': '3'}),
         }
 

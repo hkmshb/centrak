@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <h1>Teams</h1>
+    <div class="table-listing-ext">
+    {% with p=record_list %}
+        <form data-bind="table" method="post" action="{% url 'team-delete' %}"
+              data-paging-numbers="{{p.paging_numbers}}">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    &nbsp;
+                    <div class="btn-controls pull-right">
+                        <div class="btn-group">
+                            <button type="button" class="btn-link" name="btn_add" title="Add Person" data-action-url="{% url 'team-insert' %}">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </div>
+                        <button type="button" class="btn-link del-link" name="btn_delete" title="Delete Selection">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                {% csrf_token %}
+                <table class="table table-condensed">
+                    <thead>
+                        <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
+                            <th>Code</th><th>Name</th><th># People</th><th># Devices</th></tr>
+                    </thead>
+                    <tbody>
+                    {% for item in p %}
+                        <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
+                            <td>{{ item.code }}</td>
+                            <td><a href="{% url 'team-view' item.id %}">{{ item.name }}</a></td>
+                            <td> ? </td>
+                            <td> ? </td></tr>
+                    {% empty %}
+                        <tr><td colspan="5">No Data Available.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    {% endwith %}
+    </div>
+{% endblock %}
+{% block extra-scripts %}
+    <script src="{% static "js/datatable.js" %}"></script>
+{% endblock %}
+

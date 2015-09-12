@@ -1,0 +1,44 @@
+{% extends 'layout-cols-md-sm.html' %}
+{% block cols-md-content %}
+    {% if form.errors %}
+    <div class="alert alert-messages alert-danger">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        {{ form.non_field_errors }}    
+    </div>
+    {% endif %}
+    
+    <div class="pad-top">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                {%if form.instance.id %}Update{% else %}Add{% endif %} Membership Role
+            </div>
+            
+            <div class="panel-body">
+                <form method="post" class="form-horizontal">
+                    {% csrf_token %}
+                    <div class="form-group-ext divider">
+                        <div class="form-row{% if form.name.errors %} has-error{% endif %}">
+                            <label for="id_name" class="form-label-lg">Name</label>
+                            <div class="form-value">{{ form.name }}</div>
+                        </div>
+                        <div class="form-row">
+                            <label for="id_description" class="form-label-lg">Description</label>
+                            <div class="form-value" style="vertical-align:top;">{{ form.description }}</div>
+                        </div>
+                    </div>
+                    <div class="form-group-ext">
+                        <div class="form-row">
+                            <label class="form-label-lg">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary" name="btn_save">Save</button>
+                            {%if not form.instance.id %}
+                            <button type="submit" class="btn btn-primary" name="btn_save_new">Save & New</button>
+                            {% endif %}
+                            <button type="button" class="btn btn-default" name="btn_cancel"
+                                    data-action-url="{% url 'roles' %}">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>    
+{% endblock %}

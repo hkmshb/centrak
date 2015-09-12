@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person
+     Person, Team, MemberRole
 from core.models import State, BusinessOffice
 
 
@@ -147,5 +147,53 @@ class PersonTest(EntityBaseTestCase):
                        location=office, mobile='080-3333-2222',
                        email='info@example.org')
             p.full_clean()
+    
+    def test_new_person_active_by_default(self):
+        office = self.create_business_office()
+        person = Person.objects.create(first_name='John', last_name='Doe',
+                    gender=Person.MALE, official_status=Person.FULL_STAFF,
+                    email='info@example.com', mobile='080-2222-1111',
+                    location=office)
+        self.assertTrue(person.id > 0)
+        self.assertTrue(person.is_active)
+    
+    def test_person_deletion_only_sets_is_active_to_false(self):
+        self.fail('write test')
+        
 
+class TeamTest(TestCase):
+    
+    def test_cannot_save_without_nonblank_fields(self):
+        with self.assertRaises(ValidationError):
+            team = Team()
+            team.full_clean()
+    
+    def test_new_team_active_by_default(self):
+        team = Team(code='Code', name='Name')
+        self.assertTrue(team.is_active)
+    
+    def test_duplicate_codes_are_invalid(self):
+        Team.objects.create(code='Code', name='Name')
+        with self.assertRaises(ValidationError):
+            team = Team(code='Code', name='Diff.Name')
+            team.full_clean()
+    
+    def test_duplicate_name_are_invalid(self):
+        Team.objects.create(code='Code', name='Name')
+        with self.assertRaises(ValidationError):
+            team = Team(code='New.Code', name='Name')
+            team.full_clean()
+    
+    def test_team_deletion_only_sets_is_active_to_false(self):
+        self.fail('write test')
+    
 
+class MemberRoleTest(TestCase):
+    
+    def test_duplicate_name_are_invalid(self):
+        MemberRole.objects.create(name='Name', description='Description')
+        with self.assertRaises(ValidationError):
+            role = MemberRole(name='Name', description='New.Description')
+            role.full_clean()
+
+        

@@ -2,7 +2,7 @@ from django.contrib.messages.api import get_messages
 from django.http.response import Http404
 from django.test import TestCase
 
-from enumeration.models import Manufacturer, MobileOS, Person
+from enumeration.models import Manufacturer, MobileOS, Person, MemberRole
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
@@ -199,7 +199,7 @@ class PersonViewTest(TestCase):
         
         resp = self.client.get(self.url_persons)
         self.assertEqual(200, resp.status_code)
-        self.assertEqual(3, resp.context['record_list'])    
+        self.assertEqual(3, len(resp.context['record_list']))    
     
     @staticmethod
     def create_person():
@@ -216,18 +216,45 @@ class PersonViewTest(TestCase):
         # person 1
         Person.objects.create(first_name='John', last_name='Doe', 
             gender=Person.MALE, official_status=Person.FULL_STAFF, 
-            location=office.id, email='john.doe@example.org', 
+            location=office, email='john.doe@example.org', 
             mobile='080-2222-1111')
         
         # person 2
         Person.objects.create(first_name='Jane', last_name='Doe', 
             gender=Person.FEMALE, official_status=Person.FULL_STAFF, 
-            location=office.id, email='jane.doe@example.org', 
+            location=office, email='jane.doe@example.org', 
             mobile='080-2222-3333')
         
         # person 3
         Person.objects.create(first_name='Bobby', last_name='Fisher', 
             gender=Person.MALE, official_status=Person.CONTRACT_STAFF, 
-            location=office.id, email='b.fisher@chess.org', 
+            location=office, email='b.fisher@chess.org', 
             mobile='080-9995-8884')
+
+
+class MemberRoleViewTest(TestCase):
+    url_roles = reverse('roles')
+    url_role_create = reverse('role-insert')
+    url_role_update = reverse('role-update', args=[0])
+    
+    def test_saving_a_POST_request(self):
+        data = dict(name='Role', description='Description')
+        resp = self.client.post(self.url_role_create, data=data)
+        self.assertEqual(302, resp.status_code)
+        self.assertEqual(1, MemberRole.objects.count())
+
+    def test_updating_via_POST_request(self):
+        roleX = MemberRole.objects.create(name='Name', description='Description')
+        data = dict(name='New.Name', description='New.Description')
+        upd_url = self.url_role_update.replace('/0', '/%s' % roleX.id)
+        
+        resp = self.client.post(upd_url, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        roleY = MemberRole.objects.get(pk=roleX.id)
+        self.assertTrue(roleX.name != roleY.name
+                    and roleX.description != roleY.description
+                    and roleX.id == roleY.id
+                    and roleY.name == 'New.Name'
+                    and roleY.description == 'New.Description')
 

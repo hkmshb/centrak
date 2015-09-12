@@ -8,9 +8,9 @@ from django.http.response import Http404
 from django.contrib import messages
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person
+     Person, Team, MemberRole
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
-     PersonForm
+     PersonForm, TeamForm, MemberRoleForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
@@ -213,4 +213,79 @@ def manage_person(request, id=None):
 def delete_person(request, id=None):
     return manage_object_deletion(request, 
         Person, 'person(s)', 'persons', id)
+
+
+def role_list(request):
+    roles = get_paged_object_list(request, MemberRole)
+    return render(request,
+        'enumeration/role-list.html', {
+        'record_list': roles
+    })
+
+
+def manage_role(request, id=None):
+    role = MemberRole() if not id else get_object_or_404(MemberRole, pk=id)
+    if request.method == 'POST':
+        role_form = MemberRoleForm(data=request.POST, instance=role)
+        if role_form.is_valid():
+            role_form.save()
+            
+            msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
+            messages.success(request, msg_fmt % 'Member Role', extra_tags='success')
+            
+            urlname = ('roles' if 'btn_save' in request.POST else 'role-insert')
+            return redirect(reverse(urlname))
+    else:
+        role_form = MemberRoleForm(instance=role)
+    return render(request, 'enumeration/role-form.html', {
+        'form': role_form
+    })
+
+
+def delete_role(request, id=None):
+    return manage_object_deletion(request, 
+        MemberRole, 'role(s)', 'roles', id)
+
+
+def team_list(request):
+    teams = get_paged_object_list(request, Team)
+    return render(request, 
+        'enumeration/team-list.html', {
+        'record_list': teams
+    })
+
+
+def view_team(request, id):
+    team = get_object_or_404(Team, pk=id)
+    devices = get_paged_object_list(request, Device)
+    members = get_paged_object_list(request, Person)
+    return render(request,
+        'enumeration/team-view.html', {
+        'team': team,
+        'device_list': devices,
+        'member_list': members
+    })
+
+
+def manage_team(request, id=None):
+    team = (Team() if not id else get_object_or_404(Team, pk=id))
+    if request.method == 'POST':
+        team_form = TeamForm(data=request.POST, instance=team)
+        if team_form.is_valid():
+            new_team = team_form.save()
+            
+            msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
+            messages.success(request, msg_fmt % 'Team', extra_tags='success')
+            if 'btn_save' in request.POST:
+                return redirect(reverse('team-view', args=[id or new_team.id]))
+            return redirect(reverse('team-insert'))
+    else:
+        team_form = TeamForm(instance=team)
+    return render(request, 'enumeration/team-form.html', {
+        'form': team_form
+    })
+
+def delete_team(request, id=None):
+    return manage_object_deletion(request, 
+        Team, 'team(s)', 'teams', id)
 
