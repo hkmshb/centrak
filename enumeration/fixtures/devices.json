@@ -1,0 +1,85 @@
+[
+    {
+        "pk": 1,
+        "model": "enumeration.Device",
+        "fields": {
+            "label": "B01D01",
+            "brand": "8",
+            "model": "SM-G7102",
+            "mobile_os": "1",
+            "form_factor": "P",
+            "notes": "Mariri BU Device",
+            "serialno": "R51F917LF8F"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "enumeration.Device",
+        "fields": {
+            "label": "B01D02",
+            "brand": "8",
+            "model": "SM-G7102",            
+            "mobile_os": "1",
+            "form_factor": "P"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "enumeration.Device",
+        "fields": {
+            "label": "B01D03",
+            "brand": "8",
+            "model": "SM-G7102",
+            "mobile_os": "1",
+            "form_factor": "P"
+        }
+    },
+    {
+        "pk": 1,
+        "model": "enumeration.DeviceIMEI",
+        "fields": {
+            "device": "1",
+            "imei": "353515/06/518780/9"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "enumeration.DeviceIMEI",
+        "fields": {
+            "device": "1",
+            "imei": "353516/06/518780/7"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "enumeration.DeviceIMEI",
+        "fields": {
+            "device": "2",
+            "imei": "353515065184269/01"
+        }
+    },
+    {
+        "pk": 4,
+        "model": "enumeration.DeviceIMEI",
+        "fields": {
+            "device": "2",
+            "imei": "353516065184267/01"
+        }
+    },
+    {
+        "pk": 5,
+        "model": "enumeration.DeviceIMEI",
+        "fields": {
+            "device": "3",
+            "imei": "353515065714628/01"
+        }
+    },
+    {
+        "pk": 6,
+        "model": "enumeration.DeviceIMEI",
+        "fields": {
+            "device": "3",
+            "imei": "353516065714626/01"
+        }
+    }
+]

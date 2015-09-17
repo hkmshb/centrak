@@ -51,6 +51,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    # third-party apps
+    'select2',
+    
     # centrak apps
     'main',
     'core',

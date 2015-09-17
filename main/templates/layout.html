@@ -8,6 +8,8 @@
     
     <title>CENTrak {%  block title %}{% endblock %}</title>
     <link href="{% static "bootstrap-3.3.5/css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "select2/css/select2.css" %}" rel="stylesheet">
+    <link href="{% static "css/select2-bootstrap.css" %}" rel="stylesheet">
     <link href="{% static "css/style.css" %}" rel="stylesheet" type="text/css">
     {% block extra-links %}{% endblock %}
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -72,7 +74,10 @@
     <!-- le scripts -->
     <script src="{% static "js/jquery-2.1.1.min.js" %}"></script>
     <script src="{% static "bootstrap-3.3.5/js/bootstrap.min.js" %}"></script>
+    <script src="{% static "select2/js/select2.min.js" %}"></script>
+    <script src="{% static "select2/js/select2.jquery_ready.js" %}"></script>    
     <script src="{% static "js/centrak.common.js" %}"></script>
+    <script src="{% static "js/datatable.js" %}"></script>
     {% block extra-scripts %}{% endblock %}
 </body>
 </html>

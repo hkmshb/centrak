@@ -2,7 +2,8 @@ from django.contrib.messages.api import get_messages
 from django.http.response import Http404
 from django.test import TestCase
 
-from enumeration.models import Manufacturer, MobileOS, Person, MemberRole
+from enumeration.models import Manufacturer, MobileOS, Device, Team, Person, \
+        MemberRole
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
@@ -258,3 +259,79 @@ class MemberRoleViewTest(TestCase):
                     and roleY.name == 'New.Name'
                     and roleY.description == 'New.Description')
 
+
+class TeamViewTest(TestCase):
+    
+    fixtures = ['device-options', 'devices']
+    urlf_team_view = lambda s,x: reverse('team-view', args=[x])
+    urlf_team_device_add = lambda s,x: reverse('team-device-add', args=[x])
+    urlf_team_device_rem = lambda s,x: reverse('team-device-remove', args=[x])
+    
+    def setUp(self):
+        # create teams
+        tA = Team.objects.create(code='A', name='TeamA')
+        Team.objects.create(code='B', name='TeamB')
+        Team.objects.create(code='C', name='TeamC')
+        
+        d1 = Device.objects.get(pk=1)
+        tA.devices.add(d1)
+    
+    def test_add_device_form_has_only_unassigned_devices(self):        
+        team = Team.objects.get(code='A')
+        url_view = self.urlf_team_view(team.id)
+        resp = self.client.get(url_view)
+        self.assertEqual(200, resp.status_code)
+        
+        form = resp.context['devices_form']
+        self.assertIsNotNone(form)
+        self.assertEqual(2, len(form.fields['device'].choices))
+    
+    def test_adding_device_via_POST_request(self):
+        team = Team.objects.get(code='A')
+        url_add = self.urlf_team_device_add(team.id)
+        resp = self.client.post(url_add, data={'device':'2'})
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(2, len(team.devices.all()))
+        
+    def test_assigned_devices_unavailable_in_device_select_form(self):
+        team = Team.objects.get(code='A')
+        resp = self.client.get(self.urlf_team_view(team.id))
+        form = resp.context['devices_form']
+        self.assertEqual(2, len(form.fields['device'].choices))
+        
+        device = Device.objects.unassigned()[0]
+        team.devices.add(device)
+
+        resp = self.client.get(self.urlf_team_view(team.id))
+        form = resp.context['devices_form']
+        self.assertEqual(1, len(form.fields['device'].choices))
+        
+    def test_removing_device_via_POST_request(self):
+        team = Team.objects.get(code='A')
+        self.assertEqual(1, len(team.devices.all()))
+        url_rem = self.urlf_team_device_rem(team.id)
+        
+        data = {'record_ids': team.devices.all()[0].id}
+        resp = self.client.post(url_rem, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(0, len(team.devices.all()))
+    
+    def test_removed_device_isnot_deleted(self):
+        team = Team.objects.get(code='A')
+        self.assertEqual(1, len(team.devices.all()))
+        url_rem = self.urlf_team_device_rem(team.id)
+        
+        device_id = team.devices.all()[0].id
+        data = {'record_ids': device_id}
+        resp = self.client.post(url_rem, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        device = Device.objects.get(pk=device_id)
+        self.assertIsNotNone(device)
+        
+    
+    

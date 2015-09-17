@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.http.response import Http404
 from django.contrib import messages
@@ -15,6 +15,12 @@ MSG_FMT_ERROR_DELETE = 'None of the selected %s were deleted';
 MSG_FMT_WARN_DELETE = (
     'Some of the selected %s were delete successfully. '
     'However %s of the selection could not be deleted.')
+
+MSG_FMT_SUCCESS_REMOVE = 'Selected %s removed successfully.'
+MSG_FMT_ERROR_REMOVE = 'None of the selected %s were removed.'
+MSG_FMT_WARN_REMOVE = (
+    'Some of the selected %s were removed successfully. '
+    'However %s of the selected could not be deleted.')
 
 # string consts :: form messages
 REQUIRED_FIELD_ERROR   = 'This field is required.'
@@ -87,3 +93,17 @@ def manage_object_deletion(request, model, model_name, model_list_url_name, id=N
     )
     return redirect(reverse(model_list_url_name))
 
+
+def add_message_for_m2m_removal_operation(request, model_name, target_count, 
+                                          failed_count):
+    messages.add_message(request, 
+        level=(messages.SUCCESS if failed_count == 0 else
+            messages.WARNING if failed_count < target_count else messages.ERROR),
+        message = (MSG_FMT_SUCCESS_REMOVE % model_name
+            if failed_count == 0 else
+                MSG_FMT_WARN_REMOVE % (model_name, target_count - failed_count)
+                    if failed_count < target_count else
+                        MSG_FMT_ERROR_REMOVE % model_name),
+        extra_tags=('success' if failed_count == 0 else 'warning'
+            if failed_count < target_count else 'danger')
+    )

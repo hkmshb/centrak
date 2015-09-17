@@ -33,6 +33,22 @@ class MobileOS(models.Model):
         return self.name
 
 
+class DeviceManager(models.Manager):
+    
+    def unassigned(self):
+        qs  = Team.objects.filter(is_active=True, devices__isnull=False)
+        ids = [d['devices'] for d in qs.values('devices')]
+        return Device.objects.exclude(id__in = ids)
+    
+    def as_choices(self):
+        for device in self.all():
+            yield (device.pk, device.label)
+    
+    def unassigned_as_choices(self):
+        for device in self.unassigned():
+            yield (device.id, device.label)
+
+
 class Device(models.Model):
     PHONE   = 'P'
     TABLET  = 'T'
@@ -52,6 +68,8 @@ class Device(models.Model):
     serialno = models.CharField(max_length=25, blank=True)
     notes    = models.TextField(blank=True)
     
+    objects = DeviceManager()
+    
     class Meta:
         db_table = 'enum_device'
     
@@ -60,6 +78,9 @@ class Device(models.Model):
         serialno = (self.serialno or '')
         if serialno and Device.objects.filter(serialno=serialno).exists():
             raise ValidationError({'serialno': UNIQUE_SERIALNO_ERROR}, code='unique')
+
+    def __str__(self):
+        return self.label
 
 
 class DeviceIMEI(models.Model):

@@ -1,7 +1,12 @@
 from django import forms
+from django.core.exceptions import ValidationError
+
+from select2 import fields as select2_fields
+from select2 import widgets as select2_widgets
+
 from enumeration.models import Manufacturer, MobileOS, Device, Person, Team, \
         MemberRole
-from django.core.exceptions import ValidationError
+
 
 
 
@@ -131,3 +136,14 @@ class MemberRoleForm(ModelForm):
                     'class': 'form-control input-sm', 'rows': '3'}),
         }
 
+
+class TeamDeviceForm(forms.Form):
+    
+    def __init__(self, *args, **kwargs):
+        super(TeamDeviceForm, self).__init__(*args, **kwargs)
+        self.fields['device'] = select2_fields.ChoiceField(
+                choices=Device.objects.unassigned_as_choices(),
+                overlay='Select a Devices')
+
+
+        

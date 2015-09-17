@@ -1,6 +1,4 @@
 {% extends 'layout.html' %}
-{% load static %}
-
 {% block content %}
 <div class="pad-top">
     <div class="panel panel-flat">
@@ -54,7 +52,7 @@
 		                        <th>Status</th><th>Device</th></tr>
 		                </thead>
 		                <tbody>
-		                {% for m in members %}
+		                {% for m in team.members.all %}
 		                {% empty %}
 		                    <tr><td colspan="6">No Data Available.</td></tr>
 		                {% endfor %}
@@ -63,25 +61,54 @@
 	            </div>
             </div>
             
-            <div id="devices" class="tab-pane fade">      
-            
-                <div class="panel panel-flat">
-                    <table class="table table-condensed">
-                        <thead>
-                            <tr><th><input type="checkbox" /></th>
-                                <th>Label</th><th>Form Factor</th><th>Brand</th>
-                        </thead>
-                        <tbody>
-                        {% for d in devices %}
-                        {% empty %}
-                            <tr><td colspan="4">No Data Available.</td></tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>                
+            <div id="devices" class="tab-pane fade table-listing">
+                <div class="row">
+                    <div class="col-md-4 pull-right">
+                        <div class="panel panel-flat">
+                            <div class="panel-heading">Select Device</div>
+                            <div class="panel-body">
+	                            <form class="form-inline pull-right" method="post" action="{% url 'team-device-add' team.id %}">
+	                                {% csrf_token %}
+	                                {{ devices_form.device }}
+	                                <button type="submit" class="btn btn-primary" style="padding:3px 5px;">Add Device</button>
+	                            </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 pull-left">
+                        <form data-bind="table" method="post" action="{% url 'team-device-remove' team.id %}">
+	                        {% csrf_token %}
+	                        <div class="panel panel-flat">
+	                            <div class="panel-heading">
+	                                Team Devices
+	                                <div class="btn-controls pull-right">
+                                        <button type="button" class="btn-link del-link" name="btn_delete" title="Remove Selected Devices">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </button>
+	                                </div>
+	                            </div>
+	                            <table class="table table-condensed">
+	                                <thead>
+	                                   <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
+	                                       <th>Label</th><th>Form Factor</th><th>Brand</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for d in team.devices.all %}
+                                        <tr><td><input type="checkbox" name="record_ids" value="{{ d.id }}" /></td>
+                                            <td>{{ d.label }}</td>
+                                            <td>{{ d.get_form_factor_display }}</td>
+                                            <td>{{ d.brand }}</td></tr>
+                                    {% empty %}
+                                        <tr><td colspan="4">No Data Available.</td></tr>
+                                    {% endfor %}
+                                    </tbody>
+	                            </table>
+	                        </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </div>
-        
+        </div>        
     </div>
 </div>
 {% endblock %}

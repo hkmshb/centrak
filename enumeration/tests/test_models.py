@@ -186,6 +186,10 @@ class TeamTest(TestCase):
     
     def test_team_deletion_only_sets_is_active_to_false(self):
         self.fail('write test')
+        
+    
+    def test_device_removal_does_not_delete_device(self):
+        self.fail('write test')
     
 
 class MemberRoleTest(TestCase):

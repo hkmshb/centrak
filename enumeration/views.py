@@ -10,10 +10,11 @@ from django.contrib import messages
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
      Person, Team, MemberRole
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
-     PersonForm, TeamForm, MemberRoleForm
+     PersonForm, TeamForm, MemberRoleForm, TeamDeviceForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
+from core import utils
 
 
 
@@ -256,14 +257,11 @@ def team_list(request):
 
 
 def view_team(request, id):
-    team = get_object_or_404(Team, pk=id)
-    devices = get_paged_object_list(request, Device)
-    members = get_paged_object_list(request, Person)
+    team = get_object_or_404(Team, pk=id)    
     return render(request,
         'enumeration/team-view.html', {
         'team': team,
-        'device_list': devices,
-        'member_list': members
+        'devices_form': TeamDeviceForm()
     })
 
 
@@ -288,4 +286,39 @@ def manage_team(request, id=None):
 def delete_team(request, id=None):
     return manage_object_deletion(request, 
         Team, 'team(s)', 'teams', id)
+
+
+def manage_team_device(request, id):
+    if request.method == 'POST':
+        team = get_object_or_404(Team, pk=id)
+        form = TeamDeviceForm(data=request.POST)
+        if form.is_valid():
+            device_id = form.cleaned_data['device']
+            device = Device.objects.get(pk=device_id)
+            team.devices.add(device)
+            
+    return redirect(reverse('team-view', args=[id]))
+
+
+def remove_team_device(request, id, device_id=None):
+    if request.method != 'POST':
+        raise Http404('Method type not supported')
+    
+    team = get_object_or_404(Team, pk=id)
+    target_ids = (device_id or request.POST.getlist('record_ids'))
+    if not target_ids:
+        return redirect(reverse('team-view', args=[id]))
+    
+    failed_ids = []
+    for item_id in target_ids:
+        try:
+            device = Device.objects.get(pk=item_id)
+            team.devices.remove(device)
+        except ObjectDoesNotExist:
+            failed_ids.append(item_id)
+    
+    utils.add_message_for_m2m_removal_operation(
+        request, 'device(s)', len(target_ids), len(failed_ids)
+    )
+    return redirect(reverse('team-view', args=[id])) 
 
