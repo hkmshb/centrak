@@ -43,54 +43,91 @@
         </ul>
         
         <div class="tab-content table-listing pad-top">
-            <div id="members" class="tab-pane fade in active">
-	            <div class="panel panel-flat">
-		            <table class="table table-condensed">
-		                <thead>
-		                    <tr><th><input type="checkbox" /></th>
-		                        <th>Name</th><th>Gender</th><th>Role</th>
-		                        <th>Status</th><th>Device</th></tr>
-		                </thead>
-		                <tbody>
-		                {% for m in team.members.all %}
-		                {% empty %}
-		                    <tr><td colspan="6">No Data Available.</td></tr>
-		                {% endfor %}
-		                </tbody>
-		            </table>
+            
+            <div id="members" class="tab-pane fade in active table-listing">
+                <div class="row">
+                    
+                    <div class="col-xs-8">
+                        <form data-bind="table" method="post" action="">
+                            {% csrf_token %}
+                            <div class="panel panel-flat">
+                                <div class="panel-heading">
+                                    Team Members
+                                    <div class="btn-controls pull-right">
+                                        <button type="button" class="btn-link del-link" name="btn_delete" title="Remove Selected Members">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr><th><input type="checkbox" /></th>
+                                            <th>Name</th><th>Role</th><th>Device</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for m in team.members.all %}
+                                    {% empty %}
+                                        <tr><td colspan="4">No Data Available.</td></tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>                    
+                    
+                    <div class="col-xs-4">
+                        <div class="panel panel-flat">
+                            <div class="panel-heading">Member Form</div>
+                            <div class="panel-body">
+                            {% with f=members_form %}
+                                <form class="form-horizontal" method="post" action="">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label class="col-sm-3">Person:</label>
+                                        <div class="col-sm-9">{{ f.person }}</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3">Role: </label>
+                                        <div class="col-sm-9">{{ f.role }}</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-3">Device:</label>
+                                        <div class="col-sm-9">{{ f.device }}</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-3 col-sm-9">
+                                            <button type="submit" class="btn btn-primary" style="padding:3px 5px;">Add Member</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+		            
 	            </div>
             </div>
             
             <div id="devices" class="tab-pane fade table-listing">
                 <div class="row">
-                    <div class="col-md-4 pull-right">
-                        <div class="panel panel-flat">
-                            <div class="panel-heading">Select Device</div>
-                            <div class="panel-body">
-	                            <form class="form-inline pull-right" method="post" action="{% url 'team-device-add' team.id %}">
-	                                {% csrf_token %}
-	                                {{ devices_form.device }}
-	                                <button type="submit" class="btn btn-primary" style="padding:3px 5px;">Add Device</button>
-	                            </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-8 pull-left">
+
+                    <div class="col-xs-8">
                         <form data-bind="table" method="post" action="{% url 'team-device-remove' team.id %}">
-	                        {% csrf_token %}
-	                        <div class="panel panel-flat">
-	                            <div class="panel-heading">
-	                                Team Devices
-	                                <div class="btn-controls pull-right">
+                            {% csrf_token %}
+                            <div class="panel panel-flat">
+                                <div class="panel-heading">
+                                    Team Devices
+                                    <div class="btn-controls pull-right">
                                         <button type="button" class="btn-link del-link" name="btn_delete" title="Remove Selected Devices">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </button>
-	                                </div>
-	                            </div>
-	                            <table class="table table-condensed">
-	                                <thead>
-	                                   <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
-	                                       <th>Label</th><th>Form Factor</th><th>Brand</th></tr>
+                                    </div>
+                                </div>
+                                <table class="table table-condensed">
+                                    <thead>
+                                       <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
+                                           <th>Label</th><th>Form Factor</th><th>Brand</th></tr>
                                     </thead>
                                     <tbody>
                                     {% for d in team.devices.all %}
@@ -102,10 +139,26 @@
                                         <tr><td colspan="4">No Data Available.</td></tr>
                                     {% endfor %}
                                     </tbody>
-	                            </table>
-	                        </div>
+                                </table>
+                            </div>
                         </form>
+                    </div>                
+                
+                    <div class="col-xs-4">
+                        <div class="panel panel-flat">
+                            <div class="panel-heading">Select Device</div>
+                            <div class="panel-body">
+	                            <form class="form-horizontal flex-right" method="post" action="{% url 'team-device-add' team.id %}">
+	                                {% csrf_token %}
+	                                <div class="form-group" style="padding-left: 15px">
+	                                   {{ devices_form.device }}
+	                                </div>	                                
+	                                <button type="submit" class="btn btn-primary" style="padding:3px 5px;">Add Device</button>
+	                            </form>
+                            </div>
+                        </div>
                     </div>
+                    
                 </div>
             </div>
         </div>        

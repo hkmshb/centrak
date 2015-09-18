@@ -10,7 +10,7 @@ from django.contrib import messages
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
      Person, Team, MemberRole
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
-     PersonForm, TeamForm, MemberRoleForm, TeamDeviceForm
+     PersonForm, TeamForm, MemberRoleForm, TeamDeviceForm, TeamMemberForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
@@ -261,7 +261,8 @@ def view_team(request, id):
     return render(request,
         'enumeration/team-view.html', {
         'team': team,
-        'devices_form': TeamDeviceForm()
+        'devices_form': TeamDeviceForm(),
+        'members_form': TeamMemberForm(team)
     })
 
 
@@ -282,6 +283,7 @@ def manage_team(request, id=None):
     return render(request, 'enumeration/team-form.html', {
         'form': team_form
     })
+
 
 def delete_team(request, id=None):
     return manage_object_deletion(request, 

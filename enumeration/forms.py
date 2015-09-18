@@ -146,4 +146,16 @@ class TeamDeviceForm(forms.Form):
                 overlay='Select a Devices')
 
 
-        
+class TeamMemberForm(forms.Form):
+    role = select2_fields.ChoiceField(choices=MemberRole.objects.as_choices())    
+    
+    def __init__(self, team, *args, **kwargs):        
+        super(TeamMemberForm, self).__init__(*args, **kwargs)
+    
+        self.team = team
+        self.fields['person'] = select2_fields.ChoiceField(
+                choices=Person.objects.unassigned_as_choices(),
+                overlay='Select a Person')
+        self.fields['device'] = select2_fields.ChoiceField(
+                choices=team.devices.as_choices())
+

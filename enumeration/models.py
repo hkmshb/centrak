@@ -109,6 +109,17 @@ class NamedEntityBase(EntityBase):
         abstract = True
 
 
+class PersonManager(models.Manager):
+    
+    def unassigned(self):
+        qs = Team.objects.filter(is_active=True, members__isnull=False)
+        ids = [m['members'] for m in qs.values('members')]
+        return Person.objects.exclude(id__in=ids)
+    
+    def unassigned_as_choices(self):
+        for person in self.unassigned():
+            yield (person.id, person.fullname)
+
 class Person(EntityBase):
     MALE   = 'M'
     FEMALE = 'F'
@@ -139,13 +150,28 @@ class Person(EntityBase):
     mobile2   = models.CharField(max_length=20, blank=True)
     email     = models.EmailField(max_length=50)
     
+    objects = PersonManager()
+    
     class Meta:
         db_table = 'enum_person'
         unique_together = ('first_name', 'last_name')
+    
+    @property
+    def fullname(self):
+        return '%s %s' % (self.first_name, self.last_name)
+
+
+class MemberRoleManager(models.Manager):
+
+    def as_choices(self):
+        for role in self.all():
+            yield (role.pk, role.name)
 
 
 class MemberRole(NamedEntityBase):
     description = models.TextField(blank=True)
+    
+    objects = MemberRoleManager()
     
     class Meta:
         db_table = 'enum_member_role'
