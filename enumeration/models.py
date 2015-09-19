@@ -40,7 +40,8 @@ class DeviceManager(models.Manager):
         ids = [d['devices'] for d in qs.values('devices')]
         return Device.objects.exclude(id__in = ids)
     
-    def as_choices(self):
+    def as_choices(self, include_none=False):
+        if include_none: yield ('0', 'None')
         for device in self.all():
             yield (device.pk, device.label)
     
@@ -207,7 +208,7 @@ class Team(NamedEntityBase):
 class TeamMembership(models.Model):
     team    = models.ForeignKey(Team, on_delete=models.PROTECT)
     person  = models.ForeignKey(Person, on_delete=models.PROTECT)
-    device  = models.ForeignKey(Device, on_delete=models.PROTECT)
+    device  = models.ForeignKey(Device, null=True, blank=True, on_delete=models.PROTECT)
     role    = models.CharField(max_length=2, 
                 choices=MemberRole.ROLE_CHOICES,
                 default=MemberRole.MEMBER)
@@ -215,4 +216,17 @@ class TeamMembership(models.Model):
 
     class Meta:
         db_table = 'enum_team_membership'
-
+    
+    def clean(self):
+        # don't allow non enumerators to be assigned a device
+        if self.device and self.role != MemberRole.ENUMERATOR:
+            raise ValidationError('Only enumerators can be assigned a device.')
+        
+        # don't allow single device to be assigned to multiple members
+        if self.device:
+            memberships = TeamMembership.objects.exclude(team=self.team, 
+                            device=self.device, person=self.person)
+            if memberships:
+                message = 'Cannot assign a device to more than on enumerator.'
+                raise ValidationError(message)
+                

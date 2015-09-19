@@ -275,31 +275,30 @@ class TeamViewTest(TestCase):
     
     def setUp(self):
         # create teams
-        tA = Team.objects.create(code='A', name='TeamA')
+        self.team = Team.objects.create(code='A', name='TeamA')
         Team.objects.create(code='B', name='TeamB')
         Team.objects.create(code='C', name='TeamC')
         
-        d1 = Device.objects.get(pk=1)
-        tA.devices.add(d1)
+        self.device = Device.objects.get(pk=1)
+        self.team.devices.add(self.device)
         
         # create member role
         #MemberRole.objects.create(name='Member')
         
         # create people
         location = BusinessOffice.objects.get(name='Dakata')
-        Person.objects.create(first_name='John', last_name='Doe',
-            email='john.doe@example.com', mobile='080-2222-1111', 
-            location=location)
-        Person.objects.create(first_name='Jane', last_name='Doe',
-            email='jane.doe@example.com', mobile='080-3333-2222',
-            location=location)
-        Person.objects.create(first_name='Ola', last_name='Sani',
-            email='ola.sani@example.com', mobile='080-4444-3333',
-            location=location)
+        self.john = Person.objects.create(first_name='John', last_name='Doe',
+                        email='john.doe@example.com', mobile='080-2222-1111', 
+                        location=location)
+        self.jane = Person.objects.create(first_name='Jane', last_name='Doe',
+                        email='jane.doe@example.com', mobile='080-3333-2222',
+                        location=location)
+        self.ola = Person.objects.create(first_name='Ola', last_name='Sani',
+                        email='ola.sani@example.com', mobile='080-4444-3333',
+                        location=location)
     
     def test_add_device_form_has_only_unassigned_devices(self):        
-        team = Team.objects.get(code='A')
-        url_view = self.urlf_team_view(team.id)
+        url_view = self.urlf_team_view(self.team.id)
         resp = self.client.get(url_view)
         self.assertEqual(200, resp.status_code)
         
@@ -308,8 +307,7 @@ class TeamViewTest(TestCase):
         self.assertEqual(2, len(form.fields['device'].choices))
     
     def test_adding_device_via_POST_request(self):
-        team = Team.objects.get(code='A')
-        url_add = self.urlf_team_device_add(team.id)
+        url_add = self.urlf_team_device_add(self.team.id)
         resp = self.client.post(url_add, data={'device':'2'})
         self.assertEqual(302, resp.status_code)
         
@@ -317,24 +315,22 @@ class TeamViewTest(TestCase):
         self.assertEqual(2, len(team.devices.all()))
         
     def test_assigned_devices_unavailable_in_device_select_form(self):
-        team = Team.objects.get(code='A')
-        resp = self.client.get(self.urlf_team_view(team.id))
+        resp = self.client.get(self.urlf_team_view(self.team.id))
         form = resp.context['devices_form']
         self.assertEqual(2, len(form.fields['device'].choices))
         
         device = Device.objects.unassigned()[0]
-        team.devices.add(device)
+        self.team.devices.add(device)
 
-        resp = self.client.get(self.urlf_team_view(team.id))
+        resp = self.client.get(self.urlf_team_view(self.team.id))
         form = resp.context['devices_form']
         self.assertEqual(1, len(form.fields['device'].choices))
         
     def test_removing_device_via_POST_request(self):
-        team = Team.objects.get(code='A')
-        self.assertEqual(1, len(team.devices.all()))
-        url_rem = self.urlf_team_device_rem(team.id)
+        self.assertEqual(1, len(self.team.devices.all()))
+        url_rem = self.urlf_team_device_rem(self.team.id)
         
-        data = {'record_ids': team.devices.all()[0].id}
+        data = {'record_ids': self.team.devices.all()[0].id}
         resp = self.client.post(url_rem, data=data)
         self.assertEqual(302, resp.status_code)
         
@@ -342,11 +338,10 @@ class TeamViewTest(TestCase):
         self.assertEqual(0, len(team.devices.all()))
     
     def test_removed_device_isnot_deleted(self):
-        team = Team.objects.get(code='A')
-        self.assertEqual(1, len(team.devices.all()))
-        url_rem = self.urlf_team_device_rem(team.id)
+        self.assertEqual(1, len(self.team.devices.all()))
+        url_rem = self.urlf_team_device_rem(self.team.id)
         
-        device_id = team.devices.all()[0].id
+        device_id = self.team.devices.all()[0].id
         data = {'record_ids': device_id}
         resp = self.client.post(url_rem, data=data)
         self.assertEqual(302, resp.status_code)
@@ -355,8 +350,7 @@ class TeamViewTest(TestCase):
         self.assertIsNotNone(device)
         
     def test_add_member_form_has_only_unassigned_members(self):
-        team = Team.objects.get(code='A')
-        url_view = self.urlf_team_view(team.id)
+        url_view = self.urlf_team_view(self.team.id)
         resp = self.client.get(url_view)
         self.assertEqual(200, resp.status_code)
         
@@ -365,15 +359,61 @@ class TeamViewTest(TestCase):
         self.assertEqual(3, len(form.fields['person'].choices))
     
     def test_adding_member_via_POST_request(self):
-        team = Team.objects.get(code='A')
-        url_add = self.urlf_team_member_add(team.id)
-        
-        p = Person.objects.get(first_name='John', last_name='Doe')
-        
-        data={'person': p.id, 'device':'1', 'role': MemberRole.MEMBER}
+        url_add = self.urlf_team_member_add(self.team.id)        
+        data={'person': self.john.id, 'device':'1', 'role': MemberRole.ENUMERATOR}
         resp = self.client.post(url_add, data=data)
         self.assertEqual(302, resp.status_code)
         
         team = Team.objects.get(code='A')
         self.assertEqual(1, len(team.members.all()))
 
+    def test_device_choices_has_empty_entry(self):
+        url_view = self.urlf_team_view(self.team.id)
+        resp = self.client.get(url_view)
+        self.assertEqual(200, resp.status_code)
+        
+        form = resp.context['members_form']
+        self.assertEqual(1, len(self.team.devices.all()))
+        self.assertEqual(len(form.fields['device'].choices),
+                         len(self.team.devices.all()) + 1)
+        self.assertEqual(form.fields['device'].choices[0], ('0', 'None'))
+
+    def test_device_cannot_be_assigned_to_multiple_members(self):
+        urlf_add = self.urlf_team_member_add(self.team.id)
+        
+        # first member
+        data = {'person': self.john.id, 'device':'1', 'role': MemberRole.ENUMERATOR}
+        resp = self.client.post(urlf_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(1, len(team.members.all()))
+        
+        # proposed second member; addition should fail
+        data = {'person': self.jane.id, 'device':'1', 'role':MemberRole.ENUMERATOR}
+        resp = self.client.post(urlf_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertNotEqual(2, len(team.members.all())) 
+    
+    def test_device_can_only_be_assigned_to_enumerator(self):
+        urlf_add = self.urlf_team_device_add(self.team.id)
+        
+        data = {'person':self.john.id, 'device':'1', 'role': MemberRole.MEMBER}
+        resp = self.client.post(urlf_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(0, len(team.members.all()))
+    
+    def test_can_add_non_enumerator_without_device(self):
+        urlf_add = self.urlf_team_member_add(self.team.id)
+        data = {'person':self.john.id, 'device': '0', 'role': MemberRole.MEMBER}
+        resp = self.client.post(urlf_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(1, len(team.members.all()))
+        
+    

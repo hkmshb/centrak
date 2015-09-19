@@ -51,7 +51,7 @@ class MobileOSForm(forms.models.ModelForm):
         }
 
 
-class FormMixin:
+class FormMixin(object):
     
     def clean(self):
         super(FormMixin, self).clean()
@@ -69,7 +69,7 @@ class FormMixin:
                     self.add_error(None, message)
 
 
-class DeviceForm(forms.models.ModelForm, FormMixin):
+class DeviceForm(FormMixin, forms.models.ModelForm):
     
     class Meta:
         model = Device
@@ -94,7 +94,7 @@ class DeviceForm(forms.models.ModelForm, FormMixin):
         }
             
             
-class PersonForm(forms.models.ModelForm, FormMixin):
+class PersonForm(FormMixin, forms.models.ModelForm):
     
     class Meta:
         model = Person
@@ -113,7 +113,7 @@ class PersonForm(forms.models.ModelForm, FormMixin):
         }
 
 
-class TeamForm(forms.models.ModelForm, FormMixin):
+class TeamForm(FormMixin, forms.models.ModelForm):
     
     class Meta:
         model = Team
@@ -138,7 +138,7 @@ class TeamForm(forms.models.ModelForm, FormMixin):
 #         }
 
 
-class TeamDeviceForm(forms.Form, FormMixin):
+class TeamDeviceForm(FormMixin, forms.Form):
     
     def __init__(self, *args, **kwargs):
         super(TeamDeviceForm, self).__init__(*args, **kwargs)
@@ -147,7 +147,7 @@ class TeamDeviceForm(forms.Form, FormMixin):
                 overlay='Select a Devices')
 
 
-class TeamMemberForm(forms.Form, FormMixin):
+class TeamMemberForm(FormMixin, forms.Form):
 
     role = select2_fields.ChoiceField(choices=MemberRole.ROLE_CHOICES)
 
@@ -157,7 +157,11 @@ class TeamMemberForm(forms.Form, FormMixin):
         self.team = team
         self.fields['person'] = select2_fields.ChoiceField(
                 choices=Person.objects.unassigned_as_choices(),
-                overlay='Select a Person')
+                overlay='Select a Person',
+                error_messages= {
+                    'required': 'Person field is required'
+                })
         self.fields['device'] = select2_fields.ChoiceField(
-                choices=team.devices.as_choices())
+                choices=team.devices.as_choices(True))
+
 

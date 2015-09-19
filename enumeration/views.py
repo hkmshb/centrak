@@ -1,8 +1,7 @@
 from datetime import date
 
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.models import inlineformset_factory
 from django.core.urlresolvers import reverse
 from django.forms.utils import ErrorList
@@ -10,7 +9,7 @@ from django.http.response import Http404
 from django.contrib import messages
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person, Team, MemberRole, TeamMembership
+     Person, Team, TeamMembership
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
      PersonForm, TeamForm, TeamDeviceForm, TeamMemberForm
 
@@ -336,13 +335,28 @@ def manage_team_member(request, id):
             device_id = form.cleaned_data['device']
             role = form.cleaned_data['role']
             
-            person = Person.objects.get(pk=person_id)
-            device = Device.objects.get(pk=device_id)
+            kwargs = {
+                'team': team, 'person': Person.objects.get(pk=person_id),
+                'role': role, 'date_joined': date.today()
+            }
+            if device_id not in ('0', None):
+                kwargs['device'] = Device.objects.get(pk=device_id)
             
-            membership = TeamMembership(team=team, person=person,
-                            device=device, role=role,
-                            date_joined=date.today())
-            membership.save()
+            membership = TeamMembership(**kwargs)
+            try: 
+                membership.full_clean()
+            except ValidationError as ex:
+                message = 'Member not added. %s' % ex.message_dict['__all__'][0]
+                messages.error(request, message, extra_tags='danger')
+            else: 
+                membership.save()            
+                message = MSG_FMT_SUCCESS_ADD % 'Member'
+                messages.success(request, message, extra_tags='success')
+        else:
+            message = 'Member not added. '
+            for k in [e for e in form.errors.as_data() if e != '__all__']:
+                message += '%s ' % form.errors[k][0];
+            messages.error(request, message, extra_tags='danger')
     
     return redirect(reverse('team-view', args=[id]))
 

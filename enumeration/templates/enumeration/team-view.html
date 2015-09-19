@@ -1,6 +1,13 @@
 {% extends 'layout.html' %}
 {% load filters %}
 {% block content %}
+{% if form.errors %}
+<div class="alert alert-messages alert-danger">
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    {{ form.non_field_errors }}    
+</div>
+{% endif %}
+    
 <div class="pad-top">
     <div class="panel panel-flat">
         <div class="panel-heading">
@@ -71,7 +78,7 @@
                                         <tr><td><input type="checkbox" /></td>
                                             <td>{{ m.fullname }}</td>
                                             {% with tm=m|get_teammembership:team %}
-                                            <td>{{ tm.role.name }}</td>
+                                            <td>{{ tm.get_role_display }}</td>
                                             <td>{{ tm.device.label }}</td></tr>
                                             {% endwith %}
                                     {% empty %}
@@ -94,7 +101,7 @@
                                         <label class="col-sm-3">Person:</label>
                                         <div class="col-sm-9">{{ f.person }}</div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group has-error">
                                         <label class="col-sm-3">Role: </label>
                                         <div class="col-sm-9">{{ f.role }}</div>
                                     </div>

@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person, Team, MemberRole
+     Person, Team, MemberRole, TeamMembership
 from core.models import State, BusinessOffice
 
 
@@ -185,12 +185,51 @@ class TeamTest(TestCase):
             team.full_clean()
     
     def test_team_deletion_only_sets_is_active_to_false(self):
-        self.fail('write test')
-        
+        self.fail('write test')        
     
     def test_device_removal_does_not_delete_device(self):
-        self.fail('write test')
+        self.fail('write test')    
+
+
+class TeamMembershipTest(TestCase):    
     
+    fixtures = ['states', 'business-entities', 'device-options', 'devices']
+    
+    def setUp(self):
+        # create teams
+        self.team = Team.objects.create(code='A', name='Team-A')
+        Team.objects.create(code='B', name='Team-B')
+        Team.objects.create(code='C', name='Team-C')
+        
+        # assign device
+        self.device = Device.objects.get(pk=1)
+        self.team.devices.add(self.device)
+        
+        # create person
+        location = BusinessOffice.objects.get(name='Dakata')
+        self.john = Person.objects.create(first_name='John', last_name='Doe',
+                        email='john.doe@example.com', mobile='080-2222-1111', 
+                        location=location)
+        self.jane = Person.objects.create(first_name='Jane', last_name='Doe',
+                        email='jane.doe@example.com', mobile='080-3333-2222',
+                        location=location)        
+    
+    def test_cannot_assign_device_to_non_enumerator(self):
+        t, d, p = (self.team, self.device, self.john)
+        with self.assertRaises(ValidationError):
+            r = MemberRole.MEMBER
+            m = TeamMembership(team=t, person=p, device=d, role=r)
+            m.full_clean()
+    
+    def test_cannot_assign_team_device_to_multiple_members(self):
+        t, d, p = (self.team, self.device, self.john)
+        r = MemberRole.ENUMERATOR
+        
+        TeamMembership.objects.create(team=t, person=p, device=d, role=r)
+        with self.assertRaises(ValidationError):
+            p = Person.objects.get(first_name='Jane')
+            m = TeamMembership(team=t, person=p, device=d, role=r)
+            m.full_clean()
 
 # class MemberRoleTest(TestCase):
 #     
