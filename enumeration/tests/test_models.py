@@ -192,12 +192,12 @@ class TeamTest(TestCase):
         self.fail('write test')
     
 
-class MemberRoleTest(TestCase):
-    
-    def test_duplicate_name_are_invalid(self):
-        MemberRole.objects.create(name='Name', description='Description')
-        with self.assertRaises(ValidationError):
-            role = MemberRole(name='Name', description='New.Description')
-            role.full_clean()
+# class MemberRoleTest(TestCase):
+#     
+#     def test_duplicate_name_are_invalid(self):
+#         MemberRole.objects.create(name='Name', description='Description')
+#         with self.assertRaises(ValidationError):
+#             role = MemberRole(name='Name', description='New.Description')
+#             role.full_clean()
 
         

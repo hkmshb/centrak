@@ -96,7 +96,7 @@ class DeviceIMEI(models.Model):
 
 class EntityBase(models.Model):
     is_active    = models.BooleanField(default=True)
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateField(auto_now_add=True)
     
     class Meta:
         abstract = True
@@ -119,6 +119,7 @@ class PersonManager(models.Manager):
     def unassigned_as_choices(self):
         for person in self.unassigned():
             yield (person.id, person.fullname)
+
 
 class Person(EntityBase):
     MALE   = 'M'
@@ -161,20 +162,37 @@ class Person(EntityBase):
         return '%s %s' % (self.first_name, self.last_name)
 
 
-class MemberRoleManager(models.Manager):
-
-    def as_choices(self):
-        for role in self.all():
-            yield (role.pk, role.name)
-
-
-class MemberRole(NamedEntityBase):
-    description = models.TextField(blank=True)
+class MemberRole:
+    SUPERVISOR = 'SP'
+    LEAD       = 'LD'
+    SCOUT      = 'ST'
+    ENUMERATOR = 'EN'
+    MARKER     = 'MK'
+    RECORDER   = 'RC'
+    MEMBER     = 'MB'
     
-    objects = MemberRoleManager()
-    
-    class Meta:
-        db_table = 'enum_member_role'
+    ROLE_CHOICES = (
+        (SUPERVISOR, 'Supervisor'), (LEAD, 'Lead'),
+        (SCOUT, 'Scout'), (ENUMERATOR, 'Enumerator'),
+        (MARKER, 'Marker'), (RECORDER, 'Recorder'),
+        (MEMBER, 'Member')
+    )
+
+
+# class MemberRoleManager(models.Manager):
+# 
+#     def as_choices(self):
+#         for role in self.all():
+#             yield (role.pk, role.name)
+# 
+#     
+# class MemberRole(NamedEntityBase):
+#     description = models.TextField(blank=True)
+#      
+#     objects = MemberRoleManager()
+#      
+#     class Meta:
+#         db_table = 'enum_member_role'
 
 
 class Team(NamedEntityBase):
@@ -187,11 +205,13 @@ class Team(NamedEntityBase):
 
 
 class TeamMembership(models.Model):
-    team    = models.ForeignKey(Team)
-    person  = models.ForeignKey(Person)
-    device  = models.ForeignKey(Device)
-    role    = models.ForeignKey(MemberRole)
-    date_joined = models.DateField()
+    team    = models.ForeignKey(Team, on_delete=models.PROTECT)
+    person  = models.ForeignKey(Person, on_delete=models.PROTECT)
+    device  = models.ForeignKey(Device, on_delete=models.PROTECT)
+    role    = models.CharField(max_length=2, 
+                choices=MemberRole.ROLE_CHOICES,
+                default=MemberRole.MEMBER)
+    date_joined = models.DateField(auto_now_add=True)
 
     class Meta:
         db_table = 'enum_team_membership'

@@ -235,31 +235,31 @@ class PersonViewTest(TestCase):
             mobile='080-9995-8884')
 
 
-class MemberRoleViewTest(TestCase):
-    url_roles = reverse('roles')
-    url_role_create = reverse('role-insert')
-    url_role_update = reverse('role-update', args=[0])
-    
-    def test_saving_a_POST_request(self):
-        data = dict(name='Role', description='Description')
-        resp = self.client.post(self.url_role_create, data=data)
-        self.assertEqual(302, resp.status_code)
-        self.assertEqual(1, MemberRole.objects.count())
-
-    def test_updating_via_POST_request(self):
-        roleX = MemberRole.objects.create(name='Name', description='Description')
-        data = dict(name='New.Name', description='New.Description')
-        upd_url = self.url_role_update.replace('/0', '/%s' % roleX.id)
-        
-        resp = self.client.post(upd_url, data=data)
-        self.assertEqual(302, resp.status_code)
-        
-        roleY = MemberRole.objects.get(pk=roleX.id)
-        self.assertTrue(roleX.name != roleY.name
-                    and roleX.description != roleY.description
-                    and roleX.id == roleY.id
-                    and roleY.name == 'New.Name'
-                    and roleY.description == 'New.Description')
+# class MemberRoleViewTest(TestCase):
+#     url_roles = reverse('roles')
+#     url_role_create = reverse('role-insert')
+#     url_role_update = reverse('role-update', args=[0])
+#     
+#     def test_saving_a_POST_request(self):
+#         data = dict(name='Role', description='Description')
+#         resp = self.client.post(self.url_role_create, data=data)
+#         self.assertEqual(302, resp.status_code)
+#         self.assertEqual(1, MemberRole.objects.count())
+# 
+#     def test_updating_via_POST_request(self):
+#         roleX = MemberRole.objects.create(name='Name', description='Description')
+#         data = dict(name='New.Name', description='New.Description')
+#         upd_url = self.url_role_update.replace('/0', '/%s' % roleX.id)
+#         
+#         resp = self.client.post(upd_url, data=data)
+#         self.assertEqual(302, resp.status_code)
+#         
+#         roleY = MemberRole.objects.get(pk=roleX.id)
+#         self.assertTrue(roleX.name != roleY.name
+#                     and roleX.description != roleY.description
+#                     and roleX.id == roleY.id
+#                     and roleY.name == 'New.Name'
+#                     and roleY.description == 'New.Description')
 
 
 class TeamViewTest(TestCase):
@@ -283,7 +283,7 @@ class TeamViewTest(TestCase):
         tA.devices.add(d1)
         
         # create member role
-        MemberRole.objects.create(name='Member')
+        #MemberRole.objects.create(name='Member')
         
         # create people
         location = BusinessOffice.objects.get(name='Dakata')
@@ -369,10 +369,8 @@ class TeamViewTest(TestCase):
         url_add = self.urlf_team_member_add(team.id)
         
         p = Person.objects.get(first_name='John', last_name='Doe')
-        r = MemberRole.objects.get(name='Member')
-        self.assertIsNotNone(r)
         
-        data={'person': p.id, 'device':'1', 'role': r.id}
+        data={'person': p.id, 'device':'1', 'role': MemberRole.MEMBER}
         resp = self.client.post(url_add, data=data)
         self.assertEqual(302, resp.status_code)
         

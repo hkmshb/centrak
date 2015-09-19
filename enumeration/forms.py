@@ -125,17 +125,17 @@ class TeamForm(forms.models.ModelForm, FormMixin):
         }
 
         
-class MemberRoleForm(forms.models.ModelForm, FormMixin):
-    
-    class Meta:
-        model = MemberRole
-        fields = ('name', 'description')
-        _attrs = {'class': 'form-control input-sm'}
-        widgets = {
-            'name': forms.fields.TextInput(attrs=_attrs),
-            'description': forms.Textarea(attrs={
-                    'class': 'form-control input-sm', 'rows': '3'}),
-        }
+# class MemberRoleForm(forms.models.ModelForm, FormMixin):
+#     
+#     class Meta:
+#         model = MemberRole
+#         fields = ('name', 'description')
+#         _attrs = {'class': 'form-control input-sm'}
+#         widgets = {
+#             'name': forms.fields.TextInput(attrs=_attrs),
+#             'description': forms.Textarea(attrs={
+#                     'class': 'form-control input-sm', 'rows': '3'}),
+#         }
 
 
 class TeamDeviceForm(forms.Form, FormMixin):
@@ -149,6 +149,8 @@ class TeamDeviceForm(forms.Form, FormMixin):
 
 class TeamMemberForm(forms.Form, FormMixin):
 
+    role = select2_fields.ChoiceField(choices=MemberRole.ROLE_CHOICES)
+
     def __init__(self, team, *args, **kwargs):        
         super(TeamMemberForm, self).__init__(*args, **kwargs)
     
@@ -158,6 +160,4 @@ class TeamMemberForm(forms.Form, FormMixin):
                 overlay='Select a Person')
         self.fields['device'] = select2_fields.ChoiceField(
                 choices=team.devices.as_choices())
-        self.fields['role'] = select2_fields.ChoiceField(
-                choices=MemberRole.objects.as_choices())
 

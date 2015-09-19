@@ -12,7 +12,7 @@ from django.contrib import messages
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
      Person, Team, MemberRole, TeamMembership
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
-     PersonForm, TeamForm, MemberRoleForm, TeamDeviceForm, TeamMemberForm
+     PersonForm, TeamForm, TeamDeviceForm, TeamMemberForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
@@ -218,36 +218,36 @@ def delete_person(request, id=None):
         Person, 'person(s)', 'persons', id)
 
 
-def role_list(request):
-    roles = get_paged_object_list(request, MemberRole)
-    return render(request,
-        'enumeration/role-list.html', {
-        'record_list': roles
-    })
-
-
-def manage_role(request, id=None):
-    role = MemberRole() if not id else get_object_or_404(MemberRole, pk=id)
-    if request.method == 'POST':
-        role_form = MemberRoleForm(data=request.POST, instance=role)
-        if role_form.is_valid():
-            role_form.save()
-            
-            msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
-            messages.success(request, msg_fmt % 'Member Role', extra_tags='success')
-            
-            urlname = ('roles' if 'btn_save' in request.POST else 'role-insert')
-            return redirect(reverse(urlname))
-    else:
-        role_form = MemberRoleForm(instance=role)
-    return render(request, 'enumeration/role-form.html', {
-        'form': role_form
-    })
-
-
-def delete_role(request, id=None):
-    return manage_object_deletion(request, 
-        MemberRole, 'role(s)', 'roles', id)
+# def role_list(request):
+#     roles = get_paged_object_list(request, MemberRole)
+#     return render(request,
+#         'enumeration/role-list.html', {
+#         'record_list': roles
+#     })
+# 
+# 
+# def manage_role(request, id=None):
+#     role = MemberRole() if not id else get_object_or_404(MemberRole, pk=id)
+#     if request.method == 'POST':
+#         role_form = MemberRoleForm(data=request.POST, instance=role)
+#         if role_form.is_valid():
+#             role_form.save()
+#             
+#             msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
+#             messages.success(request, msg_fmt % 'Member Role', extra_tags='success')
+#             
+#             urlname = ('roles' if 'btn_save' in request.POST else 'role-insert')
+#             return redirect(reverse(urlname))
+#     else:
+#         role_form = MemberRoleForm(instance=role)
+#     return render(request, 'enumeration/role-form.html', {
+#         'form': role_form
+#     })
+# 
+# 
+# def delete_role(request, id=None):
+#     return manage_object_deletion(request, 
+#         MemberRole, 'role(s)', 'roles', id)
 
 
 def team_list(request):
@@ -334,11 +334,10 @@ def manage_team_member(request, id):
         if form.is_valid():
             person_id = form.cleaned_data['person']
             device_id = form.cleaned_data['device']
-            role_id = form.cleaned_data['role']
+            role = form.cleaned_data['role']
             
             person = Person.objects.get(pk=person_id)
             device = Device.objects.get(pk=device_id)
-            role = MemberRole.objects.get(pk=role_id)
             
             membership = TeamMembership(team=team, person=person,
                             device=device, role=role,
