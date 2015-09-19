@@ -51,15 +51,15 @@ class MobileOSForm(forms.models.ModelForm):
         }
 
 
-class ModelForm(forms.models.ModelForm):
+class FormMixin:
     
     def clean(self):
-        super(ModelForm, self).clean()
+        super(FormMixin, self).clean()
         if self.errors:
             self.add_error(None, REQUIRED_INVALID_ERROR)
 
     def validate_unique(self):
-        super(ModelForm, self).validate_unique()
+        super(FormMixin, self).validate_unique()
         if self.errors:
             if '__all__' not in self.errors:
                 self.add_error(None, REQUIRED_INVALID_ERROR)
@@ -69,7 +69,7 @@ class ModelForm(forms.models.ModelForm):
                     self.add_error(None, message)
 
 
-class DeviceForm(ModelForm):
+class DeviceForm(forms.models.ModelForm, FormMixin):
     
     class Meta:
         model = Device
@@ -94,7 +94,7 @@ class DeviceForm(ModelForm):
         }
             
             
-class PersonForm(ModelForm):
+class PersonForm(forms.models.ModelForm, FormMixin):
     
     class Meta:
         model = Person
@@ -112,7 +112,8 @@ class PersonForm(ModelForm):
             'email':      forms.fields.EmailInput(attrs=_attrs),
         }
 
-class TeamForm(ModelForm):
+
+class TeamForm(forms.models.ModelForm, FormMixin):
     
     class Meta:
         model = Team
@@ -124,7 +125,7 @@ class TeamForm(ModelForm):
         }
 
         
-class MemberRoleForm(ModelForm):
+class MemberRoleForm(forms.models.ModelForm, FormMixin):
     
     class Meta:
         model = MemberRole
@@ -137,7 +138,7 @@ class MemberRoleForm(ModelForm):
         }
 
 
-class TeamDeviceForm(forms.Form):
+class TeamDeviceForm(forms.Form, FormMixin):
     
     def __init__(self, *args, **kwargs):
         super(TeamDeviceForm, self).__init__(*args, **kwargs)
@@ -146,9 +147,9 @@ class TeamDeviceForm(forms.Form):
                 overlay='Select a Devices')
 
 
-class TeamMemberForm(forms.Form):
-    role = select2_fields.ChoiceField(choices=MemberRole.objects.as_choices())    
-    
+class TeamMemberForm(forms.Form, FormMixin):
+    role = select2_fields.ChoiceField(choices=MemberRole.objects.as_choices())
+
     def __init__(self, team, *args, **kwargs):        
         super(TeamMemberForm, self).__init__(*args, **kwargs)
     
@@ -158,4 +159,5 @@ class TeamMemberForm(forms.Form):
                 overlay='Select a Person')
         self.fields['device'] = select2_fields.ChoiceField(
                 choices=team.devices.as_choices())
+        
 
