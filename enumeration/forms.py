@@ -148,7 +148,6 @@ class TeamDeviceForm(forms.Form, FormMixin):
 
 
 class TeamMemberForm(forms.Form, FormMixin):
-    role = select2_fields.ChoiceField(choices=MemberRole.objects.as_choices())
 
     def __init__(self, team, *args, **kwargs):        
         super(TeamMemberForm, self).__init__(*args, **kwargs)
@@ -159,5 +158,6 @@ class TeamMemberForm(forms.Form, FormMixin):
                 overlay='Select a Person')
         self.fields['device'] = select2_fields.ChoiceField(
                 choices=team.devices.as_choices())
-        
+        self.fields['role'] = select2_fields.ChoiceField(
+                choices=MemberRole.objects.as_choices())
 

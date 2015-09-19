@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% load filters %}
 {% block content %}
 <div class="pad-top">
     <div class="panel panel-flat">
@@ -67,6 +68,12 @@
                                     </thead>
                                     <tbody>
                                     {% for m in team.members.all %}
+                                        <tr><td><input type="checkbox" /></td>
+                                            <td>{{ m.fullname }}</td>
+                                            {% with tm=m|get_teammembership:team %}
+                                            <td>{{ tm.role.name }}</td>
+                                            <td>{{ tm.device.label }}</td></tr>
+                                            {% endwith %}
                                     {% empty %}
                                         <tr><td colspan="4">No Data Available.</td></tr>
                                     {% endfor %}
@@ -81,7 +88,7 @@
                             <div class="panel-heading">Member Form</div>
                             <div class="panel-body">
                             {% with f=members_form %}
-                                <form class="form-horizontal" method="post" action="">
+                                <form class="form-horizontal" method="post" action="{% url 'team-member-add' team.id %}">
                                     {% csrf_token %}
                                     <div class="form-group">
                                         <label class="col-sm-3">Person:</label>

@@ -38,4 +38,6 @@ urlpatterns = patterns('enumeration.views',
         name='team-device-add'),
     url(r'^teams/view/(?P<id>[0-9]+)/devices/remove(/(?P<device_id>[0-9]+))?',
         'remove_team_device', name='team-device-remove'),
+    url(r'^teams/view/(?P<id>[0-9]+)/members/add$', 'manage_team_member',
+        name='team-member-add'),
 )

@@ -1,6 +1,7 @@
 from django.contrib.messages.api import get_messages
 from django.http.response import Http404
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 
 from enumeration.models import Manufacturer, MobileOS, Device, Team, Person, \
         MemberRole
@@ -8,9 +9,10 @@ from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
     MSG_FMT_ERROR_DELETE, MSG_FMT_WARN_DELETE
+from core.models import BusinessOffice
 
 from .test_models import EntityBaseTestCase
-from django.core.urlresolvers import reverse
+
 
 
 class DeviceOptionViewTest(TestCase):
@@ -262,10 +264,14 @@ class MemberRoleViewTest(TestCase):
 
 class TeamViewTest(TestCase):
     
-    fixtures = ['device-options', 'devices']
+    fixtures = ['states', 'business-entities', 'device-options', 'devices']
     urlf_team_view = lambda s,x: reverse('team-view', args=[x])
     urlf_team_device_add = lambda s,x: reverse('team-device-add', args=[x])
     urlf_team_device_rem = lambda s,x: reverse('team-device-remove', args=[x])
+    
+    urlf_team_member_add = lambda s,x: reverse('team-member-add', args=[x])
+    urlf_team_member_rem = lambda s,x: reverse('team-member-remove', args=[x])
+    
     
     def setUp(self):
         # create teams
@@ -275,6 +281,21 @@ class TeamViewTest(TestCase):
         
         d1 = Device.objects.get(pk=1)
         tA.devices.add(d1)
+        
+        # create member role
+        MemberRole.objects.create(name='Member')
+        
+        # create people
+        location = BusinessOffice.objects.get(name='Dakata')
+        Person.objects.create(first_name='John', last_name='Doe',
+            email='john.doe@example.com', mobile='080-2222-1111', 
+            location=location)
+        Person.objects.create(first_name='Jane', last_name='Doe',
+            email='jane.doe@example.com', mobile='080-3333-2222',
+            location=location)
+        Person.objects.create(first_name='Ola', last_name='Sani',
+            email='ola.sani@example.com', mobile='080-4444-3333',
+            location=location)
     
     def test_add_device_form_has_only_unassigned_devices(self):        
         team = Team.objects.get(code='A')
@@ -333,5 +354,28 @@ class TeamViewTest(TestCase):
         device = Device.objects.get(pk=device_id)
         self.assertIsNotNone(device)
         
+    def test_add_member_form_has_only_unassigned_members(self):
+        team = Team.objects.get(code='A')
+        url_view = self.urlf_team_view(team.id)
+        resp = self.client.get(url_view)
+        self.assertEqual(200, resp.status_code)
+        
+        form = resp.context['members_form']
+        self.assertIsNotNone(form)
+        self.assertEqual(3, len(form.fields['person'].choices))
     
-    
+    def test_adding_member_via_POST_request(self):
+        team = Team.objects.get(code='A')
+        url_add = self.urlf_team_member_add(team.id)
+        
+        p = Person.objects.get(first_name='John', last_name='Doe')
+        r = MemberRole.objects.get(name='Member')
+        self.assertIsNotNone(r)
+        
+        data={'person': p.id, 'device':'1', 'role': r.id}
+        resp = self.client.post(url_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(1, len(team.members.all()))
+

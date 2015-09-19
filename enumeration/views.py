@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
@@ -8,7 +10,7 @@ from django.http.response import Http404
 from django.contrib import messages
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person, Team, MemberRole
+     Person, Team, MemberRole, TeamMembership
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
      PersonForm, TeamForm, MemberRoleForm, TeamDeviceForm, TeamMemberForm
 
@@ -323,4 +325,28 @@ def remove_team_device(request, id, device_id=None):
         request, 'device(s)', len(target_ids), len(failed_ids)
     )
     return redirect(reverse('team-view', args=[id])) 
+
+
+def manage_team_member(request, id):
+    if request.method == 'POST':
+        team = get_object_or_404(Team, pk=id)
+        form = TeamMemberForm(team, data=request.POST)
+        if form.is_valid():
+            person_id = form.cleaned_data['person']
+            device_id = form.cleaned_data['device']
+            role_id = form.cleaned_data['role']
+            
+            person = Person.objects.get(pk=person_id)
+            device = Device.objects.get(pk=device_id)
+            role = MemberRole.objects.get(pk=role_id)
+            
+            membership = TeamMembership(team=team, person=person,
+                            device=device, role=role,
+                            date_joined=date.today())
+            membership.save()
+    
+    return redirect(reverse('team-view', args=[id]))
+
+
+
 
