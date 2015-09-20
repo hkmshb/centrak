@@ -1,3 +1,4 @@
+import re
 from django.contrib.messages.api import get_messages
 from django.http.response import Http404
 from django.test import TestCase
@@ -265,6 +266,8 @@ class PersonViewTest(TestCase):
 class TeamViewTest(TestCase):
     
     fixtures = ['states', 'business-entities', 'device-options', 'devices']
+    
+    url_teams = reverse('teams')
     urlf_team_view = lambda s,x: reverse('team-view', args=[x])
     urlf_team_device_add = lambda s,x: reverse('team-device-add', args=[x])
     urlf_team_device_rem = lambda s,x: reverse('team-device-remove', args=[x])
@@ -472,3 +475,44 @@ class TeamViewTest(TestCase):
         person = Person.objects.get(pk=self.john.id)
         self.assertIsNotNone(person)
 
+    def test_team_with_devices_only_has_correct_count_summaries(self):
+        # self.team has no members but one device assigned
+        self.assertTrue(self.team.members.count() == 0 
+                    and self.team.devices.count() == 1)
+        
+        resp = self.client.get(self.url_teams)
+        list_ = list(resp.context['record_list'])
+        self.assertEqual(3, len(list_))
+        self.assertTrue(list_[0].code == 'A' 
+                    and list_[0].name == 'TeamA'
+                    and list_[0].members.count() == 0
+                    and list_[0].devices.count() == 1)
+        
+        tr = self.re_find(resp.content, '<tbody>.+<tr>.+</tr>')
+        self.assertTrue(tr.find('<td>A</td>') != -1
+                    and tr.find('TeamA') != -1
+                    and tr.find('<td>0</td>') != -1
+                    and tr.find('<td>1</td>') != -1)        
+    
+    def test_team_with_devices_and_members_has_correct_count_summaries(self):
+        TeamMembership.objects.create(team=self.team, person=self.john,
+            role=MemberRole.MEMBER)
+        
+        resp = self.client.get(self.url_teams)
+        list_ = list(resp.context['record_list'])
+        self.assertEqual(3, len(list_))
+        self.assertTrue(list_[0].code == 'A' 
+                    and list_[0].name == 'TeamA'
+                    and list_[0].members.count() == 1
+                    and list_[0].devices.count() == 1)
+        
+        tr = self.re_find(resp.content, '<tbody>.+<tr>.+</tr>')
+        self.assertTrue(tr.find('<td>A</td>') != -1
+                    and tr.find('TeamA') != -1
+                    and tr.find('<td>1</td>') != -1
+                    and tr.find('<td>1</td>') != -1)    
+    
+    def re_find(self, content, pattern):
+        m = re.search(pattern, content.decode(), re.DOTALL)
+        self.assertIsNotNone(m)
+        return m.group(0)
