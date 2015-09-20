@@ -361,5 +361,27 @@ def manage_team_member(request, id):
     return redirect(reverse('team-view', args=[id]))
 
 
+def remove_team_member(request, id, member_id=None):
+    if request.method != 'POST':
+        raise Http404('Method type not supported')
+    
+    team = get_object_or_404(Team, pk=id)
+    target_ids = (member_id or request.POST.getlist('record_ids'))
+    if not target_ids:
+        return redirect(reverse('team-view', args=[id]))
+    
+    failed_ids = []
+    for item_id in target_ids:
+        try:
+            member = Person.objects.get(pk=item_id)
+            membership = TeamMembership.objects.filter(team=team, person=member)
+            membership.first().delete()
+        except ObjectDoesNotExist:
+            failed_ids.append(item_id)
+    
+    utils.add_message_for_m2m_removal_operation(
+        request, 'member(s)', len(target_ids), len(failed_ids)
+    )
+    return redirect(reverse('team-view', args=[id]))
 
 

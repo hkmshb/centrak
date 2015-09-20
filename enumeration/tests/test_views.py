@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from enumeration.models import Manufacturer, MobileOS, Device, Team, Person, \
-        MemberRole
+        MemberRole, TeamMembership
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
@@ -415,5 +415,36 @@ class TeamViewTest(TestCase):
         
         team = Team.objects.get(code='A')
         self.assertEqual(1, len(team.members.all()))
+
+    def test_removing_member_via_POST_request(self):
+        TeamMembership.objects.create(team=self.team, person=self.john,
+            device=self.device, role=MemberRole.ENUMERATOR)
         
-    
+        team = Team.objects.get(code=self.team.code)
+        self.assertEqual(1, len(team.members.all()))
+        
+        url_rem = self.urlf_team_member_rem(self.team.id)        
+        resp = self.client.post(url_rem, data={'record_ids': self.john.id})
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code=self.team.code)
+        self.assertEqual(0, len(team.members.all()))
+        
+    def test_removed_member_isnot_deleted(self):
+        TeamMembership.objects.create(team=self.team, person=self.john,
+            device=self.device, role=MemberRole.ENUMERATOR)
+        
+        team = Team.objects.get(code=self.team.code)
+        self.assertEqual(1, len(team.members.all()))        
+        
+        url_rem = self.urlf_team_member_rem(self.team.id)
+        resp = self.client.post(url_rem, data={'record_ids': self.john.id})
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code=self.team.code)
+        self.assertEqual(0, len(team.members.all()))        
+        
+        # ensure member still exist
+        person = Person.objects.get(pk=self.john.id)
+        self.assertIsNotNone(person)
+
