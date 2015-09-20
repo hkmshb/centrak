@@ -416,6 +416,30 @@ class TeamViewTest(TestCase):
         team = Team.objects.get(code='A')
         self.assertEqual(1, len(team.members.all()))
 
+    def test_cannot_add_enumerator_without_device(self):
+        url_add = self.urlf_team_member_add(self.team.id)
+        data = {'person':self.john.id, 'device':'0', 'role':MemberRole.ENUMERATOR}
+        resp = self.client.post(url_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        team = Team.objects.get(code='A')
+        self.assertEqual(0, len(team.members.all()))
+
+    def test_member_assigned_team_device_not_available_in_form(self):
+        url_detail = self.urlf_team_view(self.team.id)
+        resp = self.client.get(url_detail)
+        form = resp.context['members_form']
+        self.assertEqual(2, len(form.fields['device'].choices))
+        
+        # assign enumerator to team
+        TeamMembership.objects.create(team=self.team, person=self.john,
+            device=self.device, role=MemberRole.ENUMERATOR)
+        
+        resp = self.client.get(url_detail)
+        choices = resp.context['members_form'].fields['device'].choices
+        self.assertEqual(1, len(choices))
+        self.assertEqual(('0', 'None'), choices[0])
+
     def test_removing_member_via_POST_request(self):
         TeamMembership.objects.create(team=self.team, person=self.john,
             device=self.device, role=MemberRole.ENUMERATOR)

@@ -214,6 +214,13 @@ class TeamMembershipTest(TestCase):
                         email='jane.doe@example.com', mobile='080-3333-2222',
                         location=location)        
     
+    def test_enumerator_must_be_assigned_device(self):
+        t, p = (self.team, self.john)
+        with self.assertRaises(ValidationError):
+            r = MemberRole.ENUMERATOR
+            m = TeamMembership(team=t, person=p, role=r)
+            m.full_clean()
+    
     def test_cannot_assign_device_to_non_enumerator(self):
         t, d, p = (self.team, self.device, self.john)
         with self.assertRaises(ValidationError):

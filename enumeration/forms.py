@@ -162,6 +162,20 @@ class TeamMemberForm(FormMixin, forms.Form):
                     'required': 'Person field is required'
                 })
         self.fields['device'] = select2_fields.ChoiceField(
-                choices=team.devices.as_choices(True))
+                choices=self._get_unassigned_team_devices())
+    
+    def _get_unassigned_team_devices(self):    
+        team = self.team
+        
+        # build unassigned team devices        
+        choices = list(team.devices.as_choices(True))
+        memberships = [
+            m.teammembership_set.get(team=team) 
+                for m in team.members.all()]
+        assigned = [
+            (m.device.id, m.device.label)
+                for m in memberships if m.device]
+        return [c for c in choices if c not in assigned]
+        
 
 

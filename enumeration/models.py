@@ -218,6 +218,10 @@ class TeamMembership(models.Model):
         db_table = 'enum_team_membership'
     
     def clean(self):
+        # enumerators must be assigned a device
+        if self.role == MemberRole.ENUMERATOR and not self.device:
+            raise ValidationError('Enumerators must be assigned a device.')
+        
         # don't allow non enumerators to be assigned a device
         if self.device and self.role != MemberRole.ENUMERATOR:
             raise ValidationError('Only enumerators can be assigned a device.')
