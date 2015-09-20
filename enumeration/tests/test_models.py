@@ -237,6 +237,24 @@ class TeamMembershipTest(TestCase):
             p = Person.objects.get(first_name='Jane')
             m = TeamMembership(team=t, person=p, device=d, role=r)
             m.full_clean()
+    
+    def test_can_add_multiple_enumerators(self):
+        # NOTE: the TeamMember model logic which prevents multiple assignment
+        # o same device is ill-formed as this prevents the addition of another
+        # enumerator to the team. Hence the need to test that a team can be
+        # assigned multiple enumerators!
+        t, d, john, jane = (self.team, self.device, self.john, self.jane)
+        d2 = Device.objects.get(pk=2)
+        r = MemberRole.ENUMERATOR
+        self.assertEqual(0, len(t.members.all()))
+        
+        TeamMembership.objects.create(team=t, person=john, device=d, role=r)        
+        tm = TeamMembership(team=t, person=jane, device=d2, role=r)
+        tm.full_clean()
+        tm.save()
+        
+        t2 = Team.objects.get(code=t.code)
+        self.assertEqual(2, len(t2.members.all()))
 
 # class MemberRoleTest(TestCase):
 #     

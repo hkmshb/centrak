@@ -230,7 +230,8 @@ class TeamMembership(models.Model):
         if self.device:
             memberships = TeamMembership.objects.exclude(team=self.team, 
                             device=self.device, person=self.person)
-            if memberships:
+            in_use = [m.device for m in memberships if m.device == self.device]
+            if in_use:
                 message = 'Cannot assign a device to more than on enumerator.'
                 raise ValidationError(message)
                 
