@@ -11,6 +11,25 @@ from core.models import BusinessOffice
 UNIQUE_SERIALNO_ERROR  = "Serial # already exist."
 
 
+class IsActiveManagerMixin:
+    """A Manager mixin for models with the 'is_active' field. Holds generic
+    query methods returning results based on state of this field.
+    """
+    
+    def all(self, include_inactive=False):
+        q = (self.get_queryset().filter()
+                if include_inactive else
+                    self.get_queryset().filter(is_active=True))
+        return q
+
+
+class IsActiveManager(IsActiveManagerMixin, models.Manager):
+    """A Manager that can be directly sub-classed or used directly for models
+    that need to manage query methods relying on the 'is_active' field in a
+    general way.
+    """
+    pass
+
 
 class Manufacturer(models.Model):
     name = models.CharField(max_length=25, unique=True)
@@ -110,7 +129,7 @@ class NamedEntityBase(EntityBase):
         abstract = True
 
 
-class PersonManager(models.Manager):
+class PersonManager(IsActiveManagerMixin, models.Manager):
     
     def unassigned(self):
         qs = Team.objects.filter(is_active=True, members__isnull=False)
@@ -201,6 +220,8 @@ class Team(NamedEntityBase):
     devices = models.ManyToManyField(Device)
     members = models.ManyToManyField(Person, through='TeamMembership')
     
+    objects = IsActiveManager()
+    
     class Meta:
         db_table = 'enum_team'
 
@@ -236,21 +257,12 @@ class TeamMembership(models.Model):
                 raise ValidationError(message)
                 
 
-class GroupManager(models.Manager):
-    
-    def all(self, include_inactive=False):
-        q = (self.get_queryset().filter()
-                if include_inactive else
-                    self.get_queryset().filter(is_active=True))
-        return q
-
-
 class Group(NamedEntityBase):
     supervisor = models.ForeignKey(Person, on_delete=models.PROTECT)
     note       = models.TextField(blank=True)
     teams      = models.ManyToManyField(Team)
 
-    objects = GroupManager()
+    objects = IsActiveManager()
     
     class Meta:
         db_table = 'enum_group'

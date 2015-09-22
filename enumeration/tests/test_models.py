@@ -129,6 +129,22 @@ class EntityBaseTestCase(TestCase):
 
 class PersonTest(EntityBaseTestCase):
     
+    fixtures = ['states', 'business-entities']
+
+    @staticmethod
+    def person_setup(self):
+        # create person
+        location = BusinessOffice.objects.get(name='Dakata')
+        self.john = Person.objects.create(first_name='John', last_name='Doe',
+                        email='john.doe@example.com', mobile='080-2222-1111', 
+                        location=location)
+        self.jane = Person.objects.create(first_name='Jane', last_name='Doe',
+                        email='jane.doe@example.com', mobile='080-3333-2222',
+                        location=location)     
+    
+    def setUp(self):
+        self.person_setup(self)
+    
     def test_cannot_save_without_nonblank_fields(self):
         office = self.create_business_office()
         person = Person(gender=Person.MALE, official_status=Person.FULL_STAFF,
@@ -150,9 +166,9 @@ class PersonTest(EntityBaseTestCase):
     
     def test_new_person_active_by_default(self):
         office = self.create_business_office()
-        person = Person.objects.create(first_name='John', last_name='Doe',
+        person = Person.objects.create(first_name='John', last_name='Snow',
                     gender=Person.MALE, official_status=Person.FULL_STAFF,
-                    email='info@example.com', mobile='080-2222-1111',
+                    email='john.snow@example.com', mobile='080-2222-1111',
                     location=office)
         self.assertTrue(person.id > 0)
         self.assertTrue(person.is_active)
@@ -161,8 +177,13 @@ class PersonTest(EntityBaseTestCase):
         self.fail('write test')
 
     def test_implicit_listing_provides_active_persons_only(self):
-        self.fail('write test')
-        
+        # add in active person
+        Person.objects.create(first_name='Bob', last_name='Rob',
+            email='bob.rob@example.com', mobile='070-9999-8888',
+            location=BusinessOffice.objects.get(name='Dakata'),
+            is_active=False)
+        self.assertEqual(2, Person.objects.all().count())
+        self.assertEqual(3, Person.objects.all(include_inactive=True).count())
 
 class TeamTest(TestCase):
     
@@ -259,6 +280,13 @@ class TeamMembershipTest(TestCase):
         
         t2 = Team.objects.get(code=t.code)
         self.assertEqual(2, len(t2.members.all()))
+    
+    def test_implicit_listing_provides_active_teams_only(self):
+        # add inactive group
+        Team.objects.create(code='D', name='Team-D', is_active=False)
+        self.assertEqual(3, Team.objects.all().count())
+        self.assertEqual(4, Team.objects.all(include_inactive=True).count())
+        
 
 # class MemberRoleTest(TestCase):
 #     
@@ -267,9 +295,6 @@ class TeamMembershipTest(TestCase):
 #         with self.assertRaises(ValidationError):
 #             role = MemberRole(name='Name', description='New.Description')
 #             role.full_clean()
-    
-    def test_implicit_listing_provides_active_teams_only(self):
-        self.fail('write test')
 
 
 class GroupTest(TestCase):
