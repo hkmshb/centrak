@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person, Team, MemberRole, TeamMembership
+     Person, Team, MemberRole, TeamMembership, Group
 from core.models import State, BusinessOffice
 
 
@@ -159,6 +159,9 @@ class PersonTest(EntityBaseTestCase):
     
     def test_person_deletion_only_sets_is_active_to_false(self):
         self.fail('write test')
+
+    def test_implicit_listing_provides_active_persons_only(self):
+        self.fail('write test')
         
 
 class TeamTest(TestCase):
@@ -192,7 +195,8 @@ class TeamMembershipTest(TestCase):
     
     fixtures = ['states', 'business-entities', 'device-options', 'devices']
     
-    def setUp(self):
+    @staticmethod
+    def membership_setup(self):
         # create teams
         self.team = Team.objects.create(code='A', name='Team-A')
         Team.objects.create(code='B', name='Team-B')
@@ -210,6 +214,9 @@ class TeamMembershipTest(TestCase):
         self.jane = Person.objects.create(first_name='Jane', last_name='Doe',
                         email='jane.doe@example.com', mobile='080-3333-2222',
                         location=location)        
+
+    def setUp(self):
+        self.membership_setup(self)
     
     def test_enumerator_must_be_assigned_device(self):
         t, p = (self.team, self.john)
@@ -260,5 +267,66 @@ class TeamMembershipTest(TestCase):
 #         with self.assertRaises(ValidationError):
 #             role = MemberRole(name='Name', description='New.Description')
 #             role.full_clean()
+    
+    def test_implicit_listing_provides_active_teams_only(self):
+        self.fail('write test')
 
+
+class GroupTest(TestCase):
+
+    fixtures = ['states', 'business-entities']
+
+    @staticmethod
+    def group_setup(self):
+        # create person
+        location = BusinessOffice.objects.get(name='Dakata')
+        self.john = Person.objects.create(first_name='John', last_name='Doe',
+                        email='john.doe@example.com', mobile='080-2222-1111', 
+                        location=location)
+        self.jane = Person.objects.create(first_name='Jane', last_name='Doe',
+                        email='jane.doe@example.com', mobile='080-3333-2222',
+                        location=location)  
         
+        # create teams
+        self.team = Team.objects.create(code='A', name='Team-A')
+        Team.objects.create(code='B', name='Team-B')
+        Team.objects.create(code='C', name='Team-C')
+    
+    def setUp(self):
+        self.group_setup(self)
+
+    def test_duplicate_name_are_invalid(self):
+        Group.objects.create(name='GroupA', supervisor=self.john)
+        with self.assertRaises(ValidationError):
+            group = Group(name='GroupA', supervisor=self.john)
+            group.full_clean()
+    
+    def test_cannot_save_without_supervisor(self):
+        with self.assertRaises(Exception):
+            group = Group(name='GroupA')
+            group.full_clean()
+    
+    def test_cant_assign_same_person_to_supervise_multiple_groups(self):
+        Group.objects.create(name='GroupA', supervisor=self.john)
+        with self.assertRaises(ValidationError):
+            group = Group(name='GroupB', supervisor=self.john)
+            group.full_clean()
+        
+    def test_cant_assign_person_with_function_as_supervisor(self):
+        # make john member of team A
+        TeamMembership.objects.create(team=self.team, person=self.john,
+            role=MemberRole.MEMBER)
+        
+        # now try making john a group supervisor; should fail
+        with self.assertRaises(ValidationError):
+            group = Group(name='GroupA', supervisor=self.john)
+            group.full_clean()
+    
+    def test_implicit_listing_provides_active_groups_only(self):
+        # setup group entries
+        Group.objects.create(name='GroupA', supervisor=self.john)
+        Group.objects.create(name='GroupB', supervisor=self.jane, is_active=False)
+        self.assertEqual(1, Group.objects.all().count())
+        self.assertEqual(2, Group.objects.all(include_inactive=True).count())
+
+

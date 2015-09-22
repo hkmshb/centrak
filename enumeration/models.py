@@ -235,3 +235,42 @@ class TeamMembership(models.Model):
                 message = 'Cannot assign a device to more than on enumerator.'
                 raise ValidationError(message)
                 
+
+class GroupManager(models.Manager):
+    
+    def all(self, include_inactive=False):
+        q = (self.get_queryset().filter()
+                if include_inactive else
+                    self.get_queryset().filter(is_active=True))
+        return q
+
+
+class Group(NamedEntityBase):
+    supervisor = models.ForeignKey(Person, on_delete=models.PROTECT)
+    note       = models.TextField(blank=True)
+    teams      = models.ManyToManyField(Team)
+
+    objects = GroupManager()
+    
+    class Meta:
+        db_table = 'enum_group'
+
+    def clean(self):
+        # ensure group is assigned a supervisor
+        if not self.supervisor:
+            raise ValidationError('Group must be assigned a supervisor.')
+        
+        # ensure supervisor isn't a member of any team
+        team_membership = TeamMembership.objects.filter(team__is_active=True,
+                            person=self.supervisor)
+        if team_membership:
+            message = 'The specified person already belongs to an active team.'
+            raise ValidationError(message)
+        
+        # ensure single person cannot supervise multiple groups
+        supervised_groups = Group.objects.filter(is_active=True, 
+                                supervisor=self.supervisor)
+        if supervised_groups:
+            message = 'The specified person already supervises an active group.'
+            raise ValidationError(message)
+        
