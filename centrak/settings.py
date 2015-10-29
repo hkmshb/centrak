@@ -79,15 +79,11 @@ WSGI_APPLICATION = 'centrak.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'CenTrak',
-        'ENGINE': 'sqlserver_ado',
-        'HOST': get_env_var('CENTRAK_DB_HOST'),
-        'USER': '',
-        'PASSWORD': '',
-        'OPTIONS': {
-            'provider': 'SQLOLEDB',
-            'use_mars': False,
-        }
+        'NAME': 'CENTrak',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': get_env_var('CENTRAK_DB_HOST', 'localhost'),
+        'USER': get_env_var('CENTRAK_DB_USR'),
+        'PASSWORD': get_env_var('CENTRAK_DB_PWD'),
     }
 }
 
