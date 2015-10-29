@@ -48,7 +48,9 @@ def devices(request):
 
 def manage_device(request, id=None):
     device = (Device() if not id else Device.objects.get(pk=id))
-    IMEIInlineFormSet = inlineformset_factory(Device, DeviceIMEI, extra=2, max_num=2)
+    IMEIInlineFormSet = inlineformset_factory(Device, DeviceIMEI, extra=2, 
+                            max_num=2, fields=['device', 'imei'])
+                        
         
     if request.method == 'POST':
         device_form = DeviceForm(data=request.POST, instance=device)
