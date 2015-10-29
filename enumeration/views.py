@@ -9,9 +9,9 @@ from django.http.response import Http404
 from django.contrib import messages
 
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
-     Person, Team, TeamMembership
+     Person, Team, TeamMembership, Group
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
-     PersonForm, TeamForm, TeamDeviceForm, TeamMemberForm
+     PersonForm, TeamForm, TeamDeviceForm, TeamMemberForm, GroupForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
@@ -386,4 +386,26 @@ def remove_team_member(request, id, member_id=None):
     )
     return redirect(reverse('team-view', args=[id]))
 
+
+def group_list(request):
+    pass
+
+
+def manage_group(request, id=None):
+    group = (Group() if not id else get_object_or_404(Group, pk=id))
+    if request.method == 'POST':
+        group_form = GroupForm(data=request.POST, instance=group)
+        if group_form.is_valid():
+            new_group = group_form.save()
+            
+            msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
+            messages.success(request, msg_fmt % 'Group', extra_tags='success')
+            if 'btn_save' in request.POST:
+                return redirect(reverse('', args=[id or new_group.id]))
+            return redirect(reverse('group-insert'))
+    else:
+        group_form = GroupForm(instance=group)
+    return render(request, 'enumeration/group-form.html', {
+        'form': group_form
+    })
 

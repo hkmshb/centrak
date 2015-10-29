@@ -185,6 +185,7 @@ class PersonTest(EntityBaseTestCase):
         self.assertEqual(2, Person.objects.all().count())
         self.assertEqual(3, Person.objects.all(include_inactive=True).count())
 
+
 class TeamTest(TestCase):
     
     def test_cannot_save_without_nonblank_fields(self):

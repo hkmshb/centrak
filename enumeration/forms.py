@@ -5,7 +5,7 @@ from select2 import fields as select2_fields
 from select2 import widgets as select2_widgets
 
 from enumeration.models import Manufacturer, MobileOS, Device, Person, Team, \
-        MemberRole
+        Group, MemberRole
 
 
 
@@ -176,6 +176,22 @@ class TeamMemberForm(FormMixin, forms.Form):
             (m.device.id, m.device.label)
                 for m in memberships if m.device]
         return [c for c in choices if c not in assigned]
-        
 
 
+class GroupForm(FormMixin, forms.models.ModelForm):
+    
+    class Meta:
+        model = Group
+        fields = ('name', 'supervisor')
+        _attrs = {'class':'form-control input-sm'}
+        widgets = {
+            'name': forms.fields.TextInput(attrs=_attrs),
+            'supervisor': select2_widgets.Select()
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super(GroupForm, self).__init__(*args, **kwargs)
+        f = Person.objects.unassigned_as_choices
+        self.fields['supervisor'].choices = f() 
+    
+    

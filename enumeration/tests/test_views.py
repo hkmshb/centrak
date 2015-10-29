@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 
 from enumeration.models import Manufacturer, MobileOS, Device, Team, Person, \
-        MemberRole, TeamMembership
+        Group, MemberRole, TeamMembership
 from enumeration.forms import UNIQUE_MANUFACTURER_NAME_ERROR
 
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_DELETE, \
@@ -162,7 +162,7 @@ class DeviceOptionViewTest(TestCase):
         MobileOS.objects.create(name='iOS')
         MobileOS.objects.create(name='Windows Phone')
         MobileOS.objects.create(name='Tizen')
-    
+
 
 class PersonViewTest(TestCase):
     url_persons = reverse('persons')    
@@ -263,7 +263,7 @@ class PersonViewTest(TestCase):
 #                     and roleY.description == 'New.Description')
 
 
-class TeamViewTest(TestCase):
+class GroupingBaseTestCase(TestCase):
     
     fixtures = ['states', 'business-entities', 'device-options', 'devices']
     
@@ -300,6 +300,9 @@ class TeamViewTest(TestCase):
                         email='ola.sani@example.com', mobile='080-4444-3333',
                         location=location)
     
+
+class TeamViewTest(GroupingBaseTestCase):
+
     def test_add_device_form_has_only_unassigned_devices(self):        
         url_view = self.urlf_team_view(self.team.id)
         resp = self.client.get(url_view)
@@ -516,3 +519,56 @@ class TeamViewTest(TestCase):
         m = re.search(pattern, content.decode(), re.DOTALL)
         self.assertIsNotNone(m)
         return m.group(0)
+
+
+class GroupViewTest(GroupingBaseTestCase):
+    
+    url_group_add = reverse('group-insert')
+    
+    def setUp(self):
+        GroupingBaseTestCase.setUp(self)
+        
+        # create more people
+        location = BusinessOffice.objects.get(name='Dakata')
+        self.umar = Person.objects.create(first_name='Umar', last_name='Gambo',
+                        email='g.umar@example.com', mobile='080-2222-1101',
+                        location=location)
+        self.uche = Person.objects.create(first_name='Uche', last_name='Paul',
+                email='p.uche@example.com', mobile='080-2222-1102',
+                location=location)
+        self.seun = Person.objects.create(first_name='Seun', last_name='Bucknor',
+                        email='b.seun@example.com', mobile='080-2222-1103',
+                        location=location)
+        self.tosin = Person.objects.create(first_name='Tosin', last_name='Olawale',
+                        email='o.tosin@example.com', mobile='080-2222-1104',
+                        location=location)
+        
+        # assign people to teams
+        TeamMembership.objects.create(team=self.team, person=self.uche,
+            role=MemberRole.MEMBER)
+        TeamMembership.objects.create(team=self.team, person=self.jane,
+            role=MemberRole.MEMBER)
+        TeamMembership.objects.create(team=self.team, person=self.seun,
+            role=MemberRole.MARKER)
+        
+        # create groups
+        self.group = Group.objects.create(name='GroupA', supervisor=self.john)
+    
+    def test_add_group_form_has_only_unassigned_people(self):
+        resp = self.client.get(self.url_group_add)
+        self.assertEqual(200, resp.status_code)
+        
+        form = resp.context['form']
+        self.assertIsNotNone(form)
+        supervisors = form.fields['supervisor'].choices
+        for s in supervisors:
+            print(s)
+        self.assertEqual(3, len(supervisors))
+    
+    def test_adding_group_via_POST_request(self):
+        data={'name': 'GroupB', 'supervisor': self.umar.id}
+        resp = self.client.post(self.url_group_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        group = Group.objects.get(name='GroupB')
+        self.assertIsNotNone(group)

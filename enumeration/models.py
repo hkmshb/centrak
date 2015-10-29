@@ -132,9 +132,15 @@ class NamedEntityBase(EntityBase):
 class PersonManager(IsActiveManagerMixin, models.Manager):
     
     def unassigned(self):
-        qs = Team.objects.filter(is_active=True, members__isnull=False)
-        ids = [m['members'] for m in qs.values('members')]
-        return Person.objects.exclude(id__in=ids)
+        # get people that belong to teams
+        qs_team = Team.objects.filter(is_active=True, members__isnull=False)
+        mem_ids = [m['members'] for m in qs_team.values('members')]
+        
+        # people that are supervisors
+        qs_group = Group.objects.filter(is_active=True, supervisor__isnull=False)
+        supvr_ids = [s['supervisor'] for s in qs_group.values('supervisor')]
+        
+        return Person.objects.exclude(id__in=(mem_ids + supvr_ids))
     
     def unassigned_as_choices(self):
         for person in self.unassigned():
