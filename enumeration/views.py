@@ -389,7 +389,11 @@ def remove_team_member(request, id, member_id=None):
 
 
 def group_list(request):
-    pass
+    groups = get_paged_object_list(request, Group)
+    return render(request,
+        'enumeration/group-list.html', {
+        'record_list': groups
+    })
 
 
 def view_group(request, id):
