@@ -1,0 +1,119 @@
+{% extends 'layout.html' %}
+{% block content %}
+{% if form.errors %}
+<div class="alert alert-messages alert-danger">
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    {{ form.non_field_errors }}
+</div>
+{% endif %}
+<div class="pad-top">
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            Group Information
+            
+            <div class="btn-controls pull-right">
+                <div class="btn-group">
+                    <button type="button" class="btn-link" name="btn_action" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-cog"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="{ url 'group-update' team.id }">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                &nbsp; Update Group
+                            </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="label-group">
+                <div class="label-row-group">
+                    <div class="label-row col-xs-6">
+                        <label class="label-name">Name</label>
+                        <label class="label-value">{{ group.name }}</label>
+                    </div>
+                    <div class="label-row col-xs-6">
+                        <label class="label-name-lg">Supervisor</label>
+                        <label class="label-value">{{ group.supervisor.fullname }}</label>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabbed-control table-listing">
+        <ul class="nav nav-flattabs">
+            <li class="active"><a href="#teams" data-toggle="tab">Teams</a></li>
+        </ul>
+        
+        <div class="tab-content table-listing pad-top">
+        
+            <div id="members" class="tab-pane fade in active table-listing">
+                <div class="row">
+                    
+                    <div class="col-xs-8">
+                        <form data-bind="table" method="post" action="{ url 'group-team-remove' team.id }">
+                            {% csrf_token %}
+                            <div class="panel panel-flat">
+                                <div class="panel-heading">
+                                    Group Teams
+                                    <div class="btn-controls pull-right">
+                                        <button type="button" class="btn-link del-link" name="btn_delete" title="Remove Selected Team(s)">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
+                                            <th>Code</th><th>Name</th><th>Type</th><th># People</th><th># Device</th></tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for t in group.teams.all %}
+                                        <tr><td><input type="checkbox" name="record_ids" value="{{ t.id }}" /></td>
+                                            <td>{{ t.code }}</td>
+                                            <td>{{ t.name }}</td>
+                                            <td>{{ t.type }}</td>
+                                            <td>{{ t.members|length }}</td>
+                                            <td>{{ t.devices|length }}</td></tr>
+                                    {% empty %}
+                                        <tr><td colspan="6">No Data Available.</td></tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>                    
+                    
+                    <div class="col-xs-4">
+                        <div class="panel panel-flat">
+                            <div class="panel-heading">Team Form</div>
+                            <div class="panel-body">
+                            {% with f=teams_form %}
+                                <form class="form-horizontal" method="post" action="{ url 'group-team-add' team.id }">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label class="col-sm-3">Details:</label>
+                                        <br/>
+                                        <div class="col-sm-12">{{ f.team }}</div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-9">
+                                            <button type="submit" class="btn btn-primary" style="padding:3px 5px;">Add Team</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+</div>
+
+{% endblock %}

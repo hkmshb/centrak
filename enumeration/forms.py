@@ -193,5 +193,17 @@ class GroupForm(FormMixin, forms.models.ModelForm):
         super(GroupForm, self).__init__(*args, **kwargs)
         f = Person.objects.unassigned_as_choices
         self.fields['supervisor'].choices = f() 
+
+
+class GroupTeamForm(FormMixin, forms.Form):
     
-    
+    def __init__(self, *args, **kwargs):
+        super(GroupTeamForm, self).__init__(*args, **kwargs)
+        
+        self.fields['team'] = select2_fields.ChoiceField(
+                choices=Team.objects.unassigned_as_choices(),
+                overlay='Select a Team',
+                error_messages={
+                    'required': 'Team field is required.'
+                })
+

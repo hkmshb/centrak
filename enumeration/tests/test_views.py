@@ -524,6 +524,7 @@ class TeamViewTest(GroupingBaseTestCase):
 class GroupViewTest(GroupingBaseTestCase):
     
     url_group_add = reverse('group-insert')
+    urlf_group_view = lambda s,x: reverse('group-view', args=[x])
     
     def setUp(self):
         GroupingBaseTestCase.setUp(self)
@@ -561,14 +562,28 @@ class GroupViewTest(GroupingBaseTestCase):
         form = resp.context['form']
         self.assertIsNotNone(form)
         supervisors = form.fields['supervisor'].choices
-        for s in supervisors:
-            print(s)
         self.assertEqual(3, len(supervisors))
     
-    def test_adding_group_via_POST_request(self):
+    def test_can_add_group_via_POST_request(self):
         data={'name': 'GroupB', 'supervisor': self.umar.id}
         resp = self.client.post(self.url_group_add, data=data)
         self.assertEqual(302, resp.status_code)
         
         group = Group.objects.get(name='GroupB')
         self.assertIsNotNone(group)
+
+    def test_add_team_form_has_only_unassigned_teams(self):
+        # add team to group
+        self.group.teams.add(self.team)
+        
+        # test
+        url_view = self.urlf_group_view(self.group.id)
+        resp = self.client.get(url_view)
+        self.assertEqual(200, resp.status_code)
+        
+        form = resp.context['teams_form']
+        self.assertIsNotNone(form)
+        self.assertEqual(2, len(form.fields['team'].choices))
+    
+    
+    

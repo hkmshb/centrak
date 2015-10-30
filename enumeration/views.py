@@ -11,7 +11,8 @@ from django.contrib import messages
 from enumeration.models import Manufacturer, MobileOS, Device, DeviceIMEI, \
      Person, Team, TeamMembership, Group
 from enumeration.forms import ManufacturerForm, MobileOSForm, DeviceForm, \
-     PersonForm, TeamForm, TeamDeviceForm, TeamMemberForm, GroupForm
+     PersonForm, TeamForm, TeamDeviceForm, TeamMemberForm, GroupForm, \
+     GroupTeamForm
 
 from core.utils import get_paged_object_list, manage_object_deletion
 from core.utils import MSG_FMT_SUCCESS_ADD, MSG_FMT_SUCCESS_UPD
@@ -391,6 +392,15 @@ def group_list(request):
     pass
 
 
+def view_group(request, id):
+    group = get_object_or_404(Group, pk=id)
+    return render(request,
+        'enumeration/group-view.html', {
+        'group': group,
+        'teams_form': GroupTeamForm()
+    })
+
+
 def manage_group(request, id=None):
     group = (Group() if not id else get_object_or_404(Group, pk=id))
     if request.method == 'POST':
@@ -401,7 +411,7 @@ def manage_group(request, id=None):
             msg_fmt = MSG_FMT_SUCCESS_ADD if not id else MSG_FMT_SUCCESS_UPD
             messages.success(request, msg_fmt % 'Group', extra_tags='success')
             if 'btn_save' in request.POST:
-                return redirect(reverse('', args=[id or new_group.id]))
+                return redirect(reverse('group-view', args=[id or new_group.id]))
             return redirect(reverse('group-insert'))
     else:
         group_form = GroupForm(instance=group)
