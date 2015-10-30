@@ -188,6 +188,8 @@ class PersonTest(EntityBaseTestCase):
 
 class TeamTest(TestCase):
     
+    fixtures = ['states', 'business-entities']
+    
     def test_cannot_save_without_nonblank_fields(self):
         with self.assertRaises(ValidationError):
             team = Team()
@@ -211,7 +213,18 @@ class TeamTest(TestCase):
     
     def test_team_deletion_only_sets_is_active_to_false(self):
         self.fail('write test')
-
+    
+    def test_can_retrieve_unassigned_teams(self):
+        PersonTest.person_setup(self)
+        Team.objects.create(code='ET-01', name='EnumTeam-#1')
+        Team.objects.create(code='ET-02', name='EnumTeam-#2')
+        team3 = Team.objects.create(code='ET-03', name='EnumTeam-#3')
+        group = Group.objects.create(name='EnumGroup-#1', supervisor=self.john)
+        group.teams.add(team3)
+        
+        available_teams = Team.objects.unassigned()
+        self.assertEqual(2, len(available_teams))
+        
 
 class TeamMembershipTest(TestCase):    
     

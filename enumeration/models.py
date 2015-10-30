@@ -221,12 +221,26 @@ class MemberRole:
 #         db_table = 'enum_member_role'
 
 
+class TeamManager(IsActiveManagerMixin, models.Manager):
+    
+    def unassigned(self):
+        # get teams that belong to groups already
+        qs_group = Group.objects.filter(is_active=True, teams__isnull=False)
+        team_ids = [t['teams'] for t in qs_group.values('teams')]
+        
+        return Team.objects.exclude(id__in=team_ids)
+    
+    def unassigned_as_choices(self):
+        for team in self.unassigned():
+            yield (team.id, '%s: %s' % (team.code, team.name))
+
+
 class Team(NamedEntityBase):
     code = models.CharField(max_length=20, unique=True)
     devices = models.ManyToManyField(Device)
     members = models.ManyToManyField(Person, through='TeamMembership')
     
-    objects = IsActiveManager()
+    objects = TeamManager()
     
     class Meta:
         db_table = 'enum_team'
