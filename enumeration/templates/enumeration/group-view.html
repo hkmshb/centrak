@@ -68,18 +68,17 @@
                                 <table class="table table-condensed">
                                     <thead>
                                         <tr><th><input type="checkbox" title="Toggle Selection" data-toggle="checked" data-target="record_ids" /></th>
-                                            <th>Code</th><th>Name</th><th>Type</th><th># People</th><th># Device</th></tr>
+                                            <th>Code</th><th>Name</th><th># People</th><th># Device</th></tr>
                                     </thead>
                                     <tbody>
                                     {% for t in group.teams.all %}
                                         <tr><td><input type="checkbox" name="record_ids" value="{{ t.id }}" /></td>
                                             <td>{{ t.code }}</td>
                                             <td>{{ t.name }}</td>
-                                            <td>{{ t.type }}</td>
-                                            <td>{{ t.members|length }}</td>
-                                            <td>{{ t.devices|length }}</td></tr>
+                                            <td>{{ t.members.count }}</td>
+                                            <td>{{ t.devices.count }}</td></tr>
                                     {% empty %}
-                                        <tr><td colspan="6">No Data Available.</td></tr>
+                                        <tr><td colspan="5">No Data Available.</td></tr>
                                     {% endfor %}
                                     </tbody>
                                 </table>
@@ -92,7 +91,7 @@
                             <div class="panel-heading">Team Form</div>
                             <div class="panel-body">
                             {% with f=teams_form %}
-                                <form class="form-horizontal" method="post" action="{ url 'group-team-add' team.id }">
+                                <form class="form-horizontal" method="post" action="{% url 'group-team-add' group.id %}">
                                     {% csrf_token %}
                                     <div class="form-group">
                                         <label class="col-sm-3">Details:</label>

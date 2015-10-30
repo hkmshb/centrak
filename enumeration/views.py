@@ -419,3 +419,22 @@ def manage_group(request, id=None):
         'form': group_form
     })
 
+
+def manage_group_team(request, id):
+    if request.method == 'POST':
+        group = get_object_or_404(Group, pk=id)
+        form = GroupTeamForm(data=request.POST)
+        if form.is_valid():
+            team = Team.objects.get(id = form.cleaned_data['team'])
+            group.teams.add(team)
+            
+            message = MSG_FMT_SUCCESS_ADD % 'Team'
+            messages.success(request, message, extra_tags='success')
+        else:
+            message = 'Team not added.'
+            for k in [e for e in form.errors.as_data() if e != '__all__']:
+                message += '%s' % form.errors[k][0];
+            messages.error(request, message, extra_tags='danger')
+    return redirect(reverse('group-view', args=[id]))
+    
+    

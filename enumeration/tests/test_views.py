@@ -267,15 +267,6 @@ class GroupingBaseTestCase(TestCase):
     
     fixtures = ['states', 'business-entities', 'device-options', 'devices']
     
-    url_teams = reverse('teams')
-    urlf_team_view = lambda s,x: reverse('team-view', args=[x])
-    urlf_team_device_add = lambda s,x: reverse('team-device-add', args=[x])
-    urlf_team_device_rem = lambda s,x: reverse('team-device-remove', args=[x])
-    
-    urlf_team_member_add = lambda s,x: reverse('team-member-add', args=[x])
-    urlf_team_member_rem = lambda s,x: reverse('team-member-remove', args=[x])
-    
-    
     def setUp(self):
         # create teams
         self.team = Team.objects.create(code='A', name='TeamA')
@@ -302,7 +293,15 @@ class GroupingBaseTestCase(TestCase):
     
 
 class TeamViewTest(GroupingBaseTestCase):
-
+    
+    url_teams = reverse('teams')
+    urlf_team_view = lambda s,x: reverse('team-view', args=[x])
+    urlf_team_device_add = lambda s,x: reverse('team-device-add', args=[x])
+    urlf_team_device_rem = lambda s,x: reverse('team-device-remove', args=[x])
+    
+    urlf_team_member_add = lambda s,x: reverse('team-member-add', args=[x])
+    urlf_team_member_rem = lambda s,x: reverse('team-member-remove', args=[x])
+    
     def test_add_device_form_has_only_unassigned_devices(self):        
         url_view = self.urlf_team_view(self.team.id)
         resp = self.client.get(url_view)
@@ -525,6 +524,8 @@ class GroupViewTest(GroupingBaseTestCase):
     
     url_group_add = reverse('group-insert')
     urlf_group_view = lambda s,x: reverse('group-view', args=[x])
+    urlf_group_team_add = lambda s,x: reverse('group-team-add', args=[x])
+    
     
     def setUp(self):
         GroupingBaseTestCase.setUp(self)
@@ -585,5 +586,13 @@ class GroupViewTest(GroupingBaseTestCase):
         self.assertIsNotNone(form)
         self.assertEqual(2, len(form.fields['team'].choices))
     
+    def test_can_add_team_via_POST_request(self):
+        urlf_add = self.urlf_group_team_add(self.group.id)
+        data = {'team': self.team.id}
+        resp = self.client.post(urlf_add, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        group = Group.objects.get(name=self.group.name)
+        self.assertEqual(1, len(group.teams.all())) 
     
     
