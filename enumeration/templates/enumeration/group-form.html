@@ -33,10 +33,10 @@
                             {% if not form.instance.id %}
                             <button type="submit" class="btn btn-primary" name="btn_save_new">Save & New</button>
                             <button type="button" class="btn btn-default" name="btn_cancel"
-                                    data-action-url="{}">Cancel</button>
+                                    data-action-url="{% url 'groups' %}">Cancel</button>
                             {% else %}
                             <button type="button" class="btn btn-default" name="btn_cancel"
-                                    data-action-url="{}">Cancel</button>
+                                    data-action-url="{% url 'group-view' form.instance.id %}">Cancel</button>
                             {% endif %}
                         </div>
                     </div>

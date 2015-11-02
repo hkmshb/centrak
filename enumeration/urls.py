@@ -45,6 +45,7 @@ urlpatterns = patterns('enumeration.views',
     
     url(r'^groups/$', 'group_list', name='groups'),
     url(r'^groups/create$', 'manage_group', name='group-insert'),
+    url(r'^groups/update/(?P<id>[0-9]+)$', 'manage_group', name='group-update'),
     url(r'^groups/view/(?P<id>[0-9]+)/$', 'view_group', name='group-view'),
     url(r'^groups/view/(?P<id>[0-9]+)/teams/add$', 'manage_group_team',
         name='group-team-add'),

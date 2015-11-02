@@ -523,6 +523,8 @@ class TeamViewTest(GroupingBaseTestCase):
 class GroupViewTest(GroupingBaseTestCase):
     
     url_group_add = reverse('group-insert')
+    urlf_group_upd = lambda s,x: reverse('group-update', args=[x])
+    
     urlf_group_view = lambda s,x: reverse('group-view', args=[x])
     urlf_group_team_add = lambda s,x: reverse('group-team-add', args=[x])
     
@@ -555,6 +557,18 @@ class GroupViewTest(GroupingBaseTestCase):
         
         # create groups
         self.group = Group.objects.create(name='GroupA', supervisor=self.john)
+    
+    def test_can_update_group_via_POST_request(self):
+        data = {'name': 'Group-X', 'supervisor': self.tosin.id}
+        upd_url = self.urlf_group_upd(self.group.id)
+        resp = self.client.post(upd_url, data=data)
+        self.assertEqual(302, resp.status_code)
+        
+        adjusted = Group.objects.get(pk=self.group.id)
+        self.assertTrue(adjusted.name != self.group.name
+                    and adjusted.supervisor.id != self.group.supervisor.id
+                    and adjusted.name == 'Group-X'
+                    and adjusted.supervisor.id == self.tosin.id)
     
     def test_add_group_form_has_only_unassigned_people(self):
         resp = self.client.get(self.url_group_add)
