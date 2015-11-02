@@ -440,5 +440,27 @@ def manage_group_team(request, id):
                 message += '%s' % form.errors[k][0];
             messages.error(request, message, extra_tags='danger')
     return redirect(reverse('group-view', args=[id]))
+
+
+def remove_group_team(request, id, team_id=None):
+    if request.method != 'POST':
+        raise Http404('Method type not supported.')
     
+    group = get_object_or_404(Group, pk=id)
+    target_ids = (team_id or request.POST.getlist('record_ids'))
+    if not target_ids:
+        return redirect(reverse('group-view', args=[id]))
     
+    failed_ids = []
+    for item_id in target_ids:
+        try:
+            team = Team.objects.get(pk=item_id)
+            group.teams.remove(team)
+        except ObjectDoesNotExist:
+            failed_ids.append(item_id)
+    
+    utils.add_message_for_m2m_removal_operation(
+        request, 'team(s)', len(target_ids), len(failed_ids)
+    )
+    return redirect(reverse('group-view', args=[id]))
+

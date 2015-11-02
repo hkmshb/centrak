@@ -527,6 +527,7 @@ class GroupViewTest(GroupingBaseTestCase):
     
     urlf_group_view = lambda s,x: reverse('group-view', args=[x])
     urlf_group_team_add = lambda s,x: reverse('group-team-add', args=[x])
+    urlf_group_team_rmv = lambda s,x: reverse('group-team-remove', args=[x])
     
     
     def setUp(self):
@@ -608,5 +609,16 @@ class GroupViewTest(GroupingBaseTestCase):
         
         group = Group.objects.get(name=self.group.name)
         self.assertEqual(1, len(group.teams.all())) 
+    
+    def test_can_remove_team_via_POST_request(self):
+        self.group.teams.add(self.team)
+        self.assertEqual(1, self.group.teams.count())
+        
+        rmv_url = self.urlf_group_team_rmv(self.group.id)
+        resp = self.client.post(rmv_url, data={'record_ids': self.team.id})
+        self.assertEqual(302, resp.status_code)
+        
+        group = Group.objects.get(pk=self.group.id)
+        self.assertEqual(0,  group.teams.count())
     
     

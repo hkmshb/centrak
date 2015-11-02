@@ -53,7 +53,7 @@
                 <div class="row">
                     
                     <div class="col-xs-8">
-                        <form data-bind="table" method="post" action="{ url 'group-team-remove' team.id }">
+                        <form data-bind="table" method="post" action="{% url 'group-team-remove' group.id %}">
                             {% csrf_token %}
                             <div class="panel panel-flat">
                                 <div class="panel-heading">
