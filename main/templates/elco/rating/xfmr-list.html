@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
-{% load static elco_core_tags elco_network_tags %}
+{% load static core_tags elco_core_tags elco_network_tags %}
 {% block content %}
   <h1>TRANSFORMER RATINGS</h1>
   
   <div class="table-listing-ext">
-    {% with p=records %}
+    {% paginate_records records as p %}
     <form data-bind="table" method="post" action="{% url 'rating-transformer-delete' %}"
           data-paging-numbers="{{ p.paging_numbers }}">
       <div class="panel panel-flat">
@@ -28,7 +28,6 @@
         {% endwith %}
       </div>
     </form>
-    {% endwith %}
   </div>
 {% endblock %}
 {% block name %}

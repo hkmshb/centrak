@@ -15,4 +15,30 @@
     <tr><td colspan="{{ field_names|length|add:1}}">No Data Available.</td></tr>
   {% endfor %}
   </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="{{ field_names|length|add:1 }}">
+        <div class="pagination-packed">
+          <div class="summary">
+            <span>{{ p.start_index }} - {{ p.end_index }} of {{ p.paginator.count }} items @</span>
+            <select name="pageSize">
+            {% for size in p.page_sizes %}
+              <option{% ifequal p.current_size size %} selected{% endifequal %}>{{ size }}</option>
+            {% endfor %}
+            </select>
+            <span>per page</span>
+          </div>
+          
+          <div class="controls">
+           <span name="first" class="btn btn-default glyphicon glyphicon-fast-backward"></span>
+           <span name="prev" class="btn btn-default glyphicon glyphicon-step-backward"></span>
+           <input type="number" name="page" min="1" max="{{ p.paginator.num_pages }}" value="{{ p.number }}" />
+               / {{ p.paginator.num_pages }} 
+           <span name="next" class="btn btn-default glyphicon glyphicon-step-forward"></span>
+           <span name="last" class="btn btn-default glyphicon glyphicon-fast-forward"></span>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
 </table>

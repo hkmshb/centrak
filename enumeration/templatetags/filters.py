@@ -1,5 +1,4 @@
-from django import template
-register = template.Library()
+from centrak.core.registry import register
 
 
 
