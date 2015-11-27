@@ -6,6 +6,10 @@
         </a>
         <ul class="dropdown-menu">
             <li><a href="{% url 'rating-transformer-list' %}">Transformer Ratings</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'station-list' "transmissions" %}">Transmission Stations</a></li>
+            <li><a href="{% url 'station-list' "injections" %}">Injection Stations</a></li>
+            <li><a href="{% url 'station-list' "distributions" %}">Distribution Stations</a></li>
         </ul>
     </li>
     <li class="dropdown">

@@ -1,0 +1,118 @@
+{% extends 'layout.html' %}
+{% load core_tags elco_core_tags elco_network_tags %}
+{% block content %}
+  {% if form.errors %}
+  <div class="alert alert-messages alert-danger">
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  
+  <div class="pad-top">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        {{ station_type_name|capfirst|slice:":-1" }} Station Information
+        
+        <div class="btn-controls pull-right">
+          <div class="btn-group">
+            <button type="button" class="btn-link" name="btn_action" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-cog"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="{{ station.get_absolute_url }}update">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    &nbsp; Update Station
+                  </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+      <div class="panel-body">
+        <div class="label-group">
+          <div class="label-row-group">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Code</label>
+              <label class="label-value">{{ station.code }}</label>
+            </div>
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Name</label>
+              <label class="label-value">{{ station.name }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        
+          <div class="label-row-group divider">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Voltage Ratio</label>
+              <label class="label-value">{{ station.get_voltage_ratio_display }}</label>
+            </div>
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Dedicated</label>
+              <label class="label-value">{{ station.is_dedicated }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        
+          <div class="label-row-group divider">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Address</label>
+              <label class="label-value">{{ station.address }}</label>
+            </div>
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Date Commissioned</label>
+              <label class="label-value">{{ station.date_commissioned|default:"---" }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        
+          <div class="label-row-group">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Notes</label>
+              <label class="label-value">{{ station.notes }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="tabbed-control table-listing">
+      <ul class="nav nav-flattabs">
+      {% for label in station.asset_labels %}
+        <li {% ifequal asset_type_name label %}class="active"{% endifequal %}><a href="{{ request.path|make_station_asset_list_url:label }}">{{ label|capfirst }}</a></li>
+      {% endfor %}
+      </ul>
+      
+      <div class="tab-content table-listing pad-top">
+        <div class="tab-pane fade in active table-listing">
+        {% paginate_records asset_list as p %}
+          <form data-bind="table" method="post" action="{{ request.path|make_station_asset_action_url:"delete" }}">
+          {% csrf_token %}
+            <div class="panel panel-flat">
+              <div class="panel-heading">
+                &nbsp;
+                <div class="btn-controls pull-right">
+                  <div class="btn-group">
+                    <button type="button" class="btn-link" name="btn_add" title="Add" data-action-url="{{ request.path|make_station_asset_action_url:"create" }}">
+                      <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                  </div>
+                  <button type="button" class="btn-link del-link" name="btn_delete" title="Remove Selected">
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </button>
+                </div>
+              </div>
+              
+              {% get_station_asset_table_fields_with_model station asset_type_name as result %}
+              {% with field_names=result|first model=result|last %}
+                {% include '_table.html' with field_names=field_names model=model records=p %} 
+              {% endwith %}
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+{% endblock %}
