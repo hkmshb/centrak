@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% load elco_core_tags elco_network_tags %}
+{% block content %}
+  {% if form.errors %}
+  <div class="alert alert-messages alert-danger">
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  
+  <div class="pad-top">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        {{ entity_name }} Information
+        
+        <div class="btn-controls pull-right">
+          <div class="btn-group">
+            <button type="button" class="btn-link" name="btn_action" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-cog"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="update">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    &nbsp; Update {{ entity_name }}
+                  </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel-body">
+        <div class="label-group">
+        {% with form|visible_fields as visible_fields %}
+        {% for names in visible_fields|make_fields_name_chunks_of:2 %}
+          <div class="label-row-group">
+          {% for name in names %}
+            <div class="label-row col-xs-6">
+              <label class="{{ label_class|default:"label-name-xxlg" }}">{{ form.instance|field_verbose_name:name }}</label>
+              <label class="label-value">{{ form.instance|field_value:name }}</label>
+            </div>
+          {% endfor %}
+            <div class="clearfix"></div>
+          </div>
+        {% endfor %}
+        {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

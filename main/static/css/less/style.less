@@ -225,16 +225,27 @@ h4 {
     }
     
     .label-name,
-    .label-name-lg {
+    .label-name-lg,
+    .label-name-xlg,
+    .label-name-xxlg {
         display: inline-block;
         width: 60px;
         font-size: 10pt;
         font-weight: bold;
+        vertical-align: top;
         border-right: dotted 1px #ddd;
     }
     
     .label-name-lg {
         width: 85px;
+    }
+    
+    .label-name-xlg {
+        width: 100px;
+    }
+    
+    .label-name-xxlg {
+        width: 110px;
     }
     
     .label-value {
@@ -257,24 +268,37 @@ h4 {
     
     &.has-error {
         .form-label,
-        .form-label-lg {
+        .form-label-lg,
+        .form-label-xlg,
+        .form-label-xxlg {
             color: @brand-danger;
         }
     }
     
     .form-label,
-    .form-label-lg {
+    .form-label-lg,
+    .form-label-xlg,
+    .form-label-xxlg {
         display: inline-block;
         width: 60px;
         font-size: 10pt;
         font-weight: bold;
         text-align: right;
         padding-right: 7px;
+        vertical-align: top;
         border-right: dotted 1px #ddd;
     }
     
     .form-label-lg {
         width: 85px;
+    }
+    
+    .form-label-xlg {
+        width: 100px;
+    }
+    
+    .form-label-xxlg {
+        width: 110px;
     }
     
     .form-control {

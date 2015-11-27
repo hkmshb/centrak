@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+{% block content %}
+  {% if form.errors %}
+  <div class="alert alert-messages alert-danger">
+      <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+      {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  
+  <div class="pad-top">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        {% if form.instance.id %}Update{% else %}Add{% endif %}
+        Transformer Rating
+      </div>
+      
+      <div class="panel-body">
+        {% include '_form.html' with form=form %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

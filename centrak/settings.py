@@ -11,6 +11,7 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 
+import elco
 
 
 def get_env_var(name, default=None):
@@ -43,7 +44,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,13 +53,14 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     
     # third-party apps
+    'widget_tweaks',
     'select2',
     
     # centrak apps
     'main',
     'core',
     'enumeration',
-)
+] + elco.ELCO_CORE_APPS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
