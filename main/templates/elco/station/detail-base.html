@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+{% load core_tags elco_core_tags elco_network_tags %}
+{% block content %}
+  {% if form.errors %}
+  <div class="alert alert-messages alert-danger">
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+    {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+  
+  <div class="pad-top">
+    <div class="panel panel-flat">
+      <div class="panel-heading">
+        {{ station_type_name|capfirst|slice:":-1" }} Station Information
+        
+        <div class="btn-controls pull-right">
+          <div class="btn-group">
+            <button type="button" class="btn-link" name="btn_action" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-cog"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="{{ station.get_absolute_url }}update">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    &nbsp; Update Station
+                  </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+      <div class="panel-body">
+        <div class="label-group">
+          <div class="label-row-group">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Code</label>
+              <label class="label-value">{{ station.code }}</label>
+            </div>
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Name</label>
+              <label class="label-value">{{ station.name }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        
+          <div class="label-row-group divider">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Voltage Ratio</label>
+              <label class="label-value">{{ station.get_voltage_ratio_display }}</label>
+            </div>
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Dedicated</label>
+              <label class="label-value">{{ station.is_dedicated }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        
+          <div class="label-row-group divider">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Address</label>
+              <label class="label-value">{{ station.address }}</label>
+            </div>
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Date Commissioned</label>
+              <label class="label-value">{{ station.date_commissioned|default:"---" }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        
+          <div class="label-row-group">
+            <div class="label-row col-xs-6">
+              <label class="label-name-xxlg">Notes</label>
+              <label class="label-value">{{ station.notes }}</label>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {% block content-extra %}{% endblock %}
+  </div>
+{% endblock %}

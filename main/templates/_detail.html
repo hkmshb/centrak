@@ -1,17 +1,8 @@
-{% extends 'layout.html' %}
 {% load elco_core_tags elco_network_tags %}
-{% block content %}
-  {% if form.errors %}
-  <div class="alert alert-messages alert-danger">
-    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-    {{ form.non_field_errors }}
-  </div>
-  {% endif %}
-  
   <div class="pad-top">
     <div class="panel panel-flat">
       <div class="panel-heading">
-        {{ entity_name }} Information
+        {{ entity_name|capfirst }} Information
         
         <div class="btn-controls pull-right">
           <div class="btn-group">
@@ -36,7 +27,7 @@
           {% for name in names %}
             <div class="label-row col-xs-6">
               <label class="{{ label_class|default:"label-name-xxlg" }}">{{ form.instance|field_verbose_name:name }}</label>
-              <label class="label-value">{{ form.instance|field_value:name }}</label>
+              <label class="label-value">{{ form.instance|field_value:name|default:"---" }}</label>
             </div>
           {% endfor %}
             <div class="clearfix"></div>
@@ -47,4 +38,3 @@
       </div>
     </div>
   </div>
-{% endblock %}

@@ -1,4 +1,4 @@
-from centrak.core.registry import register
+from core.registry import register
 
 
 
