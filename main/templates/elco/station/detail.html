@@ -29,8 +29,8 @@
               </div>
               
               {% get_station_asset_table_fields_with_model station asset_type_name as result %}
-              {% with field_names=result|first model=result|last %}
-                {% include '_table.html' with field_names=field_names model=model records=p %} 
+              {% with field_names=result|first model=result|last base_url=request.path|make_station_asset_action_url:"" %}
+                {% include '_table.html' with field_names=field_names model=model records=p item_base_url=base_url %} 
               {% endwith %}
               </div>
             </div>

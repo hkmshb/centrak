@@ -9,7 +9,7 @@
   <tbody>
   {% for item in records %}
     <tr><td><input type="checkbox" name="record_ids" value="{{ item.id }}" /></td>
-        <td><a href="{{ item.id }}/">{{ item|field_value:field_names.0 }}</a></td>
+        <td><a href="{{ item_base_url }}{{ item.id }}/">{{ item|field_value:field_names.0 }}</a></td>
     {% for name in field_names|slice:"1:" %}<td>{{ item|field_value:name }}</td>{% endfor %}</tr>
   {% empty %}
     <tr><td colspan="{{ field_names|length|add:1}}">No Data Available.</td></tr>
