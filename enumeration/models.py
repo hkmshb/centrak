@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from core.models import BusinessOffice
@@ -244,6 +245,22 @@ class Team(NamedEntityBase):
     
     class Meta:
         db_table = 'enum_team'
+    
+    def get_absolute_url(self):
+        args = [self.id]
+        return reverse('team-view', args=args)
+    
+    @staticmethod
+    def get_devices_part_label():
+        return 'devices'
+    
+    @staticmethod
+    def is_devices_part_label(label):
+        return label == 'devices'
+    
+    @staticmethod
+    def part_labels():
+        return ['members', 'devices']
 
 
 class TeamMembership(models.Model):

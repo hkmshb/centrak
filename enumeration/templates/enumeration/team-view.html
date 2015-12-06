@@ -46,13 +46,14 @@
     
     <div class="tabbed-control table-listing">
         <ul class="nav nav-flattabs">
-            <li class="active"><a href="#members" data-toggle="tab">Members</a></li>
-            <li><a href="#devices" data-toggle="tab">Devices</a></li>
+        {% for label in team.part_labels %}
+            <li {% ifequal part_type label %}class="active"{% endifequal %}><a href="{{ team.get_absolute_url }}{{ label }}/">{{ label|capfirst }}</a></li>
+        {% endfor %}
         </ul>
         
         <div class="tab-content table-listing pad-top">
-            
-            <div id="members" class="tab-pane fade in active table-listing">
+            {%ifnotequal part_type team.get_devices_part_label %}
+            <div id="members" class="tab-pane active fade in table-listing">
                 <div class="row">
                     
                     <div class="col-xs-8">
@@ -88,13 +89,13 @@
                                 </table>
                             </div>
                         </form>
-                    </div>                    
+                    </div>
                     
                     <div class="col-xs-4">
                         <div class="panel panel-flat">
                             <div class="panel-heading">Member Form</div>
                             <div class="panel-body">
-                            {% with f=members_form %}
+                            {% with f=form %}
                                 <form class="form-horizontal" method="post" action="{% url 'team-member-add' team.id %}">
                                     {% csrf_token %}
                                     <div class="form-group">
@@ -122,8 +123,8 @@
 		            
 	            </div>
             </div>
-            
-            <div id="devices" class="tab-pane fade table-listing">
+            {% else %}
+            <div id="devices" class="tab-pane fade in active table-listing">
                 <div class="row">
 
                     <div class="col-xs-8">
@@ -165,7 +166,7 @@
 	                            <form class="form-horizontal flex-right" method="post" action="{% url 'team-device-add' team.id %}">
 	                                {% csrf_token %}
 	                                <div class="form-group" style="padding-left: 15px">
-	                                   {{ devices_form.device }}
+	                                   {{ form.device }}
 	                                </div>	                                
 	                                <button type="submit" class="btn btn-primary" style="padding:3px 5px;">Add Device</button>
 	                            </form>
@@ -175,7 +176,8 @@
                     
                 </div>
             </div>
-        </div>        
+            {% endifnotequal %}
+        </div>
     </div>
 </div>
 {% endblock %}

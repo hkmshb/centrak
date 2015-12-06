@@ -260,13 +260,19 @@ def team_list(request):
     })
 
 
-def view_team(request, id):
-    team = get_object_or_404(Team, pk=id)    
+def view_team(request, id, part_type=None):
+    team = get_object_or_404(Team, pk=id)
+    part_type = (part_type or 'members')
+    
+    form = TeamMemberForm(team)
+    if part_type == 'devices':
+        form = TeamDeviceForm()
+    
     return render(request,
         'enumeration/team-view.html', {
+        'part_type': part_type,
         'team': team,
-        'devices_form': TeamDeviceForm(),
-        'members_form': TeamMemberForm(team)
+        'form': form
     })
 
 
@@ -303,7 +309,7 @@ def manage_team_device(request, id):
             device = Device.objects.get(pk=device_id)
             team.devices.add(device)
             
-    return redirect(reverse('team-view', args=[id]))
+    return redirect(reverse('team-view-ext', args=[id, 'devices']))
 
 
 def remove_team_device(request, id, device_id=None):
@@ -326,7 +332,7 @@ def remove_team_device(request, id, device_id=None):
     utils.add_message_for_m2m_removal_operation(
         request, 'device(s)', len(target_ids), len(failed_ids)
     )
-    return redirect(reverse('team-view', args=[id])) 
+    return redirect(reverse('team-view-ext', args=[id, 'devices'])) 
 
 
 def manage_team_member(request, id):
@@ -361,7 +367,7 @@ def manage_team_member(request, id):
                 message += '%s ' % form.errors[k][0];
             messages.error(request, message, extra_tags='danger')
     
-    return redirect(reverse('team-view', args=[id]))
+    return redirect(reverse('team-view-ext', args=[id, 'members']))
 
 
 def remove_team_member(request, id, member_id=None):
@@ -385,7 +391,7 @@ def remove_team_member(request, id, member_id=None):
     utils.add_message_for_m2m_removal_operation(
         request, 'member(s)', len(target_ids), len(failed_ids)
     )
-    return redirect(reverse('team-view', args=[id]))
+    return redirect(reverse('team-view-ext', args=[id, 'members']))
 
 
 def group_list(request):
