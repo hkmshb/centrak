@@ -37,7 +37,7 @@ urlpatterns = patterns('enumeration.views',
     url(r'^teams/(?P<id>\d+)/',
         include([
             url(r'^$', 'enumeration.views.view_team', name='team-view'),
-            url(r'^update', 'enumeration.views.manage_team', name='team-update'),
+            url(r'^update$', 'enumeration.views.manage_team', name='team-update'),
             url(r'^(?P<part_type>(devices|members))/$', 'enumeration.views.view_team',
                 name='team-view-ext'),
             
@@ -57,13 +57,21 @@ urlpatterns = patterns('enumeration.views',
         ]),
     ),
     
-    
+    # groups
     url(r'^groups/$', 'group_list', name='groups'),
     url(r'^groups/create$', 'manage_group', name='group-insert'),
-    url(r'^groups/update/(?P<id>[0-9]+)$', 'manage_group', name='group-update'),
-    url(r'^groups/view/(?P<id>[0-9]+)/$', 'view_group', name='group-view'),
-    url(r'^groups/view/(?P<id>[0-9]+)/teams/add$', 'manage_group_team',
-        name='group-team-add'),
-    url(r'^groups/view/(?P<id>[0-9]+)/teams/remove(/(?P<team_id>[0-9]+))?', 
-        'remove_group_team', name='group-team-remove'),
+    url(r'^groups/(?P<id>\d+)/',
+        include([
+            url(r'^$', 'enumeration.views.view_group', name='group-view'),
+            url(r'^update$', 'enumeration.views.manage_group', name='group-update'),
+            
+            ## teams
+            url(r'^teams/add$', 'enumeration.views.manage_group_team',
+                name='group-team-add'),
+            url(r'^teams/remove(/(?P<team_id>\d+))?$',
+                'enumeration.views.remove_group_team',
+                name='group-team-remove'),
+        ])
+    ),
 )
+
