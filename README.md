@@ -1,3 +1,5 @@
-# centrak
+# CENTrak
 
-centrak (Customer Enumeration Tracker): a lightweight data entry, collation and monitoring web application for KEDCO's mobile-based customer enumeration exercise.
+Customer Enumeration Tracker. A web application to provide streamlined access
+to captured customer data and ease day-to-day management, analysis and reporting 
+of gathered data.

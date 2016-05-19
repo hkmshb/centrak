@@ -1,4 +1,0 @@
-Django==1.8.4
-django-select2-forms==1.1.25
-psycopg2==2.6.1
-wheel==0.24.0
