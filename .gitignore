@@ -1,6 +1,7 @@
-*.py[co]
-.*project
-
-
 .settings/
-*/static/css/*.css
+
+
+.*project
+*.sqlite3
+*.py[co]
+.*
