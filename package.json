@@ -1,0 +1,27 @@
+{
+  "name": "CENTrak",
+  "version": "0.3.0",
+  "description": "Customer Enumeration Tracker",
+  "main": "gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@eagle-eye.io:abdulhakeem/centrak.git"
+  },
+  "keywords": [
+    "centrak",
+    "enumeration",
+    "customer-enumeration"
+  ],
+  "author": "hkmshb <hkmshb@gmail.com>",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-less": "^1.2.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}

@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}CENTrak{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="{% block meta-keywords %}{% endblock %}">
+    <meta name="description" content="{% block meta-description %}{% endblock %}">
+    {% block meta-extra %}{% endblock %}
+    {% if debug %}
+    <link rel="stylesheet" href="{% static 'bower_comps/bootstrap/dist/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'bower_comps/font-awesome/css/font-awesome.min.css' %}" />
+    {% endif %}
+    {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}
+    {% block head-extra %}{% endblock %}
+</head>
+<body id="{% block body-id %}body{% endblock %}" class="{% block body-class %}{% endblock %}">
+    {% block skeleton-content %}{% endblock %}
+    
+    <!-- ===+: le scripts  -->
+    {% if debug %}
+    <script src="{% static 'bower_comps/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_comps/jquery-validation/dist/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'bower_comps/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    {% endif %}
+    {% block script-extra %}{% endblock %}
+</body>
+</html>

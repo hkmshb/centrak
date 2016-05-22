@@ -1,0 +1,32 @@
+{
+  "name": "centrak",
+  "description": "Customer Enumeration Tracker",
+  "main": "",
+  "authors": [
+    "hkmshb <hkmshb@gmail.com>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "centrak",
+    "enumeration",
+    "customer-enumeration"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_comps",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.4",
+    "jquery-validation", "^1.15.0",
+    "bootstrap": "^3.3.6",
+    "font-awesome": "^4.5.0",
+  }
+}

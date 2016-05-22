@@ -1,6 +1,10 @@
+node_modules/
+bower_comps/
+__pycache__/
 .settings/
 
 
+**/css/*.css
 .*project
 *.sqlite3
 *.py[co]
