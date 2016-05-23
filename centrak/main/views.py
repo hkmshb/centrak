@@ -22,8 +22,11 @@ def register_account(request):
 
 
 def registration_complete(request):
-    context = {}
-    return render(request, 'account/registration_complete.html', context)
+    return render(request, 'account/registration_complete.html')
+
+
+def password_reset(request):
+    return render(request, 'account/password_reset.html')
 
 
 #: ===+: main view functions
