@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="form-register register-block">
+        <form method="post">
+            <div class="form-header">
+                <h2 class="moderate">Create a CENTrak Account</h2>
+            </div>
+            <div class="form-body">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                    {{ form.first_name }} 
+                    <p class="text-danger">{{ form.first_name.errors|first }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                    {{ form.last_name }} 
+                    <p class="text-danger">{{ form.last_name.errors|first }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">KEDCO Email</label>
+                    {{ form.email }} 
+                    <p class="note">This will be your username - would be verified before account activation.</p>
+                    <p class="text-danger">{{ form.email.errors|first }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}">Password</label>
+                    {{ form.password1 }} 
+                    <p class="text-danger">{{ form.password1.errors|first }}</p>
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                    {{ form.password2 }} 
+                    <p class="text-danger">{{ form.password2.errors|first }}</p>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success pull-right">Create An Account</button>
+                    {% csrf_token %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block style-extra %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}" />
+{% endblock %}

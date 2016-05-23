@@ -109,3 +109,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+
+# Auth:
+LOGIN_URL = '/account/login'
+LOGIN_REDIRECT_URL = '/'
+
+
+##: ===+: Internal
+CENTRAK_KEDCO_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']

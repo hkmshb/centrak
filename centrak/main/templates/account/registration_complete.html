@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="register-block">
+        <h2><i class="fa fa-check-circle-o text-success"></i> Account Created!</h2>
+        <p>
+            A CENTrak account has been successfully created for you. 
+        </p>
+        <p>
+            However, you cannot login yet using this account until it gets
+            activated by the the CENTrak Administrator.
+        </p>
+        <hr/>
+        
+        <div class="callout callout-info">
+            <p>
+	            The supplied details will be reviewed as soon as possible (usually
+	            within the same work day) and where request is determined to be 
+	            genuine you will be contacted (if necessary) to ascertain your
+	            need for access to the platform. Thereafter, your account would be
+	            activated and you will be notified as to this effect.
+            </p>
+            <p>
+                To expediate the review process, please contact KEDCO ICT with
+                respect to this regard as soon as possible.
+            </p>
+        </div>
+        <hr/>
+        
+        <p class="callout callout-warning">
+            If you are not contacted for activation review or with an activation
+            notice, please contact KEDCO ICT on how best to proceed.
+        </p>
+        <hr/>
+    </div>
+{% endblock %}
+{% block style-extra %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}" />
+{% endblock %}

@@ -9,6 +9,7 @@ module.exports = function(grunt) {
                 },
                 files: {
                     'centrak/static/css/site.css': 'centrak/static/less/site.less',
+                    'centrak/static/css/account.css': 'centrak/static/less/account.less',
                 } 
             }
         },

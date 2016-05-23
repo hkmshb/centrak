@@ -145,9 +145,34 @@ footer {
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
     height: 30px;
     
     .fa-heart {
         color: red;
     }
 }
+
+
+/* ==============================+
+ |  widets
+ + =====================================================================*/
+
+// callout
+
+.callout {
+    padding: 5px 10px;
+    margin: 20px 0;
+    border: solid 1px #eee;
+    border-radius: 4px 7px 7px 4px;
+    border-left-width: 7px;
+    text-align: justify;
+    background-color: #f9f9f9;
+
+    p.small { font-size: 11px; }
+}
+
+.callout-info { border-left-color: @brand-info; }
+.callout-success { border-left-color: @brand-success; }
+.callout-warning { border-left-color: @brand-warning; }
+.calllout-danger { border-left-color: @brand-danger; }

@@ -16,7 +16,7 @@
                 <ul class="nav navbar-nav">
                     <li><a href="{ url 'login' }"><i class="fa fa-fw fa-sign-in"></i> Login</a></li>
                     <li class="sep">|</li>
-                    <li><a href="{ url 'register' }"><i class="fa fa-fw fa-male"></i> Register</a></li>
+                    <li><a href="{% url 'register' %}"><i class="fa fa-fw fa-male"></i> Register</a></li>
                 </ul>
             </div>
         </div>
@@ -24,14 +24,29 @@
     <nav class="header light-shadow header-fixed-top">
         <div class="container">
             <div class="header-title">
-                <h1 class="small">{% block header-title %}{:Header}{% endblock %}</h1>
+                <h1 class="small">{% block header-title %}{% endblock %}</h1>
             </div>
         </div>
     </nav>
     {% block content-wrapper %}
     <div id="content-wrapper">
         <div class="container">
-            {% block container-content %}{% endblock %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-message alert-{{ message.extra_tags }}">
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-message alert-danger">
+                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
         </div>
     </div>
     {% endblock %}
