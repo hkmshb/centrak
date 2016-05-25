@@ -14,18 +14,31 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse navbar-right">
                 <ul class="nav navbar-nav">
+                {% if request.user.is_authenticated %}
+                    {% include 'main/snippets/authd_nav_items.html' %}
+                {% else %}
                     <li><a href="{% url 'login' %}"><i class="fa fa-fw fa-sign-in"></i> Login</a></li>
                     <li class="sep">|</li>
                     <li><a href="{% url 'register' %}"><i class="fa fa-fw fa-male"></i> Register</a></li>
+                {% endif %}
                 </ul>
             </div>
         </div>
     </div>
     <nav class="header light-shadow header-fixed-top">
         <div class="container">
-            <div class="header-title">
+            <div class="header-title hide">
                 <h1 class="small">{% block header-title %}{% endblock %}</h1>
             </div>
+            {% if request.user.is_authenticated %}
+            <div class="header-body x-pull-right">
+                <ul class="nav nav-flattabs">
+                {% for item in menu.children %}
+                    {% include 'main/snippets/app_menu_item.html' with item=item %}
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
         </div>
     </nav>
     {% block content-wrapper %}
@@ -53,7 +66,7 @@
     <footer>
         <div class="container">
             <div class="legal-info">
-                Copyright &copy; 2015-{:year}, <a href="http://kedco.ng">KEDCO</a>
+                Copyright &copy; 2015-{{ current_date|date:"Y" }}, <a href="http://kedco.ng">KEDCO</a>
                 |
                 <span>
                     Made with <i class="fa fa-heart"></i> by KEDCO ICT Team

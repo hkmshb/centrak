@@ -21,6 +21,7 @@
  +----------------------------------------------------------------------*/
 
 // fonts:
+@b-font-size:           12px;
 @b-font-stack:          Roboto, OpenSans, Verdana, sans-serif;
 @h-font-stack:          Economica, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -30,6 +31,7 @@
 @strip-border-color:    #c7c7c7;
 @shadow-color:          #888;
 
+@nav-flattabs-border-size: 2px;
 
 /*------------------------------+
  |  base styling
@@ -44,7 +46,7 @@ body {
     padding: 0;
     overflow-y: scroll;
     background-color: @body-bg;
-    font: 12px/20px normal @b-font-stack;
+    font: @b-font-size/20px normal @b-font-stack;
     
     // :for sticky-footer:
     margin-bottom: 30px;
@@ -153,6 +155,47 @@ footer {
     }
 }
 
+// ===+: helper class
+.text-sm {
+    font-size: 10px;
+}
+
+
+/* ==============================+
+ |  admin adjustments
+ + =====================================================================*/
+@adm-header-bg:                 #b3c6d1;
+@adm-nav-border-color:          #c20a58;
+@adm-nav-link-hover-bg-color:   lighten(@adm-header-bg, 3%);
+ 
+.adm { 
+    .header {
+        background-color: @adm-header-bg;
+    }
+    .nav-flattabs {
+        > li {
+            > a {
+                border-bottom: solid @nav-flattabs-border-size @adm-header-bg;
+                &:focus,
+                &:hover { 
+                    background-color: @adm-nav-link-hover-bg-color;
+                    border-bottom: solid @nav-flattabs-border-size lighten(@adm-nav-border-color, 3%);
+                }
+            }
+            &.active > a {
+                background-color: lighten(@adm-header-bg, 5%);
+                border-bottom: solid @nav-flattabs-border-size @adm-nav-border-color;
+                
+                &:hover,
+                &:focus, & { 
+                    background-color: @adm-nav-link-hover-bg-color;
+                    border-bottom: solid @nav-flattabs-border-size @adm-nav-border-color;
+                }
+            }
+        }
+    }
+}
+
 
 /* ==============================+
  |  widets
@@ -176,3 +219,77 @@ footer {
 .callout-success { border-left-color: @brand-success; }
 .callout-warning { border-left-color: @brand-warning; }
 .calllout-danger { border-left-color: @brand-danger; }
+
+// nav-flattabs
+
+.nav-flattabs {
+    > li {
+        float: left;
+        
+        // actual tabs
+        > a {
+            color: @text-color;
+            margin-right: 2px;
+            padding: 12px 15px 6px;
+            line-height: @line-height-base;
+            border: 1px solid transparent;
+            border-bottom: solid @nav-flattabs-border-size @header-nav-bg;
+            
+            &:hover {
+                border-radius: none;
+                border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 20%);
+            }
+        }
+        
+        &.active > a,
+        &.active > span {
+            &,
+            &:hover,
+            &:focus {
+                color: @nav-tabs-active-link-hover-color;
+                background-color: @nav-link-hover-bg;
+                border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 5%);
+            }
+        }
+    }
+}
+
+
+// navbar-nav
+
+.navbar-nav {
+    li.strip-user > a {
+        padding: 5px 5px 5px 5px;
+        margin: 10px auto auto;
+        
+        img {
+            margin-top: -3px;
+            margin-right: 3px;
+        }
+    }
+    
+    li.strip-notification {
+        .badge {
+            margin-top: -18px;
+            margin-left: -10px;
+        }
+        .badge.text-sm {
+            padding: 2px 4px;
+            font-size: 10px;
+            font-weight: normal;
+        }
+        .badge.bg-danger {
+            background-color: @brand-danger;
+        }
+    }
+}
+
+// bootstrap overwrite: dropdown-menu
+
+ul.dropdown-menu {
+    font-family: @b-font-stack;
+    font-size: 13px;
+}
+ul.dropdown-menu.wide-menu {
+    li > a { padding: 3px 10px; }
+}

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -27,6 +28,12 @@ def registration_complete(request):
 
 def password_reset(request):
     return render(request, 'account/password_reset.html')
+
+
+#: ===+: admin view functions
+@login_required
+def admin_home(request):
+    return render(request, 'main/admin/index.html')
 
 
 #: ===+: main view functions

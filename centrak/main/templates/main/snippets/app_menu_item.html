@@ -1,0 +1,11 @@
+{% if item.is_separator %}<li class="divider"></li>{% else %}
+{% if not item.children %}<li{% if item.is_active %} class="active"{% endif %}><a href="{{ item.url }}">{{ item.text }}</a></li>{% else %}
+    <li class="dropdown{% if item.is_active %} active{% endif %}">
+        <a href="" class="dropdown-toggle" data-toggle="dropdown">{{ item.text }} <i class="caret"></i></a>
+        <ul class="dropdown-menu">
+        {% for child in item.children %}
+            {% include 'main/snippets/app_menu_item.html' with item=child %}
+        {% endfor %}
+        </ul>
+    </li> 
+{% endif %}{% endif %}
