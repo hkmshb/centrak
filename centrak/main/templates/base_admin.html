@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block body-class %}adm{% endblock %}
 {% block content %}
-    
+    <div class="admin-menu"></div>
+    <div class="admin-content">
+        {% block admin-content %}{% endblock %}
+    </div>
 {% endblock %}

@@ -7,15 +7,15 @@ from django.conf import settings
 
 
 
-class Menu:
+class Menu(object):
     """Defines the application menu."""
     
-    class Item(namedtuple('Item', ['text', 'url', 'children'])):
+    class Item(namedtuple('Item', ['menu', 'text', 'url', 'children'])):
         
-        def __new__(cls, menu, text, url=None or '', children=None):
-            kwargs = {'text':text, 'url':url, 'children': children or []}
+        def __new__(cls, menu, text, url=None, children=None):
+            kwargs = {'menu': menu, 'text': text,  'url': url or '', 
+                      'children': children or []}
             item = super(Menu.Item, cls).__new__(cls, **kwargs)
-            item.__dict__['menu'] = menu
             return item
         
         def is_active(self):
@@ -49,9 +49,9 @@ class Menu:
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('Stations')),
                 Menu.Item(self, 'Feeeders'))),
-            Menu.Item(self, _('Survey'), children=(
-                Menu.Item(self, _('Feeders')),
-                Menu.Item(self, _('XForms'))))
+            Menu.Item(self, _('Enumeration'), children=(
+                Menu.Item(self, _('Projects')),
+                Menu.Item(self, _('XForms'), reverse('admin-xforms')))),
         )
     
     @property
@@ -60,3 +60,14 @@ class Menu:
             return self._get_main_items()
         return self._get_admin_items()
 
+
+class ApiClient(object):
+    
+    def __init__(self, api_url, token=None):
+        self.api_url = api_url
+        self.token = token
+    
+    
+    
+    
+    

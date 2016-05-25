@@ -1,0 +1,50 @@
+{% extends 'base_admin.html' %}
+{% block admin-content %}
+    <h2 class="condensed">XForms</h2>
+    
+    <div id="synced" class="col-md-7 rm-r-pad">
+        <div class="header-strip">
+            <h4 class="heading">SYNCED</h4>
+            <div class="buttons">
+                <i class="fa fa-md fa-info-circle"></i>
+            </div>
+        </div>
+        <ul class="nav nav-flattabs filter-tabs">
+            <li class="active"><a href="#">All</a></li>
+            <li><a href="#">Active</a></li>
+            <li><a href="#">Inactive</a></li>
+        </ul>
+        <div class="panel panel-default panel-condensed flat-top">
+            <div class="panel-body">
+                <div class="text-center">
+                    <i class="fa fa-3x fa-pulse fa-spinner"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="survey" class="col-md-5 rm-r-pad">
+        <div class="header-strip">
+            <h4 class="heading">AVAILABLE ON SURVEY</h4>
+            <div class="buttons rm-r-margin">
+                <a class="btn btn-sm btn-slim btn-default">
+                    <i class="fa fa-md fa-cloud-download"></i>
+                </a>
+                <a class="btn btn-sm btn-slim btn-default">
+                    <i class="fa fa-md fa-refresh"></i>
+                </a>
+            </div>
+        </div>
+        <ul class="nav nav-flattabs filter-tabs">
+            <li class="active"><a href="#">Latest</a></li>
+            <li><a href="#">All</a></li>
+        </ul>
+        <div class="panel panel-info panel-condensed bg-info flat-top">
+            <div class="panel-body bg-info2">
+                <div class="text-center">
+                    <i class="fa fa-3x fa-pulse fa-spinner"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -18,4 +18,5 @@ from django.conf.urls import include, url
 
 urlpatterns = [
     url(r'', include('main.urls')),
+    url(r'', include('enumeration.urls')),
 ]

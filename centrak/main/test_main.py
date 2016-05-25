@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from .forms import UserRegistrationForm
+from .utils import Menu
 
 User = get_user_model()
 
@@ -98,4 +99,26 @@ class TestUserRegistrationForm(object):
         tmp_mail = '{}@kedco.ng'.format(email_part)
         func = UserRegistrationForm.is_valid_kedco_email_format
         assert func(tmp_mail, fname, lname) == expected
+
+
+class TestMenu(object):
+    
+    def test_item_constructor_reduces_mandatory_args_to_menu_and_text(self, rf):
+        request = rf.get(reverse('home-page'))
+        item = Menu.Item(Menu(request), 'Text')
+        assert (item and item.menu and item.text == 'Text' and
+                item.url == '' and item.children == [])
+    
+    def test_main_items_differ_from_admin_items(self, rf): 
+        request = rf.get(reverse('home-page'))
+        admin_request = rf.get(reverse('admin-home'))
+        
+        main_menu = Menu(request)
+        main_item_texts = [c.text for c in main_menu.children]
+        
+        admin_menu = Menu(admin_request)
+        admin_item_text = [c.text for c in admin_menu.children]
+        
+        assert main_item_texts != admin_item_text
+    
     

@@ -31,6 +31,9 @@
 @strip-border-color:    #c7c7c7;
 @shadow-color:          #888;
 
+@navbar-height:         51px;
+@header-height:         38px;
+@footer-height:         30px;
 @nav-flattabs-border-size: 2px;
 
 /*------------------------------+
@@ -72,6 +75,7 @@ h1, h2, h3, h4, h5, h6,
 
 // ===+: header section
 .navbar-default {
+    height: @navbar-height;
     background-color: @header-bar-bg;
     border-color: @strip-border-color;
     
@@ -124,6 +128,24 @@ h1, h2, h3, h4, h5, h6,
     .header-title {
         float: left;
     }
+    
+    .nav-flattabs {
+        > li {
+            > a {
+                border-bottom: solid @nav-flattabs-border-size @header-nav-bg;
+                &:hover {
+                    border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 20%);
+                }
+            }
+            
+            &.active > a {
+                &:hover,
+                &:focus {
+                    border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 5%);
+                }
+            }
+       }
+    }
 }
 
 .light-shadow {
@@ -139,8 +161,10 @@ h1, h2, h3, h4, h5, h6,
 footer {
     border-top: solid 1px @strip-border-color;
     padding: 4px 0 10px 0;
+    background-color: #fff;
     color: #777;
     font-size: 11px;
+    z-index: 1015;
     
     // :for sticky footer:
     position: absolute;
@@ -148,7 +172,7 @@ footer {
     right: 0;
     bottom: 0;
     width: 100%;
-    height: 30px;
+    height: @footer-height;
     
     .fa-heart {
         color: red;
@@ -158,6 +182,25 @@ footer {
 // ===+: helper class
 .text-sm {
     font-size: 10px;
+}
+
+.rm-l-pad { padding-left: 5px !important; }
+.rm-r-pad { padding-right: 5px !important; }
+.rm-l-margin { margin-left: 5px !important; }
+.rm-r-margin { margin-right: 5px !important; }
+
+.bg-info2 {
+    background-color: lighten(@brand-info, 37%);
+}
+
+.btn-slim {
+    padding: 2px 10px;
+}
+
+.fa-md {
+    font-size: 1.15em;
+    line-height: .75em;
+    vertical-align: -5%;
 }
 
 
@@ -171,27 +214,49 @@ footer {
 .adm { 
     .header {
         background-color: @adm-header-bg;
-    }
-    .nav-flattabs {
-        > li {
-            > a {
-                border-bottom: solid @nav-flattabs-border-size @adm-header-bg;
-                &:focus,
-                &:hover { 
-                    background-color: @adm-nav-link-hover-bg-color;
-                    border-bottom: solid @nav-flattabs-border-size lighten(@adm-nav-border-color, 3%);
+    
+        .nav-flattabs {
+            > li {
+                > a {
+                    border-bottom: solid @nav-flattabs-border-size @adm-header-bg;
+                    &:focus,
+                    &:hover { 
+                        background-color: @adm-nav-link-hover-bg-color;
+                        border-bottom: solid @nav-flattabs-border-size lighten(@adm-nav-border-color, 3%);
+                    }
                 }
-            }
-            &.active > a {
-                background-color: lighten(@adm-header-bg, 5%);
-                border-bottom: solid @nav-flattabs-border-size @adm-nav-border-color;
-                
-                &:hover,
-                &:focus, & { 
-                    background-color: @adm-nav-link-hover-bg-color;
+                &.active > a {
+                    background-color: lighten(@adm-header-bg, 5%);
                     border-bottom: solid @nav-flattabs-border-size @adm-nav-border-color;
+                    
+                    &:hover,
+                    &:focus, & { 
+                        background-color: @adm-nav-link-hover-bg-color;
+                        border-bottom: solid @nav-flattabs-border-size @adm-nav-border-color;
+                    }
                 }
             }
+        }
+    }
+    
+    // containers
+    
+    .admin-menu {
+        background-color: #fcfcfc;
+        position: fixed;
+        width: 220px;
+        top: @navbar-height + @header-height - 20px;
+        bottom: @footer-height - 20px;
+        margin: 10px auto;
+        z-index: 1010;
+    }
+    .admin-content {
+        margin-left: 225px;
+        
+        h2.condensed {
+            margin: 0 auto 10px;
+            padding: 0 0 5px 15px;
+            border-bottom: solid 1px @table-border-color;
         }
     }
 }
@@ -232,11 +297,12 @@ footer {
             margin-right: 2px;
             padding: 12px 15px 6px;
             line-height: @line-height-base;
-            border: 1px solid transparent;
-            border-bottom: solid @nav-flattabs-border-size @header-nav-bg;
+            border-bottom: solid @nav-flattabs-border-size #fff;
             
+            &:focus { background-color: #fff; }
             &:hover {
                 border-radius: none;
+                background-color: #fff;
                 border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 20%);
             }
         }
@@ -247,10 +313,16 @@ footer {
             &:hover,
             &:focus {
                 color: @nav-tabs-active-link-hover-color;
-                background-color: @nav-link-hover-bg;
+                background-color: #fff; // @nav-link-hover-bg;
                 border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 5%);
             }
         }
+    }
+}
+
+.nav-flattabs.filter-tabs{
+    > li > a {
+        padding: 2px 15px 2px;
     }
 }
 
@@ -292,4 +364,40 @@ ul.dropdown-menu {
 }
 ul.dropdown-menu.wide-menu {
     li > a { padding: 3px 10px; }
+}
+
+// panels
+
+.panel.flat-top {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.panel.panel-condensed {
+    .panel-body { 
+        padding: 5px; 
+        
+        .table {
+            margin-bottom: 5px;
+            
+            tr:first-child td {
+                border-top: none;
+            }
+        }
+    }
+}
+
+// header-strip 
+
+.header-strip {
+    .heading {
+        margin: 0 auto 10px;
+        padding: 0 0 5px 15px;
+        border-bottom: solid 1px @table-border-color;
+    }
+    
+    .buttons {
+         float: right;
+         margin: -38px 10px auto;
+    }
 }

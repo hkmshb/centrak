@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     
     # internal
     'core',
+    'enumeration',
     'main',
 )
 

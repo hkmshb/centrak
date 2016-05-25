@@ -4,7 +4,6 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 
 from .forms import UserRegistrationForm
-from centrak.settings import LOGIN_URL
 
 
 
