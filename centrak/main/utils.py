@@ -31,7 +31,7 @@ class Menu(object):
     
     def __init__(self, request):
         self._request_path = request.path
-        self._admin_view = request.path.startswith(settings.ADMIN_PREFIX_URL)
+        self._admin_view = request.path.startswith(settings.CENTRAK_ADMIN_PREFIX_URL)
     
     def _get_main_items(self):
         return (

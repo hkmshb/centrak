@@ -1,0 +1,13 @@
+<span class="meta">{{ p.start_index|default:"0" }} - {{ p.end_index|default:"0" }} of {{ p.paginator.count|default:"0" }}</span>
+<div class="controls pull-right">
+    <a name="pager-prev" class="btn btn-default btn-sm btn-slim" {% if not p.has_previous %}disabled{% endif %}>
+        <i class="fa fa-chevron-left"></i>
+    </a>
+    <input name="pager-pos" type="number" class="form-control input-sm" 
+           min="1" max="{{ p.paginator.num_pages|default:"0" }}"
+           value="{{ p.number|default:"0" }}" /> 
+    of {{ p.paginator.num_pages|default:"0" }}
+    <a name="pager-next" class="btn btn-default btn-sm btn-slim">
+        <i class="fa fa-chevron-right"></i>
+    </a>
+</div>

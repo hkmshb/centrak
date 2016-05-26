@@ -1,31 +1,76 @@
-{% extends 'base_admin.html' %}
-{% block admin-content %}
-    <h2 class="condensed">XForms</h2>
+{% extends 'base.html' %}
+{% load enum_tags %}
+{% block body-class %}adm{% endblock %}
+{% block content %}
+    <h2 class="sub-heading">XForms</h2>
     
     <div id="synced" class="col-md-7 rm-r-pad">
         <div class="header-strip">
-            <h4 class="heading">SYNCED</h4>
-            <div class="buttons">
-                <i class="fa fa-md fa-info-circle"></i>
+            <h4 class="text">SYNCED</h4>
+        </div>
+        <div class="search-strip row">
+            <div class="col-md-7 rm-l-pad">
+                <div class="searchbox">
+                    <form name="form-synced">
+                        <input type="text" name="search" />
+                        <button class="btn" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-5 text-right">
+                <div class="labeled-dropdown">
+                    <span class="text">Show: </span>
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn btn-sm btn-slim dropdown-toggle" data-toggle="dropdown">
+                            <i class="caret"></i> <span class="item-text">Active</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="#">Active</a></li>
+                            <li><a href="#">Inactive</a></li>
+                            <li><a href="#">All</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-        <ul class="nav nav-flattabs filter-tabs">
-            <li class="active"><a href="#">All</a></li>
-            <li><a href="#">Active</a></li>
-            <li><a href="#">Inactive</a></li>
-        </ul>
         <div class="panel panel-default panel-condensed flat-top">
             <div class="panel-body">
-                <div class="text-center">
-                    <i class="fa fa-3x fa-pulse fa-spinner"></i>
-                </div>
+                <table class="table table-stripped">
+                    <tbody>
+                    {% for xform in xforms %}
+                    <tr>
+                        <td class="data-title">{{ xform.title }}</td>
+                        <td class="data-meta">{ count }</td>
+                        <td class="data-meta"><i class="fa fa-clock-o"></i> 
+                            <span data-toggle="tooltip" title="Last Synced">{{ xform.last_synced|momentize }}</span>
+                         </td>
+                        <td class="data-meta">
+                            <i class="fa fa-{{ xform.synced_by|as_fa_user_or_pc }}" data-toggle="tooltip" title="{{ xform.synced_by|default:"Unknown" }}"></i>
+                        </td></tr>
+                    {% empty %}
+                        <tr><td colspan="4">
+                                <i class="fa fa-md fa-exclamation-triangle text-info"></i>
+                                No data available.
+                            </td></tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="table-pager">
+                            <td colspan="4">
+                                {% include 'snippets/pager.html' with p=xforms %}
+                            </td></tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>
     
     <div id="survey" class="col-md-5 rm-r-pad">
         <div class="header-strip">
-            <h4 class="heading">AVAILABLE ON SURVEY</h4>
+            <h4 class="text">AVAILABLE ON SURVEY</h4>
             <div class="buttons rm-r-margin">
                 <a class="btn btn-sm btn-slim btn-default">
                     <i class="fa fa-md fa-cloud-download"></i>
@@ -35,10 +80,33 @@
                 </a>
             </div>
         </div>
-        <ul class="nav nav-flattabs filter-tabs">
-            <li class="active"><a href="#">Latest</a></li>
-            <li><a href="#">All</a></li>
-        </ul>
+        <div class="search-strip row">
+            <div class="col-md-7 rm-l-pad">
+                <div class="searchbox">
+                    <form class="form">
+                        <input type="text" />
+                        <button class="btn">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-5 text-right">
+                <div class="labeled-dropdown">
+                    <span class="text">Show: </span>
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn btn-sm btn-slim dropdown-toggle" data-toggle="dropdown">
+                            <i class="caret"></i> <span class="item-text">Latest</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li class="active"><a href="#">Latest</a></li>
+                            <li><a href="#">All</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="panel panel-info panel-condensed bg-info flat-top">
             <div class="panel-body bg-info2">
                 <div class="text-center">

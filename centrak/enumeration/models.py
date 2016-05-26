@@ -19,13 +19,14 @@ class XForm(TimeStampedModel):
     object_id = models.PositiveIntegerField("ID", unique=True)
     id_string = models.CharField(_("ID String/Code"), max_length=30, unique=True)
     title = models.CharField(_("Title"), max_length=50, unique=True)
-    type = models.CharField(_("Type"), max_length=1)
-    description = models.TextField(_("Description"), null=True)
+    type = models.CharField(_("Type"), max_length=1, blank=True,
+                choices=TYPE_CHOICES)
+    description = models.TextField(_("Description"), blank=True)
     is_active = models.BooleanField(default=False)
-    api_url = models.URLField(_("API Url"), max_length=100)
-    synced_by = models.CharField(max_length=50)
-    last_synced = models.DateTimeField(null=True)
-    date_imported = models.DateField(null=True)
+    api_url = models.URLField(_("API Url"), max_length=100, blank=True)
+    synced_by = models.CharField(max_length=50, blank=True)
+    last_synced = models.DateTimeField(null=True, blank=True)
+    date_imported = models.DateField(null=True, blank=True)
     
     _non_meta_fields = ['title', 'type', 'description', 'is_active', 
                         'date_imported']
@@ -52,12 +53,12 @@ class Project(TimeStampedModel):
     )
     
     title = models.CharField(_('Title'), max_length=30, unique=True)
-    description = models.TextField(_('Description'), null=True)
+    description = models.TextField(_('Description'), blank=True)
     status = models.PositiveSmallIntegerField(_("Status"), 
                 choices=STATUS_CHOICES, default=STATUS_IN_VIEW)
     is_active = models.BooleanField(default=True)
     date_started = models.DateField(_('Start Date'))
-    date_ended = models.DateField(_('End Date'))
+    date_ended = models.DateField(_('End Date'), null=True, blank=True)
     
     def __str__(self):
         return "{} :: [Project {}]".format(
