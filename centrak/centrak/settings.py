@@ -77,6 +77,7 @@ TEMPLATES = [
                 
                 # internal
                 'main.context_processors.menu',
+                'main.context_processors.jsconf',
                 'main.context_processors.current_date',
             ],
         },
@@ -125,5 +126,13 @@ LOGIN_REDIRECT_URL = '/'
 ##: ===+: Internal
 CENTRAK_KEDCO_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']
 CENTRAK_ADMIN_PREFIX_URL = '/admin/'
+
+CENTRAK_API_ROOT = '/api/v1/'
+
 CENTRAK_TABLE_PAGE_SIZE_LG = 100
 CENTRAK_TABLE_PAGE_SIZE = 20
+
+
+SURVEY_API_SERVICE_KEY = 'survey'
+SURVEY_API_ROOT = 'http://survey.kedco.ng/api/v1/data'
+SURVEY_AUTH_API_ROOT = 'http://survey.kedco.ng/api/v1/user'

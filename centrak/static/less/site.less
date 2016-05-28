@@ -1,1 +1,31 @@
 @import 'base.less';
+
+// api-services
+
+#apiservice {
+    .table tr { 
+        td:first-child {
+            width: 30px;
+            white-space: nowrap;
+        }
+        
+        td:nth-child(3) {
+            width: 90%;
+        }
+    }
+    .buttons { margin-top: -10px; }
+    #creds-strip {
+        margin: 20px auto;
+        display: block;
+        border-top: solid 1px @table-border-color;
+        border-bottom: solid 1px @table-border-color;
+        
+        form.auth { margin-top: -5px; }
+        .display {
+            padding-bottom: 10px;
+            .readonly {
+                background: #ddd;
+            }
+        }
+    }
+}

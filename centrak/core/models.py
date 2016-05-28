@@ -131,3 +131,17 @@ class BusinessOffice(BusinessEntity):
                     message = self._error_messages['parent-child-same-level']
                     raise ValidationError(message)
 
+
+class ApiServiceInfo(TimeStampedModel):
+    """Maintains a registry of accessible API Services."""
+    
+    key = models.CharField(_("Service Key"), max_length=30, primary_key=True)
+    api_root = models.URLField(_("API Root"), max_length=100, unique=True)
+    api_token = models.CharField(_("API Token"), max_length=100, blank=True)
+    
+    def __str__(self):
+        return "Service Key: {}".format(self.key)
+    
+    class Meta:
+        db_table = 'apiservice_info'
+    

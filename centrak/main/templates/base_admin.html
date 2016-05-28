@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% block body-class %}adm{% endblock %}
 {% block content %}
-    <div class="admin-menu"></div>
-    <div class="admin-content">
-        {% block admin-content %}{% endblock %}
-    </div>
+    <script id="config" type="text/json">
+        {
+            "apiRoot": "{{ api_root }}",
+            "survey": { 
+                "apiRoot": "{{ survey_api_root }}",
+                "authApiRoot": "{{ survey_auth_api_root }}" 
+            }
+        }
+    </script>
+{% endblock %}
+{% block script-extra %}
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/admin/views.js' %}"></script>
+    <script src="{% static 'js/admin/router.js' %}"></script>
 {% endblock %}

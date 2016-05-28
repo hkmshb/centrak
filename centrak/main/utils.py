@@ -43,12 +43,14 @@ class Menu(object):
     def _get_admin_items(self):
         return (
             Menu.Item(self, _('Dashboard'), reverse('admin-home')),
-            Menu.Item(self, _('Organization'), children=(
-                Menu.Item(self, _('Info')),
+            Menu.Item(self, _('Settings'), children=(
+                Menu.Item(self, _('Organization')),
                 Menu.Item(self, _('Business Offices')),
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('Stations')),
-                Menu.Item(self, 'Feeeders'))),
+                Menu.Item(self, _('Feeeders')),
+                Menu.Item(self, '---'),
+                Menu.Item(self, _('External API Services'), reverse('admin-api-services')))),
             Menu.Item(self, _('Enumeration'), children=(
                 Menu.Item(self, _('Projects')),
                 Menu.Item(self, _('XForms'), reverse('admin-xforms')))),

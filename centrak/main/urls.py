@@ -1,5 +1,6 @@
 from django.contrib.auth import views as auth_views
-from django.conf.urls import url
+from django.conf.urls import include, url
+from django.conf import settings
 from . import views
 
 
@@ -18,8 +19,19 @@ urlpatterns = [
     
     
     #: ==+: admin urls
-    url(r'^admin/$', views.admin_home, name='admin-home'),
+    url(r'^admin/',
+        include([ 
+            url('^$', views.admin_home, name='admin-home') ,
+            
+            #: external api services
+            url('api-services/{}/'.format(settings.SURVEY_API_SERVICE_KEY), 
+                views.apiservice_survey, name='admin-api-services'),
+        ]),
+    ),
     
+    #: ==+: temp api urls
+    url(r'^api/v1/services/survey/token$', views.api_services_set_survey_token,
+        name='api-services-survey-token'),
     
     #: ==+: main urls
     url(r'^$', views.index, name='home-page'),
