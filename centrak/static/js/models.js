@@ -27,7 +27,7 @@
     // Setup jQuery ajax calls to handle CSRF
     $.ajaxPrefilter(function(settings, originalOptions, xhr) {
         var csrftoken;
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        if (!csrfSafeMethod(settings.type) && this && !this.crossDomain) {
             // Send the token to same-origin, relative URLs only.
             // Send the token only if the method warrants CSRF protection
             // Using the CSRFToken value acquired earlier
@@ -122,6 +122,26 @@
         
         /// more collections...
     });
+    
+    
+    // collection extension
+    Backbone.Collection.prototype.saveAll = function(data, success){
+        var self = this
+          , wrapper = {
+                url: this.url,
+                toJSON: function() {
+                    return data;
+                }
+            },
+            options = {
+                success: function(model, resp, xhr) {
+                    if (success) {
+                        success(model, resp, xhr);
+                    }
+                }
+            };
+        return Backbone.sync("create", wrapper, options);
+    };
     
     
 })(jQuery, Backbone, _, app);

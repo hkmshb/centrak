@@ -143,9 +143,24 @@
                 self.render();
                 
                 // listen for changes
-                // TODO: temporary; need to save before displaying successful
-                //       updates 
                 app.xforms.on('update', $.proxy(self.render, self));
+            });
+        },
+        registerXForms: function(data, callback) {
+            var today = moment().format('YYYY-MM-DD');
+            
+            _(data).each(function(m) {
+                m.set('object_id', m.id);
+                m.set('api_url', m.get('url'));
+                m.set('date_imported', today);
+            });
+           
+            app.xforms.saveAll(data, function(model, resp, xhr) {
+                // update local collection
+                app.xforms.add(model);
+                
+                // propagate success via callback
+                callback(model, resp, xhr);
             });
         },
         getContext: function() {
@@ -170,15 +185,25 @@
         events: {
             'click button.register': 'registerSelected',
         },
+        excludeXForms: function(data) {
+            var targetIds = _(data).pluck('object_id');
+            app.surveyXforms.remove(targetIds);
+            this.render();
+        },
         registerSelected: function() {
             // get selected objects
-            var selected = [];
+            var selected = [] 
+              , entry = null;
+            
             _.each($(':input[type=checkbox]:checked', this.$el), function(e) {
-                selected.push(app.surveyXforms.get($(e).val()));
+                entry = app.surveyXforms.get($(e).val());
+                if (entry) {
+                    entry = entry.clone();
+                    selected.push(entry.clone());
+                }
             })
             
-            // TODO: temporary, need proper way to do registration
-            app.xforms.add(selected);
+            this.mediator.registerLocalXForms(selected);
         },
         getContext: function() {
             // filter out forms that have already been registered
@@ -209,6 +234,28 @@
                 'local': new LocalXFormRegion(),
                 'survey': new SurveyXFormRegion(),
             }
+            this._regions.local.mediator = this;
+            this._regions.survey.mediator = this;
+        },
+        registerLocalXForms: function(data) {
+            var self = this;
+            if (data && data.length > 0) {
+                this._regions.local.registerXForms(data, function(model, resp, xhr) {
+                    if (resp == 'success') {
+                        self.excludeSurveyXForms(model);
+                    } else {
+                        self.displayError(resp);
+                    }
+                });
+            }
+        },
+        excludeSurveyXForms: function(data) {
+            if (data && data.length > 0) {
+                this._regions.survey.excludeXForms(data);
+            }
+        },
+        displayError: function(message) {
+            
         },
         render: function() {
             _.each(this._regions, function(r) {

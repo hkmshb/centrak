@@ -27,3 +27,8 @@ class XFormViewSet(DefaultMixin, viewsets.ModelViewSet):
     
     queryset = XForm.objects.order_by('object_id')
     serializer_class = XFormSerializer
+    
+    def get_serializer(self, *args, **kwargs):
+        kwargs['many']=True
+        return viewsets.ModelViewSet.get_serializer(self, *args, **kwargs)
+    
