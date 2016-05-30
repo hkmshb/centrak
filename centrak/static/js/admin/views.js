@@ -1,9 +1,27 @@
 (function($, Backbone, _, app) {
     'use strict';
     
-    // $.proxy(this.loginView, this);
+    // BaseView ..
+    var TemplateView = Backbone.View.extend({
+        targetEl: '',
+        templateName: '',
+        initialize: function() {
+            this.template = _.template($(this.templateName).html());
+        },
+        render: function() {
+            var context = this.getContext()
+              , html = this.template(context);
+            
+            $(this.targetEl, this.$el).html(html);
+        },
+        getContext: function() {
+            return {};
+        }
+    }),
     
-    var ApiServiceView = Backbone.View.extend({
+    // ApiServiceView
+    
+    ApiServiceView = Backbone.View.extend({
         _strips: {},
         survey_token_url: app.conf.apiRoot + 'services/survey/token',
         initialize: function() {
@@ -108,9 +126,99 @@
             $(':input[name=password]', strip).val('');
             $('label.token-value', strip).text('');
         }
+    }),
+    
+    LocalXFormRegion = TemplateView.extend({
+        el: '#local',
+        targetEl: '.region',
+        templateName: '#local-template',
+        initialize: function() {
+            var self = this;
+            TemplateView.prototype.initialize.apply(this, arguments);
+            
+            // load bootstrapped data
+            app.collections.ready.done(function() {
+                var data = JSON.parse($('#bootstrap').text());
+                app.xforms.reset(_.pluck(data, 'fields'));
+                self.render();
+                
+                // listen for changes
+                // TODO: temporary; need to save before displaying successful
+                //       updates 
+                app.xforms.on('update', $.proxy(self.render, self));
+            });
+        },
+        getContext: function() {
+            return {'xforms': app.xforms || null};
+        }
+    }),
+    
+    SurveyXFormRegion = TemplateView.extend({
+        el: '#survey',
+        targetEl: '.region',
+        templateName: '#survey-template',
+        initialize: function() {
+            var self = this;
+            TemplateView.prototype.initialize.apply(this, arguments);
+            app.collections.ready.done(function() {
+                app.surveyXforms.fetch({
+                    beforeSend: self.sendAuth,
+                    success: $.proxy(self.render, self)
+                });
+            });
+        },
+        events: {
+            'click button.register': 'registerSelected',
+        },
+        registerSelected: function() {
+            // get selected objects
+            var selected = [];
+            _.each($(':input[type=checkbox]:checked', this.$el), function(e) {
+                selected.push(app.surveyXforms.get($(e).val()));
+            })
+            
+            // TODO: temporary, need proper way to do registration
+            app.xforms.add(selected);
+        },
+        getContext: function() {
+            // filter out forms that have already been registered
+            // as best as possible
+            if (app.xforms) {
+                var localObjectIds = app.xforms.pluck('object_id')
+                  , diff = [];
+                
+                _.each(app.surveyXforms.models, function(f) {
+                    if (!_.contains(localObjectIds, f.id))
+                        diff.push(f);
+                })
+                app.surveyXforms = new app.collections.SurveyXForms(diff);
+            }
+            return {'xforms': app.surveyXforms || null};
+        },
+        sendAuth: function(xhr) {
+            xhr.setRequestHeader(
+                'Authorization', 
+                'Token ' + app.$fn.getCookie('survey_auth_token'));
+        }
+    }),
+    
+    AdminXFormView = Backbone.View.extend({
+        _regions: null,
+        initialize: function() {
+            this._regions = {
+                'local': new LocalXFormRegion(),
+                'survey': new SurveyXFormRegion(),
+            }
+        },
+        render: function() {
+            _.each(this._regions, function(r) {
+                r.render();
+            })
+        }
     });
     
     // register views
     app.views.ApiServiceView = ApiServiceView;
+    app.views.AdminXFormView = AdminXFormView;
     
 })(jQuery, Backbone, _, app);

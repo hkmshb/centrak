@@ -17,8 +17,10 @@ def current_date(request):
 
 def jsconf(request):
     """Provides some JavaScript configuration."""
-    return {
-        'api_root': settings.CENTRAK_API_ROOT,
-        'survey_api_root': settings.SURVEY_API_ROOT,
-        'survey_auth_api_root': settings.SURVEY_AUTH_API_ROOT,
-    }
+    context = {'api_root': settings.CENTRAK_API_ROOT}
+    if utils.is_admin_view(request):
+        context.update({ 
+            'survey_api_root': settings.SURVEY_API_ROOT,
+            'survey_auth_api_root': settings.SURVEY_AUTH_API_ROOT,
+        })
+    return context

@@ -1,4 +1,7 @@
+import json
 from django.contrib.humanize.templatetags import humanize
+from django.core.serializers import serialize
+from django.db.models.query import QuerySet
 from . import register
 
 
@@ -17,3 +20,10 @@ def momentize(dt):
             return dt.strftime('%H:%M')
         return value
     return "unknown"
+
+
+@register.filter
+def jsonify(obj):
+    if isinstance(obj, QuerySet):
+        return serialize('json', obj)
+    return json.dumps(obj)

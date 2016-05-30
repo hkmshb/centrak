@@ -3,8 +3,15 @@ from collections import namedtuple
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import SimpleLazyObject
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.conf import settings
 
+
+
+#: helper functions
+def is_admin_view(request):
+    target_prefix = settings.CENTRAK_ADMIN_PREFIX_URL.lower()
+    return (request.path.lower().startswith(target_prefix))
 
 
 class Menu(object):

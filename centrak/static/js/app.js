@@ -28,7 +28,14 @@ var app = (function($){
     };
     
     $(document).ready(function(){
-        var router = new app.router();
+        var router = new app.router()
+        
+        // auto router is disabled sort of since no routes are defined for
+        // the router object. Thus, router functions must be called manually
+        var funcName = $('.app-view').data('view')
+          , func = router[funcName];
+        
+        func.apply(router);
     });
     
     return app;

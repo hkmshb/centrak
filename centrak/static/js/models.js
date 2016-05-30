@@ -4,7 +4,7 @@
     // CSRF helper functions taken directly from Django docs
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
-        return (/^GET|HEAD|OPTIONS|TRACE)$/i.test(method));
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/i.test(method));
     }
     
     function getCookie(name) {
@@ -76,5 +76,52 @@
     });
     
     app.session = new Session();
+    app.$fn.getCookie = getCookie;
+    
+    // models
+    app.models.XForm = Backbone.Model.extend({
+        getLastSynced: function() {
+            var value = this.get('last_synced');
+            if (_.isEmpty(value)) {
+                return 'unknown';
+            } else {
+                return moment(value).calendar();
+            }
+        },
+        getFaSyncedBy: function() {
+            var value = this.get('synced_by');
+            if (_.isEmpty(value)) {
+                return "fa-question";
+            } else if (value === "auto") {
+                return "fa-laptop";
+            } else {
+                return "fa-user";
+            }
+        }
+    });
+    
+    // collections
+    // a]. start by discovering the root links published on the api-root
+    app.collections.ready = $.getJSON(app.conf.apiRoot);
+    
+    // b]. build collections using data returned from [a]
+    app.collections.ready.done(function(data) {
+        // local XForm
+        app.collections.XForms = Backbone.Collection.extend({
+            model: app.models.XForm,
+            url: data.xforms
+        });
+        app.xforms = new app.collections.XForms();
+        
+        // survey XForms
+        app.collections.SurveyXForms = Backbone.Collection.extend({
+            model: app.models.XForm,
+            url: app.conf.survey.apiRoot
+        })
+        app.surveyXforms = new app.collections.SurveyXForms();
+        
+        /// more collections...
+    });
+    
     
 })(jQuery, Backbone, _, app);

@@ -31,6 +31,9 @@ class XForm(TimeStampedModel):
     _non_meta_fields = ['title', 'type', 'description', 'is_active', 
                         'date_imported']
     
+    class Meta:
+        ordering = ['object_id']
+    
     def __str__(self):
         return self.title or self.id_string
 
