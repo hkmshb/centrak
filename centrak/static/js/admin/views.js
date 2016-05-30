@@ -5,7 +5,6 @@
     
     var ApiServiceView = Backbone.View.extend({
         _strips: {},
-        id: 'apiservice',
         survey_token_url: app.conf.apiRoot + 'services/survey/token',
         initialize: function() {
             this._strips = {
@@ -22,9 +21,15 @@
         },
         clearToken: function(event) {
             event.preventDefault();
-            $.post(this.survey_token_url, {'value':null})
-                .success($.proxy(this.tokenApplyPass, this))
-                .fail($.proxy(this.displayError, this));
+            var self = this
+              , title='Clear Token'
+              , message = 'Are you sure you want to clear the token?';
+            
+            app.$fn.dialog.confirm(title, message, function() {
+                $.post(self.survey_token_url, {'value':null})
+                    .success($.proxy(self.tokenApplyPass, self))
+                    .fail($.proxy(self.displayError, self));
+            });
         },
         setToken: function(event) {
             this.reset();
@@ -40,7 +45,7 @@
             $('div.error-display', this._strips.creds).html('');
             
             // display collected token
-            $('.display', this._strips.creds).removeClass('hide');
+            $('.token-display', this._strips.creds).removeClass('hide');
             $('.token-value', this._strips.creds).text(data.api_token);
         },
         applyToken: function(event) {
@@ -90,12 +95,13 @@
             
             $('button.set-token', strip).removeAttr('disabled');
             if ($('td.api-token', strip).text() === '') {
-                btnClearToken.attr('disabled', '');
+                // btnClearToken.attr('disabled', '');
             } else {
-                btnClearToken.removeAttr('disabled');
+                // btnClearToken.removeAttr('disabled');
             }
             
             strip = this._strips.creds;
+            $('.token-display', strip).addClass('hide');
             if (closeCreds === true) strip.addClass('hide');
             
             $(':input[name=username]', strip).val('');

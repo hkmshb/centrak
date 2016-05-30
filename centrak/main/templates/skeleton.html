@@ -19,6 +19,22 @@
 <body id="{% block body-id %}body{% endblock %}" class="{% block body-class %}{% endblock %}">
     {% block skeleton-content %}{% endblock %}
     
+    <div id="modals">
+        <div id="modal-confirm" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header"><h3>Title</h3></div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary yes">Yes</button>
+                        <button class="btn btn-sm btn-danger no" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- ===+: le scripts  -->
     {% if debug %}
     <script src="{% static 'bower_comps/jquery/dist/jquery.min.js' %}"></script>
