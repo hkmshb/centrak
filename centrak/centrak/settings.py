@@ -43,6 +43,8 @@ INSTALLED_APPS = (
     
     # third-party
     'ezaddress',
+    'rest_framework',
+    'rest_framework.authtoken',
     
     # internal
     'core',
