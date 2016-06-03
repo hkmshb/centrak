@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 import os
+import mongoengine
 
 
 
@@ -43,8 +44,10 @@ INSTALLED_APPS = (
     
     # third-party
     'ezaddress',
+    'mongoengine',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_mongoengine',
     
     # internal
     'core',
@@ -118,6 +121,15 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+
+##: ==+: mongo-engine settings
+_MONGODB_NAME = 'centrak_'
+_MONGODB_HOST = ''
+_MONGODB_USER = ''
+_MONGODB_PWD  = ''
+
+mongoengine.connect(_MONGODB_NAME)
 
 
 # Auth:

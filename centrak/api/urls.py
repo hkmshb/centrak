@@ -1,4 +1,4 @@
-from rest_framework.routers import DefaultRouter
+from rest_framework_mongoengine.routers import DefaultRouter
 from . import views
 
 

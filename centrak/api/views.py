@@ -1,4 +1,5 @@
-from rest_framework import authentication, permissions, viewsets
+from rest_framework import authentication, permissions
+from rest_framework_mongoengine import viewsets
 from enumeration.models import XForm
 
 from .serializers import XFormSerializer
@@ -27,8 +28,3 @@ class XFormViewSet(DefaultMixin, viewsets.ModelViewSet):
     
     queryset = XForm.objects.order_by('object_id')
     serializer_class = XFormSerializer
-    
-    def get_serializer(self, *args, **kwargs):
-        kwargs['many']=True
-        return viewsets.ModelViewSet.get_serializer(self, *args, **kwargs)
-    

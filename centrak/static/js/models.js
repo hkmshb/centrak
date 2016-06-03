@@ -75,8 +75,10 @@
         }
     });
     
+    
     app.session = new Session();
     app.$fn.getCookie = getCookie;
+    
     
     // models
     app.models.XForm = Backbone.Model.extend({
@@ -99,6 +101,7 @@
             }
         }
     });
+    
     
     // collections
     // a]. start by discovering the root links published on the api-root

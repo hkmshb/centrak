@@ -3,24 +3,40 @@
     
     // BaseView ..
     var TemplateView = Backbone.View.extend({
-        targetEl: '',
+        innerEl: null,
         templateName: '',
         initialize: function() {
             this.template = _.template($(this.templateName).html());
         },
+        
         render: function() {
             var context = this.getContext()
-              , html = this.template(context);
+              , html = this.template(context)
+              , canvas = this.getCanvas();
             
-            $(this.targetEl, this.$el).html(html);
+            canvas.html(html);
         },
+        
+        getCanvas: function() {
+            if (!_.isEmpty(this.innerEl)) {
+                if (_.isEmpty(this.$innerEl))
+                    this.$innerEl = $(this.innerEl, this.$el);
+                return this.$innerEl;
+            } else {
+                this.$innerEl = null;
+                return this.$el;
+            }
+        },
+        
         getContext: function() {
             return {};
         }
     }),
     
-    // ApiServiceView
     
+    /*-----------------------------------------------------------------------+
+     | API Service View 
+     +---------------------------------------------------------------------- */
     ApiServiceView = Backbone.View.extend({
         _strips: {},
         survey_token_url: app.conf.apiRoot + 'services/survey/token',
@@ -30,6 +46,7 @@
             };
             this.reset(true);
         },
+        
         events: {
             'click button.set-token': 'setToken',
             'click button.clear-token': 'clearToken',
@@ -37,6 +54,7 @@
             'submit #creds-strip form.creds': 'getToken',
             'submit #creds-strip form.token': 'applyToken',
         },
+        
         clearToken: function(event) {
             event.preventDefault();
             var self = this
@@ -49,6 +67,7 @@
                     .fail($.proxy(self.displayError, self));
             });
         },
+        
         setToken: function(event) {
             this.reset();
             $(event.currentTarget).attr('disabled', '');
@@ -58,6 +77,7 @@
                 $('form.auth', this._strips.creds).validate();
             }
         },
+        
         displayToken: function(data) {
             // remove any existing error display
             $('div.error-display', this._strips.creds).html('');
@@ -66,6 +86,7 @@
             $('.token-display', this._strips.creds).removeClass('hide');
             $('.token-value', this._strips.creds).text(data.api_token);
         },
+        
         applyToken: function(event) {
             event.preventDefault();
             var form = $(event.currentTarget)
@@ -75,6 +96,7 @@
                 .success($.proxy(this.tokenApplyPass, this))
                 .fail($.proxy(this.displayError, this));
         },
+        
         getToken: function(event) {
             event.preventDefault();
             var form = $(event.currentTarget)
@@ -91,6 +113,7 @@
             }).success($.proxy(this.displayToken, this))
               .fail($.proxy(this.displayError, this));
         },
+        
         displayError: function(xhr, status, error) {
             var target = $('div.error-display', this._strips.creds);
             if (error === '')
@@ -98,24 +121,27 @@
             var html = ('<div class="alert alert-danger">' + error + '</div>');
             target.html(html);
         },
+        
         tokenApplyPass: function(data) {
             // remove any existing error display
             $('div.error-display', this._strips.creds).html('');
             $('td.api-token', this._strips.info).text(data.api_token);
             this.reset(true);
         },
+        
         closeStrip: function(event) {
             this.reset(true);
         },
+        
         reset: function(closeCreds) {
             var strip = this._strips.info
               , btnClearToken = $('button.clear-token', strip);
             
             $('button.set-token', strip).removeAttr('disabled');
             if ($('td.api-token', strip).text() === '') {
-                // btnClearToken.attr('disabled', '');
+                btnClearToken.attr('disabled', '');
             } else {
-                // btnClearToken.removeAttr('disabled');
+                btnClearToken.removeAttr('disabled');
             }
             
             strip = this._strips.creds;
@@ -146,6 +172,7 @@
                 app.xforms.on('update', $.proxy(self.render, self));
             });
         },
+        
         registerXForms: function(data, callback) {
             var today = moment().format('YYYY-MM-DD');
             
@@ -163,6 +190,7 @@
                 callback(model, resp, xhr);
             });
         },
+        
         getContext: function() {
             return {'xforms': app.xforms || null};
         }
@@ -182,14 +210,17 @@
                 });
             });
         },
+        
         events: {
             'click button.register': 'registerSelected',
         },
+        
         excludeXForms: function(data) {
             var targetIds = _(data).pluck('object_id');
             app.surveyXforms.remove(targetIds);
             this.render();
         },
+        
         registerSelected: function() {
             // get selected objects
             var selected = [] 
@@ -205,6 +236,7 @@
             
             this.mediator.registerLocalXForms(selected);
         },
+        
         getContext: function() {
             // filter out forms that have already been registered
             // as best as possible
@@ -220,6 +252,7 @@
             }
             return {'xforms': app.surveyXforms || null};
         },
+        
         sendAuth: function(xhr) {
             xhr.setRequestHeader(
                 'Authorization', 
@@ -237,6 +270,7 @@
             this._regions.local.mediator = this;
             this._regions.survey.mediator = this;
         },
+        
         registerLocalXForms: function(data) {
             var self = this;
             if (data && data.length > 0) {
@@ -249,6 +283,7 @@
                 });
             }
         },
+        
         excludeSurveyXForms: function(data) {
             if (data && data.length > 0) {
                 this._regions.survey.excludeXForms(data);
@@ -257,12 +292,151 @@
         displayError: function(message) {
             
         },
+        
         render: function() {
             _.each(this._regions, function(r) {
                 r.render();
             })
         }
+    }),
+    
+    
+    /*-----------------------------------------------------------------------+
+    | AdminXForms View 
+    +---------------------------------------------------------------------- */
+    LocalXFormComponent = TemplateView.extend({
+        templateName: '#local-xforms-template',
+        initialize: function(){
+            var self = this;
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.mediator = arguments[0].mediator;
+            
+            // load bootstrapped data
+            app.collections.ready.done(function() {
+                var data = JSON.parse($('#bootstrap').text());
+                app.xforms.reset(data)
+                self.render();
+                
+                // listen for changes
+                app.xforms.on('update', $.proxy(self.render, self));
+            });
+        },
+        
+        register: function(options) {
+            var self = this, count = 0
+              , today = moment().format()
+              , dispatch = function(){
+                    count += 1;
+                    if (count === options.data.length) {
+                        self.render();
+                        options.success();
+                    }
+                };
+            
+            _(options.data).each(function(m){
+                m.set('date_imported', today);
+                m.set('object_id', m.get('id'));
+                if (_.isEmpty(m.get('description')))
+                    m.unset('description');
+                
+                m.unset('id');
+                app.xforms.create(m, {
+                    wait: true,
+                    success: dispatch,
+                    fail: dispatch,
+                })
+            });
+        },
+        
+        getContext: function() {
+            return {'xforms': app.xforms || null};
+        }
+    }),
+    
+    
+    SurveyXFormComponent = TemplateView.extend({
+        templateName: '#survey-xforms-template',
+        initialize: function() {
+            var self = this;
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.mediator = arguments[0].mediator;
+            
+            // load bootstrapped data
+            app.collections.ready.done(function() {
+                app.surveyXforms.fetch({
+                    beforeSend: self.sendAuth,
+                    success: $.proxy(self.render, self),
+                });
+            });
+        },
+        
+        events: {
+            'click button.register': 'registerForms',
+        },
+        
+        registerForms: function() {
+            var selected = []
+              , entry = null
+              , self = this;
+            
+            _($(':input:checked')).each(function(e) {
+                entry = app.surveyXforms.findWhere({id: Number($(e).val())});
+                if (!_.isEmpty(entry)) {
+                    selected.push(entry.clone());
+                }
+            });
+            
+            if (selected.length > 0) {
+                this.mediator.registerForms({
+                    data: selected,
+                    success: $.proxy(self.render, self),
+                });
+            }
+        },
+        
+        getContext: function() {
+            // filter out forms that have already been registered
+            if (!_.isEmpty(app.xforms)) {
+                var registered = app.xforms.pluck('object_id')
+                  , diff = [];
+                
+                _(app.surveyXforms.models).each(function(m) {
+                    if (!_.contains(registered, m.id))
+                        diff.push(m);
+                });
+                app.surveyXforms = new app.collections.SurveyXForms(diff);
+            }
+            return {'xforms': app.surveyXforms || null};
+        },
+        
+        sendAuth: function(xhr) {
+            xhr.setRequestHeader(
+                'Authorization', 
+                'Token ' + app.$fn.getCookie('survey_auth_token'));
+        }
+    }),
+    
+    AdminXFormView = TemplateView.extend({
+        _comps: null,
+        initialize: function() {
+            $('.loading').addClass('hide');
+            this._comps = {
+                'local': new LocalXFormComponent({el: '#local', mediator: this}),
+                'survey': new SurveyXFormComponent({el: '#survey', mediator: this}),
+            }
+        },
+        
+        registerForms: function(options){
+            this._comps.local.register(options);
+        },
+        
+        render: function() {
+            _(this._comps).each(function(c) {
+                c.render();
+            })
+        }
     });
+    
     
     // register views
     app.views.ApiServiceView = ApiServiceView;
