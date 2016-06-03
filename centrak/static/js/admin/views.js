@@ -15,6 +15,12 @@
               , canvas = this.getCanvas();
             
             canvas.html(html);
+            this.$alert = $('.alert');
+            this.$alert.addClass('hide').text('');
+        },
+        
+        normDate: function(field_name) {
+            return moment(this.xform.get(field_name).$date).format();
         },
         
         getCanvas: function() {
@@ -30,6 +36,17 @@
         
         getContext: function() {
             return {};
+        },
+        
+        showMessage: function(message, tag) {
+            if (_.isEmpty(message)) {
+                this.$alert.addClass('hide');
+            } else {
+                this.$alert
+                        .removeClass('hide alert-danger alert-success')
+                        .addClass('alert-' + tag || 'danger')
+                        .text(message);
+            }
         }
     }),
     
@@ -313,9 +330,11 @@
             
             // load bootstrapped data
             app.collections.ready.done(function() {
-                var data = JSON.parse($('#bootstrap').text());
-                app.xforms.reset(data)
-                self.render();
+                if (app.xforms.length === 0) {
+                    var data = JSON.parse($('#bootstrap').text());
+                    app.xforms.reset(data)
+                    self.render();
+                }
                 
                 // listen for changes
                 app.xforms.on('update', $.proxy(self.render, self));
@@ -416,7 +435,7 @@
         }
     }),
     
-    AdminXFormView = TemplateView.extend({
+    AdminXFormListView = TemplateView.extend({
         _comps: null,
         initialize: function() {
             $('.loading').addClass('hide');
@@ -435,11 +454,93 @@
                 c.render();
             })
         }
+    }),
+    
+    AdminXFormView = TemplateView.extend({
+        innerEl: '#local',
+        templateName: '#xform-detail',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            
+            // extract referred object
+            if (_.isEmpty(app.xforms) || app.xforms.length === 0) {
+                this.close();
+            } else {
+                var q = {object_id: Number(options.object_id)}
+                  , f = app.xforms.findWhere(q);
+                if (_.isEmpty(f))
+                    this.close();
+                this.xform = f;
+            }
+        },
+        
+        events: {
+            'click button.update': 'update',
+            'click button.cancel': 'close',
+        },
+        
+        update: function() {
+            if (_.isEmpty(this.$type.val())) {
+                alert('Type must be specified.');
+                return;
+            }
+            
+            var changes = this.getChanges(), self=this;
+            this.xform.save(changes, {
+                wait: true,
+                patch: true,
+                success: function(model, resp, options) {
+                    // update collections
+                    app.xforms.add(model, {merge: true});
+                    
+                    // show message
+                    self.showMessage('Update successful', 'success');
+                }
+            })
+        },
+        
+        close: function() {
+            app.router.r.navigate('', {trigger: true});
+        },
+        
+        render: function() {
+            TemplateView.prototype.render.apply(this, arguments);
+            $('#survey').html('');
+            
+            this.$desc = $('textarea.description', this.$el);
+            this.$type = $('select.type', this.$el);
+            this.$active = $('input.active', this.$el);
+        },
+        
+        getChanges: function() {
+            var changes = {
+                // id included to indicate record to update
+                id: this.xform.get('_id').$oid,
+                
+                // need to normalize these fields else error
+                last_updated: this.normDate('last_updated'),
+                date_imported: this.normDate('date_imported'),
+                
+                // actual changes
+                type: this.$type.val(),
+                description: this.$desc.val(),
+                active: this.$active.is(':checked'),
+            }
+            
+            if (_.isEmpty(changes.description))
+                delete changes['description'];
+            return changes;
+        },
+        
+        getContext: function() {
+            return {'xform': this.xform}
+        }
     });
     
     
     // register views
     app.views.ApiServiceView = ApiServiceView;
     app.views.AdminXFormView = AdminXFormView;
+    app.views.AdminXFormListView = AdminXFormListView;
     
 })(jQuery, Backbone, _, app);

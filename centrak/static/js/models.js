@@ -99,6 +99,10 @@
             } else {
                 return "fa-user";
             }
+        },
+        getFaActive: function() {
+            var active = this.get('active');
+            return (active? 'fa-check-square-o': 'fa-square-o');
         }
     });
     
