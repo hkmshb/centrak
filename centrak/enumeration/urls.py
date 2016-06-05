@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^admin/enum/',
         include([
             url(r'xforms/$', views.xforms_list, name='admin-xforms'),
+            url(r'ntwk/ps/$', views.network_ps, name='admin-ntwk-ps'),
         ])),
 ]

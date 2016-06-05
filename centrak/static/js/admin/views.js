@@ -50,6 +50,19 @@
         }
     }),
     
+    MultiViewManager = TemplateView.extend({
+        _comps: null,
+        initialize: function(options) {
+            $('.loading').addClass('hide');
+            this._comps = (options.comps || []);
+        },
+        render: function() {
+            _(this._comps).each(function(c) {
+                c.render();
+            })
+        }
+    }),
+    
     
     /*-----------------------------------------------------------------------+
      | API Service View 
@@ -168,152 +181,6 @@
             $(':input[name=username]', strip).val('');
             $(':input[name=password]', strip).val('');
             $('label.token-value', strip).text('');
-        }
-    }),
-    
-    LocalXFormRegion = TemplateView.extend({
-        el: '#local',
-        targetEl: '.region',
-        templateName: '#local-template',
-        initialize: function() {
-            var self = this;
-            TemplateView.prototype.initialize.apply(this, arguments);
-            
-            // load bootstrapped data
-            app.collections.ready.done(function() {
-                var data = JSON.parse($('#bootstrap').text());
-                app.xforms.reset(_.pluck(data, 'fields'));
-                self.render();
-                
-                // listen for changes
-                app.xforms.on('update', $.proxy(self.render, self));
-            });
-        },
-        
-        registerXForms: function(data, callback) {
-            var today = moment().format('YYYY-MM-DD');
-            
-            _(data).each(function(m) {
-                m.set('object_id', m.id);
-                m.set('api_url', m.get('url'));
-                m.set('date_imported', today);
-            });
-           
-            app.xforms.saveAll(data, function(model, resp, xhr) {
-                // update local collection
-                app.xforms.add(model);
-                
-                // propagate success via callback
-                callback(model, resp, xhr);
-            });
-        },
-        
-        getContext: function() {
-            return {'xforms': app.xforms || null};
-        }
-    }),
-    
-    SurveyXFormRegion = TemplateView.extend({
-        el: '#survey',
-        targetEl: '.region',
-        templateName: '#survey-template',
-        initialize: function() {
-            var self = this;
-            TemplateView.prototype.initialize.apply(this, arguments);
-            app.collections.ready.done(function() {
-                app.surveyXforms.fetch({
-                    beforeSend: self.sendAuth,
-                    success: $.proxy(self.render, self)
-                });
-            });
-        },
-        
-        events: {
-            'click button.register': 'registerSelected',
-        },
-        
-        excludeXForms: function(data) {
-            var targetIds = _(data).pluck('object_id');
-            app.surveyXforms.remove(targetIds);
-            this.render();
-        },
-        
-        registerSelected: function() {
-            // get selected objects
-            var selected = [] 
-              , entry = null;
-            
-            _.each($(':input[type=checkbox]:checked', this.$el), function(e) {
-                entry = app.surveyXforms.get($(e).val());
-                if (entry) {
-                    entry = entry.clone();
-                    selected.push(entry.clone());
-                }
-            })
-            
-            this.mediator.registerLocalXForms(selected);
-        },
-        
-        getContext: function() {
-            // filter out forms that have already been registered
-            // as best as possible
-            if (app.xforms) {
-                var localObjectIds = app.xforms.pluck('object_id')
-                  , diff = [];
-                
-                _.each(app.surveyXforms.models, function(f) {
-                    if (!_.contains(localObjectIds, f.id))
-                        diff.push(f);
-                })
-                app.surveyXforms = new app.collections.SurveyXForms(diff);
-            }
-            return {'xforms': app.surveyXforms || null};
-        },
-        
-        sendAuth: function(xhr) {
-            xhr.setRequestHeader(
-                'Authorization', 
-                'Token ' + app.$fn.getCookie('survey_auth_token'));
-        }
-    }),
-    
-    AdminXFormView = Backbone.View.extend({
-        _regions: null,
-        initialize: function() {
-            this._regions = {
-                'local': new LocalXFormRegion(),
-                'survey': new SurveyXFormRegion(),
-            }
-            this._regions.local.mediator = this;
-            this._regions.survey.mediator = this;
-        },
-        
-        registerLocalXForms: function(data) {
-            var self = this;
-            if (data && data.length > 0) {
-                this._regions.local.registerXForms(data, function(model, resp, xhr) {
-                    if (resp == 'success') {
-                        self.excludeSurveyXForms(model);
-                    } else {
-                        self.displayError(resp);
-                    }
-                });
-            }
-        },
-        
-        excludeSurveyXForms: function(data) {
-            if (data && data.length > 0) {
-                this._regions.survey.excludeXForms(data);
-            }
-        },
-        displayError: function(message) {
-            
-        },
-        
-        render: function() {
-            _.each(this._regions, function(r) {
-                r.render();
-            })
         }
     }),
     
@@ -535,6 +402,124 @@
         getContext: function() {
             return {'xform': this.xform}
         }
+    }),
+    
+    
+    /*-----------------------------------------------------------------------+
+    | Admin PowerStation View 
+    +---------------------------------------------------------------------- */
+    AdminStationListComponent = TemplateView.extend({
+        templateName: '#station-template',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.url = window.location.href.replace('#','');
+            this.type = options.type;
+        },
+        
+        events: {
+            'click button.add': 'create',
+        },
+        
+        create: function() {
+            window.location = (this.url + '#/' + this.type + '/create');
+        },
+        
+        getContext: function() {
+            var title, stations;
+            if (this.type === 't') {
+                title = 'TRANSMISSION';
+                stations = app.tstations;
+            } else {
+                title = 'INJECTION';
+                stations = app.istations;
+            }
+            return {title:title, stations:stations}
+        }
+    }),
+    
+    AdminStationListView = MultiViewManager.extend({
+        initialize: function() {
+            var self = this
+              , comps = {
+                'l': new AdminStationListComponent({el:'#l-content', type:'t'}),
+                'r': new AdminStationListComponent({el:'#r-content', type:'i'}),
+            };
+            MultiViewManager.prototype.initialize.call(this, {comps:comps}, arguments);
+            
+            // load bootstrapped data
+            app.collections.ready.done(function() {
+                if (_.isEmpty(this.bs_data)) {
+                    this.bs_data = JSON.parse($('#bootstrap').text());
+                }
+                
+                if (app.tstations.length < this.bs_data.tstations.length) 
+                    app.tstations.reset(this.bs_data.tstations);
+                
+                if (app.istations.length < this.bs_data.istations.length)
+                    app.istations.reset(this.bs_data.istations);
+                
+                self.render();
+            });
+        },
+    }),
+    
+    AdminStationFormView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#new-template',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.type = options.type;
+        },
+        
+        events: {
+            'click button.save': 'createOne',
+            'click button.cancel': 'close',
+        },
+        
+        createOne: function() {
+            var coll = (this.type === 't'? app.tstations: app.istations)
+              , self = this
+              , entry = {
+                    object_id: Date.now(), 
+                    type: this.type.toUpperCase(),
+                    code: this.$code.val(),
+                    name: this.$name.val(),
+                };
+            
+            if (this.type === 'i') {
+                entry.source = this.$source.val();
+            }
+            
+            coll.create(entry, {
+                wait: true,
+                success: function(m, r, o) {
+                    self.showMessage('Station created successfully', 'success');
+                },
+                fail: function(m, r, o) {
+                    self.showMessage(r, 'danger');
+                }
+            })
+        },
+        
+        close: function() {
+            app.router.r.navigate('', {trigger: true});
+        },
+        
+        render: function() {
+            TemplateView.prototype.render.apply(this, arguments);
+            $('#r-content', this.$el).html('');
+            
+            this.$code = $('input.code', this.$el);
+            this.$name = $('input.name', this.$el);
+            this.$source = $('select.source', this.$el);
+        },
+        
+        getContext: function() {
+            return {
+                type: this.type,
+                title: (this.type === 't'? 'Transmission': 'Injection').toUpperCase(),
+            }
+        }
     });
     
     
@@ -542,5 +527,9 @@
     app.views.ApiServiceView = ApiServiceView;
     app.views.AdminXFormView = AdminXFormView;
     app.views.AdminXFormListView = AdminXFormListView;
+    
+    app.views.MultiViewManager = MultiViewManager;
+    app.views.AdminStationFormView = AdminStationFormView;
+    app.views.AdminStationListView = AdminStationListView;
     
 })(jQuery, Backbone, _, app);

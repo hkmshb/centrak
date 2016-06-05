@@ -47,11 +47,28 @@
         }
     }),
     
+    AdminPowerStationRouter = BaseRouter.extend({
+        routes: {
+            '': 'home',
+            ':type/create': 'create',
+        },
+        home: function() {
+            var view = new app.views.AdminStationListView();
+            this.render(view);
+        },
+        create: function(type) {
+            var options = {type: type, el: this.contentElement}
+              , view = new app.views.AdminStationFormView(options);
+            this.render(view);
+        }
+    }),
+    
     RouterFactory = function(rname, vname){
         return {
             r: null,
             map: {
-                'adminXform': AdminXFormRouter
+                'adminXform': AdminXFormRouter,
+                'adminPStation': AdminPowerStationRouter,
             },
             route: function() {
                 if (_.isEmpty(rname)) {

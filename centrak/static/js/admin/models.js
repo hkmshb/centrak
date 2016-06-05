@@ -106,49 +106,6 @@
         }
     });
     
-    
-    // collections
-    // a]. start by discovering the root links published on the api-root
-    app.collections.ready = $.getJSON(app.conf.apiRoot);
-    
-    // b]. build collections using data returned from [a]
-    app.collections.ready.done(function(data) {
-        // local XForm
-        app.collections.XForms = Backbone.Collection.extend({
-            model: app.models.XForm,
-            url: data.xforms
-        });
-        app.xforms = new app.collections.XForms();
-        
-        // survey XForms
-        app.collections.SurveyXForms = Backbone.Collection.extend({
-            model: app.models.XForm,
-            url: app.conf.survey.apiRoot
-        })
-        app.surveyXforms = new app.collections.SurveyXForms();
-        
-        /// more collections...
-    });
-    
-    
-    // collection extension
-    Backbone.Collection.prototype.saveAll = function(data, success){
-        var self = this
-          , wrapper = {
-                url: this.url,
-                toJSON: function() {
-                    return data;
-                }
-            },
-            options = {
-                success: function(model, resp, xhr) {
-                    if (success) {
-                        success(model, resp, xhr);
-                    }
-                }
-            };
-        return Backbone.sync("create", wrapper, options);
-    };
-    
+    app.models.Station = Backbone.Model.extend({});
     
 })(jQuery, Backbone, _, app);

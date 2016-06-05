@@ -54,8 +54,9 @@ class Menu(object):
                 Menu.Item(self, _('Organization')),
                 Menu.Item(self, _('Business Offices')),
                 Menu.Item(self, '---'),
-                Menu.Item(self, _('Stations')),
-                Menu.Item(self, _('Feeeders')),
+                Menu.Item(self, _('Power Stations'), reverse('admin-ntwk-ps')),
+                Menu.Item(self, _('Power Lines (Feeders)')),
+                Menu.Item(self, _('Distribution Stations')),
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('External API Services'), reverse('admin-api-services')))),
             Menu.Item(self, _('Enumeration'), children=(

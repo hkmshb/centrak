@@ -5,7 +5,19 @@ from django.shortcuts import render
 
 from core import utils
 from .models import XForm
+from enumeration.models import PowerStation
 
+
+
+@login_required
+def network_ps(request):
+    tstations = PowerStation.objects(type=PowerStation.TRANSMISSION)
+    istations = PowerStation.objects(type=PowerStation.INJECTION)
+    context = {'tstations': tstations, 'istations': istations }
+    return render(request, 
+        'enumeration/admin/ntwk-pwr-stations.html',
+        context
+    )
 
 
 @login_required
