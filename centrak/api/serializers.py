@@ -1,4 +1,5 @@
-from rest_framework_mongoengine.serializers import DocumentSerializer
+from rest_framework import serializers
+from rest_framework_mongoengine import serializers as mserializers
 from enumeration.models import PowerStation, PowerLine, XForm
 
 
@@ -7,12 +8,18 @@ from enumeration.models import PowerStation, PowerLine, XForm
 #: NETWORK MODEL SERIALIZERS
 #:+--------------------------------------------------------------------------+
 
-class PowerStationSerializer(DocumentSerializer):
+class PowerStationSerializer(mserializers.DocumentSerializer):
+    
+    fullname = serializers.SerializerMethodField()
+    
     class Meta:
         model = PowerStation
+    
+    def get_fullname(self, obj):
+        return str(obj)
 
 
-class PowerLineSerializer(DocumentSerializer):
+class PowerLineSerializer(mserializers.DocumentSerializer):
     class Meta:
         model = PowerLine
 
@@ -21,7 +28,7 @@ class PowerLineSerializer(DocumentSerializer):
 #: ENUM. RESX. SERIALIZERS
 #:+--------------------------------------------------------------------------+
 
-class XFormSerializer(DocumentSerializer):
+class XFormSerializer(mserializers.DocumentSerializer):
     
     class Meta:
         model = XForm

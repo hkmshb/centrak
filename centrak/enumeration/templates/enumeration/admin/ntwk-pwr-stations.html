@@ -10,7 +10,8 @@
         </div>
     </div>
     <script type="application/json" id="bootstrap">
-        {"tstations":{{ tstations.to_json|safe }}, 
+        {"voltratio":{{ voltratio|safe }},
+         "tstations":{{ tstations.to_json|safe }}, 
          "istations":{{ istations.to_json|safe }}}
     </script>
     <script type="text/template" id="station-template">
@@ -29,7 +30,7 @@
                     <% if (stations && stations.length > 0) { %>
                         <% _(stations.models).each(function(m) { %>
                         <tr><td><%- m.get('code') %></td>
-                            <td><%- m.get('name') %></td>
+                            <td><%- m.getFullname() %></td>
                             <td>0</td></tr>
                         <% }) %>
                     <% } else { %>
@@ -56,6 +57,17 @@
                     <label class="col-sm-2 rm-r-pad">Name</label>
                     <div class="col-sm-10 rm-l-pad">
                         <input type="text" class="name form-control input-sm" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-2 rm-r-pad">Voltage Ratio</label>
+                    <div class="col-sm-10 rm-l-pad">
+                        <select type="text" class="voltage_ratio form-control input-sm">
+                            <option value=""></option>
+                        <% _(voltratio).each(function(v) { %>
+                            <option value="<%- v[0] %>"><%- v[1] %></option>
+                        <% }) %>
+                        </select>
                     </div>
                 </div>
                 <% if (type === 'i') { %>

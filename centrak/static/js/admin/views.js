@@ -458,6 +458,7 @@
                 if (app.istations.length < this.bs_data.istations.length)
                     app.istations.reset(this.bs_data.istations);
                 
+                app.voltratio = this.bs_data.voltratio;
                 self.render();
             });
         },
@@ -484,6 +485,7 @@
                     type: this.type.toUpperCase(),
                     code: this.$code.val(),
                     name: this.$name.val(),
+                    voltage_ratio: this.$vratio.val()
                 };
             
             if (this.type === 'i') {
@@ -512,11 +514,12 @@
             this.$code = $('input.code', this.$el);
             this.$name = $('input.name', this.$el);
             this.$source = $('select.source', this.$el);
+            this.$vratio = $('select.voltage_ratio', this.$el);
         },
         
         getContext: function() {
             return {
-                type: this.type,
+                type: this.type, voltratio: app.voltratio,
                 title: (this.type === 't'? 'Transmission': 'Injection').toUpperCase(),
             }
         }

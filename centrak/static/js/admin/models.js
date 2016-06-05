@@ -106,6 +106,19 @@
         }
     });
     
-    app.models.Station = Backbone.Model.extend({});
+    app.models.Station = Backbone.Model.extend({
+        getFullname: function() {
+            var fullname=''
+              , n = this.get('name')
+              , v = this.get('voltage_ratio');
+            
+            if (!_.isUndefined(v)) {
+                var idx = _(app.voltratio).pluck(0).indexOf(v);
+                fullname += (app.voltratio[idx][1] + ' ');
+            }
+            if (!_.isEmpty(n)) fullname += n;
+            return fullname.trim();
+        }
+    });
     
 })(jQuery, Backbone, _, app);

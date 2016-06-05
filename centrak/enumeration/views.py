@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 from core import utils
 from .models import XForm
-from enumeration.models import PowerStation
+from enumeration.models import Volt, PowerStation
 
 
 
@@ -13,11 +13,12 @@ from enumeration.models import PowerStation
 def network_ps(request):
     tstations = PowerStation.objects(type=PowerStation.TRANSMISSION)
     istations = PowerStation.objects(type=PowerStation.INJECTION)
-    context = {'tstations': tstations, 'istations': istations }
+    
     return render(request, 
-        'enumeration/admin/ntwk-pwr-stations.html',
-        context
-    )
+        'enumeration/admin/ntwk-pwr-stations.html',{
+        'tstations':tstations, 'istations':istations,
+        'voltratio': json.dumps(Volt.Ratio.PS_CHOICES),
+    })
 
 
 @login_required

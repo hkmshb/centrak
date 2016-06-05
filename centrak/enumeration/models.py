@@ -1,6 +1,7 @@
 from datetime import datetime
+from collections import OrderedDict
 from django.utils.translation import ugettext_lazy as _
-from mongoengine import Document, EmbeddedDocument, fields
+from mongoengine import Document, fields
 
 
 
@@ -16,6 +17,41 @@ class TimeStampedDocument(Document):
 #+----------------------------------------------------------------------------+
 #: Network Asset Models
 #+----------------------------------------------------------------------------+
+
+class Volt:
+    HVOLTH, HVOLTL, MVOLTH, MVOLTL, LVOLT = range(1, 6)
+    _Text = OrderedDict({
+        HVOLTH:'330KV', HVOLTL:'132KV', MVOLTH:'33KV', MVOLTL:'11KV',
+        LVOLT:'0.415KV'})
+    
+    ALL_CHOICES = (
+        (HVOLTH, _Text[HVOLTH]), (HVOLTL, _Text[HVOLTH]),
+        (MVOLTH, _Text[MVOLTH]), (MVOLTL, _Text[MVOLTL]),
+        (LVOLT, _Text[LVOLT]))
+    
+    LINE_CHOICES = ((MVOLTH, _Text[MVOLTH]), (MVOLTL, _Text[MVOLTL]))
+    
+    class Ratio:
+        HVOLTH_HVOLTL, HVOLTL_MVOLTH, HVOLTL_MVOLTL = range(1, 4)
+        MVOLTH_MVOLTL, MVOLTH_LVOLT, MVOLTL_LVOLT = range(4, 7)
+        
+        _Text = OrderedDict({
+            HVOLTH_HVOLTL:'330/132KV', HVOLTL_MVOLTH:'132/33KV',
+            HVOLTL_MVOLTL:'132/11KV', MVOLTH_MVOLTL:'33/11KV',
+            MVOLTH_LVOLT:'33/0.415KV', MVOLTL_LVOLT:'11/0.415KV'})
+        
+        ALL_CHOICES = (
+            (HVOLTH_HVOLTL, _Text[HVOLTH_HVOLTL]), (HVOLTL_MVOLTH, _Text[HVOLTL_MVOLTH]),
+            (HVOLTL_MVOLTL, _Text[HVOLTL_MVOLTL]), (MVOLTH_MVOLTL, _Text[MVOLTH_MVOLTL]),
+            (MVOLTH_LVOLT, _Text[MVOLTH_LVOLT]), (MVOLTL_LVOLT, _Text[MVOLTL_LVOLT]))
+        
+        PS_CHOICES = (
+            (HVOLTH_HVOLTL, _Text[HVOLTH_HVOLTL]), (HVOLTL_MVOLTH, _Text[HVOLTL_MVOLTH]),
+            (HVOLTL_MVOLTL, _Text[HVOLTL_MVOLTL]), (MVOLTH_MVOLTL, _Text[MVOLTH_MVOLTL]))
+        
+        DS_CHOICES = (
+            (MVOLTH_LVOLT, _Text[MVOLTH_LVOLT]), (MVOLTL_LVOLT, _Text[MVOLTL_LVOLT]))
+
 
 class PowerStation(TimeStampedDocument):
     """Represents a power station within an electricity distribution network."""
@@ -34,10 +70,15 @@ class PowerStation(TimeStampedDocument):
     name = fields.StringField(max_length=50, required=True, unique=True)
     type = fields.StringField(max_length=1, required=True, 
                 choices=STATION_CHOICES)
+    voltage_ratio = fields.IntField(required=True, choices=Volt.Ratio.ALL_CHOICES)
     source = fields.ReferenceField('PowerLine', null=True)
     
+    meta = {
+        'collection': 'stations',
+    }
+    
     def __str__(self):
-        return self.name
+        return '{} {}'.format(Volt.Ratio._Text[self.voltage_ratio], self.name)
     
     def tagcode(self):
         return self.code 
@@ -58,19 +99,12 @@ class PowerLine(TimeStampedDocument):
         (UPRISER, 'Upriser'),
     )
     
-    HVOLTH, HVOLTL, MVOLTH, MVOLTL, LVOLT = range(1, 6)
-    VOLT_CHOICES = (
-        (HVOLTH, '330KV'), (HVOLTL, '132KV'),
-        (MVOLTH,  '33KV'), (MVOLTL, '11KV'),
-        (LVOLT, '0.415KV'),
-    )
-    
     object_id = fields.IntField(unique=True)
     code  = fields.StringField(max_length=2, required=True)
     icode = fields.StringField(max_length=20, required=False)
     name  = fields.StringField(max_length=50, required=True, unique=True)
     type  = fields.StringField(max_length=1, required=True, choices=TYPE_CHOICES)
-    voltage = fields.IntField(required=True, choices=VOLT_CHOICES)
+    voltage = fields.IntField(required=True, choices=Volt.LINE_CHOICES)
     public = fields.BooleanField(default=True)
     source = fields.ReferenceField(PowerStation)
     
