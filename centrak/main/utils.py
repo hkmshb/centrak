@@ -29,9 +29,12 @@ class Menu(object):
             default_if_none_url = '_/_'
             item_url = self.url or default_if_none_url
             
-            request_root_url = self.menu._request_path.split('/')[1]
-            item_root_url = item_url.split('/')[1]
-            return item_root_url == request_root_url
+            if self.children:
+                request_root_url = self.menu._request_path.split('/')[1:3]
+                item_root_url = item_url.split('/')[1:3]
+                return item_root_url == request_root_url
+            else:
+                return self.url == self.menu._request_path
         
         def is_separator(self):
             return self.text == '---'
@@ -50,7 +53,7 @@ class Menu(object):
     def _get_admin_items(self):
         return (
             Menu.Item(self, _('Dashboard'), reverse('admin-home')),
-            Menu.Item(self, _('Settings'), children=(
+            Menu.Item(self, _('Settings'), '/admin/s/', children=(
                 Menu.Item(self, _('Organization')),
                 Menu.Item(self, _('Business Offices')),
                 Menu.Item(self, '---'),
@@ -59,7 +62,7 @@ class Menu(object):
                 Menu.Item(self, _('Distribution Stations')),
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('External API Services'), reverse('admin-api-services')))),
-            Menu.Item(self, _('Enumeration'), children=(
+            Menu.Item(self, _('Enumeration'), '/admin/enum/', children=(
                 Menu.Item(self, _('Projects')),
                 Menu.Item(self, _('XForms'), reverse('admin-xforms')))),
         )

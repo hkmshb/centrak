@@ -24,7 +24,7 @@ urlpatterns = [
             url('^$', views.admin_home, name='admin-home') ,
             
             #: external api services
-            url('api-services/{}/'.format(settings.SURVEY_API_SERVICE_KEY), 
+            url('s/apiservices/{}/$'.format(settings.SURVEY_API_SERVICE_KEY), 
                 views.apiservice_survey, name='admin-api-services'),
         ]),
     ),
