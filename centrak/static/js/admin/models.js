@@ -1,3 +1,5 @@
+/* jshint -W014, laxcomma:true */
+
 (function($, Backbone, _, app) {
     'use strict';
     
@@ -81,6 +83,28 @@
     
     
     // models
+    app.models.Project = Backbone.Model.extend({
+        getFaActive: function() {
+            var active = this.get('active');
+            return (active? 'fa-check-square-o': 'fa-square-o');
+        },
+        getDateStarted: function() {
+            return this.getDate('date_started');
+        },
+        getDateEnded: function() {
+            return this.getDate('date_ended');
+        },
+        getDate: function(field_name) {
+            var value = this.get(field_name);
+            if (!_.isEmpty(value)) {
+                if (_.isObject(value))
+                    value = value.$date;
+                return moment(value).format('DD/MM/YYYY HH:mm A');
+            }
+            return "";
+        }
+    });
+    
     app.models.XForm = Backbone.Model.extend({
         getLastSynced: function() {
             var value = this.get('last_synced');
@@ -120,5 +144,6 @@
             return fullname.trim();
         }
     });
+    
     
 })(jQuery, Backbone, _, app);

@@ -1,3 +1,5 @@
+/* jshint laxcomma:true */
+
 var app = (function($){
     var config = $('#config') 
       , app = {
@@ -28,9 +30,10 @@ var app = (function($){
     };
     
     $(document).ready(function(){
-        var ri = $('.app')
+        // routing
+        var ri = $('.app');
         app.router =  app.router(ri.data('r'), ri.data('v'));
-        app.router.route()
+        app.router.route();
     });
     
     return app;

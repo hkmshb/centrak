@@ -18,6 +18,7 @@ class TimeStampedDocument(Document):
 #: Network Asset Models
 #+----------------------------------------------------------------------------+
 
+
 class Volt:
     HVOLTH, HVOLTL, MVOLTH, MVOLTL, LVOLT = range(1, 6)
     _Text = OrderedDict({
@@ -118,6 +119,7 @@ class PowerLine(TimeStampedDocument):
 #: Enum. Resx. Models
 #+----------------------------------------------------------------------------+
 
+
 class XForm(TimeStampedDocument):
     """Represents an XForm used on the Survey platform."""
     
@@ -147,4 +149,40 @@ class XForm(TimeStampedDocument):
     
     def __str__(self):
         return self.title or self.id_string
+
+
+class Project(TimeStampedDocument):
+    """Represents an endeavour to enumerate customers on a high tension (HT)
+    PowerLine (Feeder)."""
+    
+    STATUS_IN_VIEW     = 1
+    STATUS_IN_PROGRESS = 2
+    STATUS_CONCLUDED   = 3
+    STATUS_REVISITED   = 4
+    
+    STATUS_CHOICES = (
+        (STATUS_IN_VIEW, 'In View'),
+        (STATUS_IN_PROGRESS, 'In Progress'),
+        (STATUS_CONCLUDED, 'Concluded'),
+        (STATUS_REVISITED, 'Revisited'),
+    )
+    
+    code = fields.StringField(unique=True, required=True)
+    name = fields.StringField(max_length=50, unique=True, required=True)
+    description = fields.StringField(required=False, null=True)
+    status = fields.IntField(required=True, default=STATUS_IN_VIEW,
+                choices=STATUS_CHOICES)
+    active = fields.BooleanField(default=False)
+    date_started = fields.DateTimeField(null=True)
+    date_ended = fields.DateTimeField(null=True)
+    
+    meta = {
+        'collection': 'projects',
+        'ordering': ['object_id'],
+    }
+    
+    def __str__(self):
+        return "{} :: [Project {}]".format(
+            self.title, self.get_status_display()
+        )
 

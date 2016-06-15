@@ -4,13 +4,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from core import utils
-from .models import XForm
+from .models import XForm, Project
 from enumeration.models import Volt, PowerStation
 
 
 
 @login_required
-def network_ps(request):
+def admin_pstations(request):
     tstations = PowerStation.objects(type=PowerStation.TRANSMISSION)
     istations = PowerStation.objects(type=PowerStation.INJECTION)
     
@@ -22,15 +22,26 @@ def network_ps(request):
 
 
 @login_required
-def xforms_list(request):
+def admin_xforms(request):
     # TODO: include total captures per XForm
     qset = XForm.objects
     context = {
         'xforms': qset
     }
-    response = render(request, 'enumeration/admin/xforms.html', context)
+    resp = render(request, 'enumeration/admin/xforms.html', context)
     
     # include survey auth token as cookie
     survey_auth_token = utils.get_survey_auth_token()
-    response.set_cookie('survey_auth_token', survey_auth_token, 60*15)
-    return response
+    resp.set_cookie('survey_auth_token', survey_auth_token, 60*15)
+    return resp
+
+
+@login_required
+def admin_projects(request):
+    qset = Project.objects
+    context = {
+        'projects': qset,
+        'choices_status': json.dumps(Project.STATUS_CHOICES),
+    }
+    return render(request, 'enumeration/admin/projects.html', context)
+

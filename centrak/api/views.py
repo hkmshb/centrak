@@ -1,9 +1,9 @@
 from rest_framework import authentication, permissions
 from rest_framework_mongoengine import viewsets
-from enumeration.models import PowerStation, PowerLine, XForm
+from enumeration.models import PowerStation, PowerLine, Project, XForm
 
 from .serializers import PowerStationSerializer, PowerLineSerializer, \
-        XFormSerializer
+        ProjectSerializer, XFormSerializer
 
 
 
@@ -37,6 +37,13 @@ class PowerLineViewSet(DefaultMixin, viewsets.ModelViewSet):
     
     queryset = PowerLine.objects.order_by('object_id')
     serializer_class = PowerLineSerializer
+
+
+class ProjectViewSet(DefaultMixin, viewsets.ModelViewSet):
+    """API endpoint for listing and creating Projects."""
+    
+    queryset = Project.objects.order_by('date_started')
+    serializer_class = ProjectSerializer
 
 
 class XFormViewSet(DefaultMixin, viewsets.ModelViewSet):

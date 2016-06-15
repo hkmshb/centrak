@@ -1,3 +1,5 @@
+/* jshint laxcomma:true */
+
 (function($, Backbone, _, app) {
     'use strict';
     
@@ -63,24 +65,57 @@
         }
     }),
     
+    AdminProjectRouter = BaseRouter.extend({
+        routes: {
+            '': 'home',
+            'create': 'create',
+            ':project_code/': 'view',
+            ':project_code/update': 'update',
+        },
+        home: function() {
+            var view = new app.views.AdminProjectListView({el: this.contentElement});
+            this.render(view);
+        },
+        create: function() {
+            this.manage({el: this.contentElement, edit: true});
+        },
+        view: function(project_code) {
+            this.manage({
+                el: this.contentElement, 
+                project_code: project_code, edit: false
+            });
+        },
+        update: function(project_code) {
+            this.manage({
+                el: this.contentElement, 
+                project_code: project_code, edit: true 
+            });
+        },
+        manage: function(options) {
+            var view = new app.views.AdminProjectFormView(options);
+            this.render(view);
+        }
+    }),
+    
     RouterFactory = function(rname, vname){
         return {
             r: null,
             map: {
                 'adminXform': AdminXFormRouter,
                 'adminPStation': AdminPowerStationRouter,
+                'adminProject': AdminProjectRouter,
             },
             route: function() {
                 if (_.isEmpty(rname)) {
                     this.r = new DefaultRouter();
-                    this.r[vname]()
+                    this.r[vname]();
                 } else {
                     if (!_.isEmpty(this.r))
                         this.r = null;
                     this.r = new this.map[rname]();
                 }
             }
-        }
+        };
     };
     
     app.router = RouterFactory;

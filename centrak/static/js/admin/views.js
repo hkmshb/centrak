@@ -1,3 +1,5 @@
+/* jshint laxcomma:true */
+
 (function($, Backbone, _, app) {
     'use strict';
     
@@ -17,10 +19,35 @@
             canvas.html(html);
             this.$alert = $('.alert');
             this.$alert.addClass('hide').text('');
+
+            $('.date').datetimepicker({
+                showClear: true,
+                format: 'DD/MM/YYYY HH:mm A',
+                useCurrent: false
+            }).on('dp.show', function() {
+                if ($(this).data('DateTimePicker').date() === null)
+                    $(this).data('DateTimePicker').date(moment());
+            });
         },
         
-        normDate: function(field_name) {
-            return moment(this.xform.get(field_name).$date).format();
+        getDbDate: function(model, field_name) {
+            var value = model.get(field_name);
+            if (!_.isEmpty(value)) {
+                if (_.isObject(value))
+                    value = value.$date;
+                return moment(value).format();
+            }
+            return "";
+        },
+
+        toDbDate: function(value) {
+            var fmt = 'DD/MM/YYYY HH:mm A'
+              , val = moment(value, fmt);
+            
+            if (val.isValid()) {
+                return val.format();
+            }
+            return value;
         },
         
         getCanvas: function() {
@@ -59,7 +86,7 @@
         render: function() {
             _(this._comps).each(function(c) {
                 c.render();
-            })
+            });
         }
     }),
     
@@ -199,7 +226,7 @@
             app.collections.ready.done(function() {
                 if (app.xforms.length === 0) {
                     var data = JSON.parse($('#bootstrap').text());
-                    app.xforms.reset(data)
+                    app.xforms.reset(data);
                     self.render();
                 }
                 
@@ -230,7 +257,7 @@
                     wait: true,
                     success: dispatch,
                     fail: dispatch,
-                })
+                });
             });
         },
         
@@ -309,7 +336,7 @@
             this._comps = {
                 'local': new LocalXFormComponent({el: '#local', mediator: this}),
                 'survey': new SurveyXFormComponent({el: '#survey', mediator: this}),
-            }
+            };
         },
         
         registerForms: function(options){
@@ -319,7 +346,7 @@
         render: function() {
             _(this._comps).each(function(c) {
                 c.render();
-            })
+            });
         }
     }),
     
@@ -363,7 +390,7 @@
                     // show message
                     self.showMessage('Update successful', 'success');
                 }
-            })
+            });
         },
         
         close: function() {
@@ -385,14 +412,14 @@
                 id: this.xform.get('_id').$oid,
                 
                 // need to normalize these fields else error
-                last_updated: this.normDate('last_updated'),
-                date_imported: this.normDate('date_imported'),
+                last_updated: this.getDbDate(this.xform, 'last_updated'),
+                date_imported: this.getDbDate(this.xform, 'date_imported'),
                 
                 // actual changes
                 type: this.$type.val(),
                 description: this.$desc.val(),
                 active: this.$active.is(':checked'),
-            }
+            };
             
             if (_.isEmpty(changes.description))
                 delete changes['description'];
@@ -400,7 +427,7 @@
         },
         
         getContext: function() {
-            return {'xform': this.xform}
+            return {'xform': this.xform};
         }
     }),
     
@@ -433,7 +460,7 @@
                 title = 'INJECTION';
                 stations = app.istations;
             }
-            return {title:title, stations:stations}
+            return {title:title, stations:stations};
         }
     }),
     
@@ -500,7 +527,7 @@
                 fail: function(m, r, o) {
                     self.showMessage(r, 'danger');
                 }
-            })
+            });
         },
         
         close: function() {
@@ -521,15 +548,194 @@
             return {
                 type: this.type, voltratio: app.voltratio,
                 title: (this.type === 't'? 'Transmission': 'Injection').toUpperCase(),
+            };
+        }
+    }),
+    
+    
+    AdminProjectListView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#list-template',
+        initialize: function() {
+            $('.loading').addClass('hide');
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.url = window.location.href.replace('#', '');
+            var self = this, $bs = $('#bootstrap');
+            
+            // load bootstrapped data
+            app.collections.ready.done(function() {
+                this.bs_data = JSON.parse($bs.text());
+                if (!_.isNull(this.bs_data.projects)) {
+                    app.projects.reset(this.bs_data.projects);
+                    this.bs_data.projects = null;
+                    $bs.text(JSON.stringify(this.bs_data));
+                    self.render();
+                } else {
+                    app.projects.fetch({
+                        success: $.proxy(self.render, self)
+                    });
+                }
+            });
+        },
+        
+        events: {
+            'click button.add': 'create',
+        },
+        
+        create: function() {
+            window.location = (this.url + '#/create');
+        },
+        
+        getContext: function() {
+            return {'projects': app.projects};
+        }
+    }),
+    
+    AdminProjectFormView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#form-template',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.project_code = options.project_code;
+            this.editable = options.edit || false;
+            var self = this;
+            
+            // load bootstrapped data
+            var bs_data = JSON.parse($('#bootstrap').text());
+            this.choices_status = bs_data.choices_status;
+            
+            if (!_.isEmpty(options.project_code)) {
+                if (_.isEmpty(app.projects) || app.projects.length === 0) {
+                    this.close();
+                } else {
+                    var q = {code: options.project_code}
+                      , p = app.projects.findWhere(q);
+                    
+                    if (_.isEmpty(p))
+                        this.close();
+                    this.project = p;
+                }
             }
+        },
+        events: {
+            'click button.save': 'manageOne',
+            'click button.edit': 'editOne',
+            'click button.cancel': 'close',
+        },
+        close: function() {
+            var r = '';
+            if (!_.isEmpty(this.project) && this.editable) {
+                r = '/' + this.project.get('code') + '/';
+            }
+            app.router.r.navigate(r, {trigger: true});
+        },
+        manageOne: function() {
+            var self = this
+              , entry = {
+                    code: this.$code.val(),
+                    name: this.$name.val(),
+                    description: this.$desc.val(),
+                    active: this.$active.is(':checked'),
+                    date_started: moment().format(),
+                };
+
+            if (_.isEmpty(this.project)) {
+                app.projects.create(entry, {
+                    wait: true,
+                    success: function(m, r, o) {
+                        self.showMessage('Project created successfully', 'success');
+                    },
+                    fail: function(m, r, o) {
+                        self.showMessage(r, 'danger');
+                    }
+                });
+            } else {
+                var changes = this.getChanges();
+                this.project.save(changes, {
+                    wait: true,
+                    patch: true,
+                    success: function(model, resp, options) {
+                        // update collection & show message
+                        app.projects.add(model, {merge: true});
+                        self.project = app.projects.findWhere({code: self.project_code});
+                        self.showMessage('Project updated successfully', 'success');
+                    },
+                    error: function(model, resp, options) {
+                        self.showMessage('Update failed.', 'danger');
+                    }
+                });
+            }
+        }, 
+        editOne: function() {
+            if (_.isEmpty(this.project))
+                this.close();
+            
+            var r = '#/' + this.project.get('code') + '/update';
+            app.router.r.navigate(r, {trigger:true});
+        },
+        render: function() {
+            TemplateView.prototype.render.apply(this, arguments);
+            $('#r-content', this.$el).html('');
+            
+            this.$code = $('input.code', this.$el);
+            this.$name = $('input.name', this.$el);
+            this.$desc = $('textarea.description', this.$el);
+            this.$active = $('input.active', this.$el);
+            this.$status = $('select.status', this.$el);
+            this.$dt_started = $('input.date_started', this.$el);
+            this.$dt_ended = $('input.date_ended', this.$el);
+        },
+        getContext: function() {
+            return {
+                project: this.project,
+                editable: this.editable,
+                choices_status: this.choices_status
+            };
+        },
+        getChanges: function() {
+            var field = null
+              , fields = [
+                    'code','name','description','status','active',
+                    'date_started','date_ended']
+              , changes = {
+                    // include id to indicate record to update
+                    id: (this.project.has('_id')
+                             ? this.project.get('_id').$oid
+                             : this.project.get('id')),
+
+                    // need to normalize these fields else error
+                    last_updated: moment().format(),
+                    
+                    // actual changes
+                    code: this.$code.val(),
+                    name: this.$name.val(),
+                    description: this.$desc.val(),
+                    status: this.$status.val(),
+                    active: this.$active.is(':checked'),
+                    date_started: this.toDbDate(this.$dt_started.val()),
+                    date_ended: this.toDbDate(this.$dt_ended.val()),
+                };
+            
+            for (var i in fields) {
+                field = fields[i];
+                if (this.project.get(field) == changes[field]) {
+                    delete changes[field];
+                } else if (_.isEqual(changes[field], "")) {
+                    changes[field] = null;
+                }
+            }
+            return changes;
         }
     });
+    
     
     
     // register views
     app.views.ApiServiceView = ApiServiceView;
     app.views.AdminXFormView = AdminXFormView;
     app.views.AdminXFormListView = AdminXFormListView;
+    app.views.AdminProjectListView = AdminProjectListView;
+    app.views.AdminProjectFormView = AdminProjectFormView;
     
     app.views.MultiViewManager = MultiViewManager;
     app.views.AdminStationFormView = AdminStationFormView;

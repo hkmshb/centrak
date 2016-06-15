@@ -63,7 +63,7 @@ class Menu(object):
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('External API Services'), reverse('admin-api-services')))),
             Menu.Item(self, _('Enumeration'), '/admin/enum/', children=(
-                Menu.Item(self, _('Projects')),
+                Menu.Item(self, _('Projects'), reverse('admin-projects')),
                 Menu.Item(self, _('XForms'), reverse('admin-xforms')))),
         )
     

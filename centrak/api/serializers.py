@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework_mongoengine import serializers as mserializers
-from enumeration.models import PowerStation, PowerLine, XForm
+from enumeration.models import PowerStation, PowerLine, Project, XForm
 
 
 
@@ -29,6 +29,10 @@ class PowerLineSerializer(mserializers.DocumentSerializer):
 #:+--------------------------------------------------------------------------+
 
 class XFormSerializer(mserializers.DocumentSerializer):
-    
     class Meta:
         model = XForm
+
+
+class ProjectSerializer(mserializers.DocumentSerializer):
+    class Meta:
+        model = Project
