@@ -11,7 +11,7 @@
         </div>
     </div>
     <script type="application/json" id="bootstrap">
-        {{ xforms.to_json|safe }}
+        {"xforms": {{ xforms.to_json|safe }}}
     </script>
     <script type="text/template" id="local-xforms-template">
         <div class="header-strip">

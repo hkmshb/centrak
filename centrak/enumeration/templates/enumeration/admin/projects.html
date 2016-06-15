@@ -10,7 +10,7 @@
         </div>
     </div>
     <script type="application/json" id="bootstrap">
-         {"choices_status": {{ choices_status|safe }},
+         {"choices": {{ choices|safe }},
           "projects": {{ projects.to_json|safe }}}
     </script>
     <script type="text/template" id="list-template">
@@ -68,7 +68,7 @@
                     <label class="col-sm-3 rm-r-pad">Status</label>
                     <div class="col-sm-9 rm-l-pad">
                         <select class="status form-control input-sm" <%- !editable? "disabled":"" %>>
-                            <option value=""></option> <% _(choices_status).each(function(e){ %>
+                            <option value=""></option> <% _(choices.status).each(function(e){ %>
                             <option value="<%- e[0] %>" <%- e[0]===project.get('status')? "selected":"" %>><%- e[1] %></option>
                             <% }); %>
                         </select>
@@ -79,6 +79,26 @@
                     <div class="col-sm-9 rm-l-pad">
                         <textarea type="text" class="description form-control input-sm" <%- !editable? "readonly":"" %>
                             ><%- _.isEmpty(project)? "": project.get('description') || "" %></textarea>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Capture Forms</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <select multiple="multiple" class="2 xforms form-control input-sm" <%- !editable? "disabled":"" %>>
+                            <option value=""></option><% _(choices.xforms).each(function(e) { %>
+                            <option value="<%- e[0] %>" <% if (!_.isEmpty(project)) { %><%- _(project.get('xforms')).contains(e[0])? "selected":"" %> <% } %>><%- e[1] %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Update Forms</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <select multiple="multiple" class="2 uforms form-control input-sm" <%- !editable? "disabled":"" %>>
+                            <option value=""></option><% _(choices.uforms).each(function(e) { %>
+                            <option value="<%- e[0] %>" <% if (!_.isEmpty(project)) { %><%- _(project.get('uforms')).contains(e[0])? "selected":"" %> <% } %>><%- e[1] %></option>
+                            <% }); %>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group clearfix">

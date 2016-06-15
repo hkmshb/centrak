@@ -28,6 +28,10 @@
                 if ($(this).data('DateTimePicker').date() === null)
                     $(this).data('DateTimePicker').date(moment());
             });
+
+            $('select.2').select2({
+                theme: "bootstrap"
+            });
         },
         
         getDbDate: function(model, field_name) {
@@ -218,20 +222,24 @@
     LocalXFormComponent = TemplateView.extend({
         templateName: '#local-xforms-template',
         initialize: function(){
-            var self = this;
             TemplateView.prototype.initialize.apply(this, arguments);
             this.mediator = arguments[0].mediator;
+            var self = this, $bs = $('#bootstrap');
             
             // load bootstrapped data
             app.collections.ready.done(function() {
-                if (app.xforms.length === 0) {
-                    var data = JSON.parse($('#bootstrap').text());
-                    app.xforms.reset(data);
+                this.bs_data = JSON.parse($bs.text());
+                if (!_.isNull(this.bs_data.xforms)) {
+                    app.xforms.reset(this.bs_data.xforms);
+                    this.bs_data.xforms = null;
+                    $bs.text(JSON.stringify(this.bs_data));
                     self.render();
+                } else {
+                    app.xforms.fetch({
+                        reset: true,
+                        success: $.proxy(self.render, self)
+                    });
                 }
-                
-                // listen for changes
-                app.xforms.on('update', $.proxy(self.render, self));
             });
         },
         
@@ -277,6 +285,7 @@
             // load bootstrapped data
             app.collections.ready.done(function() {
                 app.surveyXforms.fetch({
+                    cache: false,
                     beforeSend: self.sendAuth,
                     success: $.proxy(self.render, self),
                 });
@@ -409,7 +418,9 @@
         getChanges: function() {
             var changes = {
                 // id included to indicate record to update
-                id: this.xform.get('_id').$oid,
+                id: (this.xform.has('_id')
+                         ? this.xform.get('_id').$oid
+                         : this.xform.get('id')),
                 
                 // need to normalize these fields else error
                 last_updated: this.getDbDate(this.xform, 'last_updated'),
@@ -572,6 +583,7 @@
                     self.render();
                 } else {
                     app.projects.fetch({
+                        reset: true,
                         success: $.proxy(self.render, self)
                     });
                 }
@@ -602,7 +614,7 @@
             
             // load bootstrapped data
             var bs_data = JSON.parse($('#bootstrap').text());
-            this.choices_status = bs_data.choices_status;
+            this.choices = bs_data.choices;
             
             if (!_.isEmpty(options.project_code)) {
                 if (_.isEmpty(app.projects) || app.projects.length === 0) {
@@ -630,17 +642,10 @@
             app.router.r.navigate(r, {trigger: true});
         },
         manageOne: function() {
-            var self = this
-              , entry = {
-                    code: this.$code.val(),
-                    name: this.$name.val(),
-                    description: this.$desc.val(),
-                    active: this.$active.is(':checked'),
-                    date_started: moment().format(),
-                };
-
+            var self = this, changes = null;
             if (_.isEmpty(this.project)) {
-                app.projects.create(entry, {
+                changes = this.getChanges();
+                app.projects.create(changes, {
                     wait: true,
                     success: function(m, r, o) {
                         self.showMessage('Project created successfully', 'success');
@@ -650,7 +655,7 @@
                     }
                 });
             } else {
-                var changes = this.getChanges();
+                changes = this.getChanges(true);
                 this.project.save(changes, {
                     wait: true,
                     patch: true,
@@ -682,6 +687,8 @@
             this.$desc = $('textarea.description', this.$el);
             this.$active = $('input.active', this.$el);
             this.$status = $('select.status', this.$el);
+            this.$xforms = $('select.xforms', this.$el);
+            this.$uforms = $('select.uforms', this.$el);
             this.$dt_started = $('input.date_started', this.$el);
             this.$dt_ended = $('input.date_ended', this.$el);
         },
@@ -689,20 +696,15 @@
             return {
                 project: this.project,
                 editable: this.editable,
-                choices_status: this.choices_status
+                choices: this.choices
             };
         },
-        getChanges: function() {
+        getChanges: function(isUpdate) {
             var field = null
               , fields = [
-                    'code','name','description','status','active',
-                    'date_started','date_ended']
+                    'code','name','description','status','active', 'xforms',
+                    'uforms', 'date_started','date_ended']
               , changes = {
-                    // include id to indicate record to update
-                    id: (this.project.has('_id')
-                             ? this.project.get('_id').$oid
-                             : this.project.get('id')),
-
                     // need to normalize these fields else error
                     last_updated: moment().format(),
                     
@@ -714,15 +716,27 @@
                     active: this.$active.is(':checked'),
                     date_started: this.toDbDate(this.$dt_started.val()),
                     date_ended: this.toDbDate(this.$dt_ended.val()),
+                    xforms: this.$xforms.val(),
+                    uforms: this.$uforms.val(),
                 };
             
             for (var i in fields) {
                 field = fields[i];
-                if (this.project.get(field) == changes[field]) {
+                if (_(['xforms','uforms']).contains(field)) {
+                    if (_.isNull(changes[field]))
+                        changes[field] = [];
+                } else if (this.project && this.project.get(field) == changes[field]) {
                     delete changes[field];
                 } else if (_.isEqual(changes[field], "")) {
                     changes[field] = null;
                 }
+            }
+
+            if (isUpdate) {
+                // include id to indicate record to update
+                changes.id = (this.project.has('_id')
+                                  ? this.project.get('_id').$oid
+                                  : this.project.get('id'));
             }
             return changes;
         }

@@ -39,9 +39,17 @@ def admin_xforms(request):
 @login_required
 def admin_projects(request):
     qset = Project.objects
+    xform_qset = XForm.objects(type=XForm.TYPE_CAPTURE, active=True)
+    uform_qset = XForm.objects(type=XForm.TYPE_UPDATE, active=True)
+    mk_choice = lambda q: [(f.id_string, f.title) for f in q]
+    
     context = {
         'projects': qset,
-        'choices_status': json.dumps(Project.STATUS_CHOICES),
+        'choices': json.dumps({
+            'status': Project.STATUS_CHOICES,
+            'xforms': mk_choice(xform_qset),
+            'uforms': mk_choice(uform_qset)
+        })
     }
     return render(request, 'enumeration/admin/projects.html', context)
 

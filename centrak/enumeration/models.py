@@ -173,6 +173,8 @@ class Project(TimeStampedDocument):
     status = fields.IntField(required=True, default=STATUS_IN_VIEW,
                 choices=STATUS_CHOICES)
     active = fields.BooleanField(default=False)
+    xforms = fields.ListField(fields.StringField())
+    uforms = fields.ListField(fields.StringField())
     date_started = fields.DateTimeField(null=True)
     date_ended = fields.DateTimeField(null=True)
     
