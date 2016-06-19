@@ -36,3 +36,46 @@ def get_survey_auth_token():
             cache.set(key, content, 60 * 15)
     return content
 
+
+class Storage(dict):
+    """Represents a dictionary object whose elements can be accessed and set 
+    using the dot object notation. Thus in addition to `foo['bar']`, `foo.bar` 
+    can equally be used.
+    """
+    
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+
+    def __getattr__(self, key):
+        return self.__getitem__(key)
+    
+    def __setattr__(self, key, value):
+        self[key] = value
+
+    def __getitem__(self, key):
+        return dict.get(self, key, None)
+    
+    def __getstate__(self):
+        return dict(self)
+
+    def __setstate__(self, value):
+        dict.__init__(self, value)
+
+    def __repr__(self):
+        return '<Storage %s>' % dict.__repr__(self)
+    
+    @staticmethod
+    def make(obj):
+        """Converts all dict-like elements of a dict or storage object into
+        storage objects.
+        """
+        if not isinstance(obj, (dict,)):
+            raise ValueError('obj must be a dict or dict-like object')
+        
+        _make = lambda d: Storage({ k: d[k] 
+            if not isinstance(d[k], (dict, Storage))
+            else _make(d[k])
+                for k in d.keys()
+        })
+        return _make(obj)
+
