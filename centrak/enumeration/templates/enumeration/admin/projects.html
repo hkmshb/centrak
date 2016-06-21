@@ -132,6 +132,13 @@
                             <% if (!_.isEmpty(project)) { %> <%- project.get('active')? "checked":"" %> <% } %> <%- !editable? "disabled":"" %>/> Active</label>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="col-sm-3">&nbsp;</div>
+                    <div class="col-sm-9 rm-l-pad">
+                        <label><input class="auto_sync" type="checkbox" 
+                            <% if (!_.isEmpty(project)) { %> <%- project.get('auto_sync')? "checked":"" %> <% } %> <%- !editable? "disabled":"" %>/> Sync Captures Automatically</label>
+                    </div>
+                </div>
             </div>
             <div class="panel-footer">
                 <div class="row">

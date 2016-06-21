@@ -685,10 +685,11 @@
             this.$code = $('input.code', this.$el);
             this.$name = $('input.name', this.$el);
             this.$desc = $('textarea.description', this.$el);
-            this.$active = $('input.active', this.$el);
             this.$status = $('select.status', this.$el);
             this.$xforms = $('select.xforms', this.$el);
             this.$uforms = $('select.uforms', this.$el);
+            this.$active = $('input.active', this.$el);
+            this.$auto_sync = $('input.auto_sync', this.$el);
             this.$dt_started = $('input.date_started', this.$el);
             this.$dt_ended = $('input.date_ended', this.$el);
         },
@@ -702,8 +703,8 @@
         getChanges: function(isUpdate) {
             var field = null
               , fields = [
-                    'code','name','description','status','active', 'xforms',
-                    'uforms', 'date_started','date_ended']
+                    'code','name','description','status','active', 'auto_sync', 
+                    'xforms', 'uforms', 'date_started','date_ended']
               , changes = {
                     // need to normalize these fields else error
                     last_updated: moment().format(),
@@ -714,6 +715,7 @@
                     description: this.$desc.val(),
                     status: this.$status.val(),
                     active: this.$active.is(':checked'),
+                    auto_sync: this.$auto_sync.is(':checked'),
                     date_started: this.toDbDate(this.$dt_started.val()),
                     date_ended: this.toDbDate(this.$dt_ended.val()),
                     xforms: this.$xforms.val(),

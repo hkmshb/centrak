@@ -5,7 +5,12 @@ from mongoengine import Document, fields
 
 
 
-class TimeStampedDocument(Document):
+class TimeStampedMixin(object):
+    date_created = fields.DateTimeField()
+    last_updated = fields.DateTimeField(default=datetime.now())
+
+
+class TimeStampedDocument(Document, TimeStampedMixin):
     date_created = fields.DateTimeField()
     last_updated = fields.DateTimeField(default=datetime.now())
     
@@ -173,6 +178,7 @@ class Project(TimeStampedDocument):
     status = fields.IntField(required=True, default=STATUS_IN_VIEW,
                 choices=STATUS_CHOICES)
     active = fields.BooleanField(default=False)
+    auto_sync = fields.BooleanField(default=False)
     xforms = fields.ListField(fields.StringField())
     uforms = fields.ListField(fields.StringField())
     date_started = fields.DateTimeField(null=True)
@@ -184,7 +190,6 @@ class Project(TimeStampedDocument):
     }
     
     def __str__(self):
-        return "{} :: [Project {}]".format(
-            self.title, self.get_status_display()
-        )
+        return self.name
+
 
