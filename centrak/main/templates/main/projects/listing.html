@@ -1,0 +1,40 @@
+{% extends 'base_page.html' %}
+{% load humanize main_tags %}
+{% block content %}
+    <h2 class="sub-heading">Projects</h2>
+    <div id="projects" class="app" data-r="Project">
+        <div class="alert hide"></div>
+        <div id="l-content" class="col-md-7 rm-r-pad">
+            <div class="header-strip">
+                <h3 class="text">LISTING</h3>
+                <div class="buttons rm-r-margin">
+                </div>
+            </div>
+            <div class="panel panel-default panel-condensed flat-top">
+                <div class="panel-body">
+                    <table class="table table-stripped">
+                        <tbody>
+                        {% for p in projects %}{% with stat=stats|dictget:p.code %}
+                            <tr><td>{{ p.name }}</td>
+                                <td><span title="Capture Count" data-toggle="tooltip">
+                                    <i class="fa fa-hashtag"></i>
+                                    {{ stat.count|intcomma }}
+                                    <span></td>
+                                <td><span title="XForms" data-toggle="tooltip">
+                                    <i class="fa fa-md fa-file-text-o"></i> 
+                                    <a href="{% url 'projects-xform-list' p.code %}">
+                                        {{ p.xforms|length }}, {{ p.uforms|length }}
+                                    </a></span></td>
+                                <td><span title="Dist. SS Count" data-toggle="tooltip">
+                                    {{ 0 }}
+                                    </span></td></tr>
+                        {% endwith %}{% empty %}
+                            <tr><td>No data available.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

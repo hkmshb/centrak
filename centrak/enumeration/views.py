@@ -9,6 +9,7 @@ from enumeration.models import Volt, PowerStation
 
 
 
+#: ==+: admin view funcs :+==
 @login_required
 def admin_pstations(request):
     tstations = PowerStation.objects(type=PowerStation.TRANSMISSION)

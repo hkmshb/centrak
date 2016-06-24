@@ -102,6 +102,19 @@ DATABASES = {
     }
 }
 
+# settings
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -122,6 +135,30 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, '..', 'centrak-debug.log')
+        },
+        'file_error': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, '..', 'centrak-error.log')
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file_debug','file_error'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
 
 ##: ==+: mongo-engine settings
 _MONGODB_NAME = 'centrak_'
@@ -131,13 +168,21 @@ _MONGODB_PWD  = ''
 
 mongoengine.connect(_MONGODB_NAME)
 
+##: ==+: CELERY
+BROKER_URL               = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND    = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT    = ['application/json']
+CELERY_TASK_SERIALIZER   = 'json'
+CELERY_RESULT_SERIALISER = 'json'
+CELERY_TIMEZONE          = 'Africa/Lagos'
 
-# Auth:
+
+##: ==+: Auth:
 LOGIN_URL = '/account/login'
 LOGIN_REDIRECT_URL = '/'
 
 
-##: ===+: Internal
+##: ==+: Internal
 CENTRAK_KEDCO_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']
 CENTRAK_ADMIN_PREFIX_URL = '/admin/'
 

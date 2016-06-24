@@ -35,5 +35,16 @@ urlpatterns = [
     
     #: ==+: main urls
     url(r'^$', views.index, name='home-page'),
-    
+
+    url(r'^projects/', 
+        include([
+            url(r'^t/$', views.projects_list, name='projects-list'),
+            
+            url(r'^(?P<code>f[0-9A-Fa-f]{3})/',
+                include([
+                    url(r'^xforms/$', views.projects_xform_list, name='projects-xform-list'),
+                ])
+            )
+        ])
+    ),
 ]

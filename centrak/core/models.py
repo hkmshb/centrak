@@ -1,10 +1,13 @@
+from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.db import models
 
+from mongoengine import Document, fields
+
 from ezaddress.models import AddressGPSMixin
 from core.exceptions import InvalidOperationError
-from django.core.exceptions import ValidationError
 
 
 
@@ -144,4 +147,35 @@ class ApiServiceInfo(TimeStampedModel):
     
     class Meta:
         db_table = 'apiservice_info'
-    
+
+
+#: ==+: document models
+
+class StatsMixin(object):
+    key = fields.StringField(required=True)
+    count = fields.IntField(default=0)
+    dup_cin = fields.IntField(default=0)
+    dup_rseq = fields.IntField(default=0)
+    dup_acct_no = fields.IntField(default=0)
+    acct_new = fields.IntField(default=0)
+    acct_existing = fields.IntField(default=0)
+    acct_nosupply = fields.IntField(default=0)
+    acct_ytbd = fields.IntField(default=0)
+    meter_none = fields.IntField(default=0)
+    meter_ppm = fields.IntField(default=0)
+    meter_analogue = fields.IntField(default=0)
+
+
+class Stats(Document, StatsMixin):
+    meta = {
+        'collection': 'stats_xf',
+    }
+
+
+class StatsBatch(Document, StatsMixin):
+    date = fields.DateTimeField(required=True, unique_with='key')
+    meta = {
+        'collection': 'stats_bt',
+        'ordering': ['key', '-date']
+    }
+

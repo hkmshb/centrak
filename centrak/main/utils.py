@@ -46,7 +46,7 @@ class Menu(object):
     def _get_main_items(self):
         return (
             Menu.Item(self, _('Dashboard'), reverse('home-page')),
-            Menu.Item(self, _('Surveys')),
+            Menu.Item(self, _('Projects'), reverse('projects-list')),
             Menu.Item(self, _('Captures'))
         )
     
@@ -73,14 +73,3 @@ class Menu(object):
             return self._get_main_items()
         return self._get_admin_items()
 
-
-class ApiClient(object):
-    
-    def __init__(self, api_url, token=None):
-        self.api_url = api_url
-        self.token = token
-    
-    
-    
-    
-    

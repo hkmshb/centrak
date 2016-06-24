@@ -1,0 +1,54 @@
+{% extends 'base_page.html' %}
+{% load humanize main_tags %}
+{% block content %}
+    <h2 class="sub-heading">Project Details</h2>
+    <div id="projects" class="app" data-v="ProjectsXFormList">
+        <div class="alert hide"></div>
+        <div id="l-content" class="col-md-8 rm-r-pad">
+            <div class="header-strip">
+                <h3 class="text">{{ project }}</h3>
+                <div class="buttons rm-r-margin">
+                    <label class="btn btn-sm btn-slim btn-default" style="padding:1px 10px">
+                        <input type="checkbox" class="toggler" />
+                    </label>
+                    <button class="btn btn-sm btn-slim btn-default sync" title="Sync" data-toggle="tooltip">
+                        <i class="fa fa-md fa-refresh"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="panel panel-default panel-condensed flat-top listing">
+                <div class="panel-body">
+                    <form class="xforms" method="post">
+                        {% csrf_token %}
+                        <table class="table table-stripped">
+                            <tbody> {% regroup xforms|dictsort:"type" by type as xforms_list %}
+                            {% for group in xforms_list %}
+                                <tr><td colspan="4"><b>{% if group.grouper == "C" %}Capture{% else %}Update{% endif %}</b></td></tr>
+                                {% for f in group.list %}{% with stat=stats|dictget:f.id_string %}
+                                <tr><td><div class="checkbox" style="margin:0">
+                                        <label><input name="xform_id" type="checkbox" name="id_string" value="{{ f.id_string }}" class="icheckbox" data-type="{{ f.type }}" /> {{ f }}</label>
+                                        </div></td>
+                                    <td><span title="Capture Count" data-toggle="tooltip">
+                                        <i class="fa fa-hashtag"></i>
+                                        {{ stat.count|intcomma }}
+                                        </span></td>
+                                    <td><span title="Last Synced" data-toggle="tooltip">
+                                        <i class="fa fa-clock-o"></i>
+                                        {{ f.last_synced|naturaltime|default:"unknown" }}
+                                        </span></td>
+                                    <td><span title="Synced by: {{ f.synced_by|default:'unknown'}}" data-toggle="tooltip">
+                                        <i class="fa {{ f.synced_by|as_fa_user_or_pc }}"></i>
+                                        </span></td>
+                                </tr>
+                                {% endwith %}{% endfor %}
+                            {% empty %}
+                                <tr><td>No data available.</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

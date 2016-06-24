@@ -1,6 +1,55 @@
 import copy
+import logging
+import requests
 from datetime import datetime
 
+from django.conf import settings
+
+from core.utils import get_survey_auth_token, ApiClient, Storage
+from .models import SyncLog, XForm, Capture, Update
+from . import signals
+
+
+
+def import_surveys(xform_long_ids, synced_by=None):
+    auth_token = get_survey_auth_token()
+    api_client = ApiClient(settings.SURVEY_API_ROOT, auth_token)
+    importer = SurveyImporter(api_client)
+    
+    results, last_synced = ({}, datetime.now())
+    for xform_long_id in xform_long_ids:
+        result = importer.execute(xform_long_id)
+        results[xform_long_id] = result
+        
+        if not result.errors:
+            # update xform sync details
+            try:
+                XForm.objects(id_string=xform_long_id).update_one(
+                    last_synced = last_synced,
+                    synced_by = synced_by)
+            except Exception as ex:
+                msg = "XForm update after sync failed. Error: %s"
+                logging.error(msg, str(ex), exc_info=True)
+            
+            # log sync operation
+            if result.count > 0:
+                try:
+                    form_key = "project.{}.form.{}".format(
+                        xform_long_id[:4], xform_long_id)
+                    
+                    SyncLog.objects.create(key=form_key, 
+                        count=result.count,
+                        start_id=result.start_id,
+                        synced_by=synced_by,
+                        synced_on=last_synced,
+                        sync_pass=result.errors in (None, []),
+                        fail_info=(result.errors or [])[:])
+                except Exception as ex2:
+                    msg = "Sync stats update failed. Error: %s"
+                    logging.error(msg, str(ex2), exc_info=True)
+    
+    signals.post_survey_import.send(sender=None, results=results)
+    return results
 
 
 class SurveyTransformer(object):
@@ -141,7 +190,7 @@ class SurveyTransformer(object):
         transform_output['station'] = transform_output['cin_station']
         transform_output['upriser'] = "{}/{}".format(
                 transform_output['cin_station'],
-                transform_output['cin_ltroute'[0]])
+                transform_output['cin_ltroute'][0])
         transform_output['cin'] = "{}/{}/{}".format(
                 transform_output['cin_station'],
                 transform_output['cin_ltroute'],
@@ -149,6 +198,15 @@ class SurveyTransformer(object):
         transform_output['date_created'] = datetime.today().isoformat()
         transform_output['last_updated'] = None
         transform_output['dropped'] = False
+        transform_output['rseq'] = "{}/{}".format(
+                transform_output['upriser'],
+                transform_output['cin_custno'])
+                
+        key = 'neighbour_cin'
+        if key in transform_output and transform_output[key] != None:
+            transform_output['neighbour_rseq'] = "{}/{}".format(
+                    transform_output['upriser'],
+                    transform_output[key])
         return transform_output
 
 
@@ -182,3 +240,63 @@ class CentrackbSurveyTransformer(SurveyTransformer):
             output['neighbour_rseq'] = "{}/{}".format(
                 output['upriser'], output[key])
         return output
+
+
+class SurveyImporter(object):
+    
+    def __init__(self, api_client, centrackb_compatible=False):
+        self.centrackb_compatible = centrackb_compatible
+        self.api_client = api_client
+        self._exec_result = None
+    
+    def __call__(self):
+        self.execute()
+    
+    def _add_error(self, message):
+        self._exec_result.errors.append(message)
+    
+    def execute(self, xform_long_id):
+        # startup exec result need to be set here
+        self._exec_result = Storage(errors=[], count=0, 
+            xform_long_id=xform_long_id, start_id=-1)
+        
+        # retrieve form
+        xform = XForm.objects.get(id_string=xform_long_id)
+        if not xform:
+            msg = "XForm with specified id '{}' not found."
+            self._add_error(msg.format(xform_long_id))
+            return False
+        
+        # get total item count which would be used as the starting ref
+        # for the record pull from the API rest service
+        model = Capture if xform.type == XForm.TYPE_CAPTURE else Update
+        record_count = model.objects(_xform_id_string=xform.id_string).count()
+        
+        transformer_class = SurveyTransformer
+        if self.centrackb_compatible:
+            transformer_class = CentrackbSurveyTransformer
+        
+        # pull new surveys
+        try:
+            transformed, transformer = ([], transformer_class())
+            survey_class = Capture if xform.type == XForm.TYPE_CAPTURE else Update
+            for surveys in self.api_client.get_survey(xform.object_id, start=record_count):
+                logging.debug("surveys pulled: %s", len(surveys))
+                if surveys:
+                    self._exec_result.count += len(surveys)
+                    for survey in surveys:
+                        t = transformer.transform(survey)
+                        transformed.append(survey_class(**t))
+                        
+                        if self._exec_result.start_id == -1:
+                            self._exec_result.start_id = t['_id']
+                    
+                    model.objects.insert(transformed)
+                    transformed = []
+        except ConnectionError:
+            self._add_error("Sync failed. Ensure your Internet connection is active.")
+        except Exception as ex:
+            self._add_error("Sync failed. %s" % str(ex))
+            logging.error("Sync failed. %s", str(ex), exc_info=True)
+        return self._exec_result
+

@@ -2,7 +2,8 @@ import json
 from django.contrib.humanize.templatetags import humanize
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
-from . import register
+
+from core.utils import tag_registerer as register
 
 
 @register.filter

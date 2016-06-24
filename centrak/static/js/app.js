@@ -15,6 +15,12 @@ var app = (function($){
     
     app.$fn = {
         dialog: {
+            alert: function(title, message) {
+                var f = $('#modal-alert');
+                $('.modal-header h3', f).text(title);
+                $('.modal-body', f).text(message);
+                f.modal({backdrop:'static', keyboard:false, show:true});
+            },
             confirm: function(title, message, callback) {
                 var f = $('#modal-confirm');
                 $('.modal-header h3', f).text(title);

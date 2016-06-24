@@ -23,6 +23,20 @@ class TimeStampedDocument(Document, TimeStampedMixin):
 #: Network Asset Models
 #+----------------------------------------------------------------------------+
 
+class SyncLog(Document):
+    key = fields.StringField(required=True)
+    count = fields.IntField(required=True)
+    start_id = fields.IntField(required=True)
+    synced_on = fields.DateTimeField(default=datetime.now())
+    synced_by = fields.StringField(required=True)
+    sync_pass = fields.BooleanField(required=True)
+    fail_info = fields.ListField(fields.StringField())
+    
+    meta = {
+        'collection': 'sync_log',
+        'ordering': ['-_id', '-key']
+    }
+
 
 class Volt:
     HVOLTH, HVOLTL, MVOLTH, MVOLTL, LVOLT = range(1, 6)
@@ -193,3 +207,99 @@ class Project(TimeStampedDocument):
         return self.name
 
 
+class Survey(Document, TimeStampedMixin):
+    # survey-meta fields
+    _id = fields.IntField(required=True)
+    _version = fields.StringField(required=True)
+    _xform_id_string = fields.StringField(required=True)
+    _submission_time = fields.DateTimeField(required=True)
+    _uuid = fields.StringField(required=True)
+    _attachments = fields.ListField(fields.StringField())
+    _tags = fields.ListField(fields.StringField())
+    _notes = fields.ListField(fields.StringField())
+
+    group = fields.StringField(required=True)
+    station = fields.StringField(required=True)
+    upriser = fields.StringField(required=True)
+    cin     = fields.StringField(required=True)
+    dropped = fields.BooleanField(default=False)
+
+    datetime_start = fields.DateTimeField(required=True)
+    datetime_end = fields.DateTimeField(required=True)
+    datetime_today = fields.DateTimeField(requied=True)
+    device_imei = fields.StringField(required=True)
+
+    project_id = fields.StringField(required=True)
+    enum_id = fields.StringField(required=True)
+    cin_station = fields.StringField(required=True)
+    cin_ltroute = fields.StringField(required=True)
+    cin_custno  = fields.StringField(required=True)
+    cin         = fields.StringField(required=True)
+    neighbour_cin = fields.StringField()
+
+    rseq           = fields.StringField(required=True)
+    neighbour_rseq = fields.StringField(required=True)
+
+    kangis_no   = fields.StringField()
+    addr_no     = fields.StringField()
+    addr_street = fields.StringField()
+    addr_town   = fields.StringField()
+    addr_state  = fields.StringField()
+    addr_lga    = fields.StringField()
+    addr_landmark = fields.StringField()
+    gps = fields.ListField(fields.StringField())
+
+    plot_type = fields.StringField()
+    multi     = fields.StringField()
+    supply_source = fields.StringField()
+
+    landlord_name = fields.StringField()
+    cust_name     = fields.StringField()
+    occupant      = fields.StringField()
+    cust_mobile1  = fields.StringField(null=True)
+    cust_mobile2  = fields.StringField(null=True)
+    cust_email    = fields.EmailField(null=True)
+
+    acct_status   = fields.StringField()
+    book_code     = fields.StringField()
+    acct_no       = fields.StringField()
+
+    tariff        = fields.StringField()
+    tariff_pp     = fields.StringField()
+    amt_4_adc     = fields.FloatField(null=True)
+
+    meter_type    = fields.StringField()
+    meter_phase   = fields.StringField()
+    meter_phase_pp = fields.StringField()
+    meter_status  = fields.StringField()
+    meter_no      = fields.StringField()
+    meter_brand   = fields.StringField()
+    meter_model   = fields.StringField()
+    meter_location1 = fields.StringField()
+    meter_location2 = fields.StringField()
+    meter_seal_properly = fields.StringField()
+    meter_seal_location = fields.StringField()
+    meter_seal_no       = fields.StringField()
+
+    remarks       = fields.ListField(fields.StringField())
+    other_remarks = fields.StringField()
+
+    meta = {
+        'abstract': True
+    }
+
+
+class Capture(Survey):
+    
+    meta = {
+        'collection': 'captures',
+        'ordering': ['_id'],
+    }
+
+
+class Update(Survey):
+    
+    meta = {
+        'collection': 'updates',
+        'ordering': ['object_id'],
+    }
