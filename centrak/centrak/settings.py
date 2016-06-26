@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 import os
 import mongoengine
-
+from datetime import timedelta
+from celery.schedules import crontab
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -174,7 +175,26 @@ CELERY_RESULT_BACKEND    = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT    = ['application/json']
 CELERY_TASK_SERIALIZER   = 'json'
 CELERY_RESULT_SERIALISER = 'json'
-CELERY_TIMEZONE          = 'Africa/Lagos'
+
+CELERY_IMPORTS = (
+    'enumeration.tasks',
+)
+
+CELERYBEAT_SCHEDULE = {
+    'weekday-scheduled-survey-import': {
+        'task': 'tasks.scheduled-survey-import',
+        'schedule': crontab(minute=0, hour='7,9,13-16,19', 
+                            day_of_week='1,2,3,5')
+    },
+    'thursday-scheduled-survey-import': {
+        'task': 'tasks.scheduled-survey-import',
+        'schedule': crontab(minute=0, hour='7,11,15', day_of_week='4')
+    },
+    'weekend-scheduled-survey-import': {
+        'task': 'tasks.scheduled-survey-import',
+        'schedule': crontab(minute=0, hour='7,13', day_of_week='6,0')
+    }
+}
 
 
 ##: ==+: Auth:

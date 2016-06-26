@@ -3,6 +3,7 @@ psycopg2==2.6.1
 django-ezaddress==0.2
 djangorestframework==3.3.3
 pymongo==3.2.1
+blinker==1.4
 mongoengine==0.10.6
 django-rest-framework-mongoengine==3.3.0
 requests==2.10.0
@@ -12,3 +13,7 @@ pytz==2016.4
 python-dateutil==2.4.2
 numpy==1.10.2
 pandas==0.17.1
+amqp==1.4.9
+anyjson==0.3.3
+billiard==3.3.0.23
+celery==3.1.23
