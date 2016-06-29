@@ -1,5 +1,8 @@
 import pandas as pd
 from datetime import datetime
+
+from mongoengine.queryset import Q
+
 from core.utils import Storage
 from core.models import Stats, StatsBatch
 from enumeration.models import SyncLog, XForm, Capture, Update
@@ -58,8 +61,16 @@ def _build_stats_for_project(project, key, rebuild):
 
 
 def _build_stats_for_project_xform(xform, key, rebuild):
-    survey_class = Capture if xform.type == xform.TYPE_CAPTURE else Update
-    pure_count = survey_class.objects(_xform_id_string=xform.id_string).count()
+    # Q objects
+    _xform_qs = Q(_xform_id_string=xform.id_string)
+    update_qs = (Q(dropped__ne=True) | Q(merged__ne=True))
+    
+    survey_class, main_qs = (Capture, _xform_qs)
+    if xform.type == xform.TYPE_UPDATE:
+        survey_class = Update
+        main_qs = _xform_qs & update_qs
+    
+    pure_count = survey_class.objects(main_qs).count()
     blank_stats = _get_blank_stats_entry()
     fstats = Stats.objects(key=key).first() or blank_stats
     if not rebuild and pure_count == fstats.count:
@@ -77,9 +88,8 @@ def _build_stats_for_project_xform(xform, key, rebuild):
     
     # pull records for distinct dates (new & old)
     fields = ('datetime_today','cin','rseq','acct_no','acct_status','meter_type')
-    records = survey_class.objects(_xform_id_string=xform.id_string,
-                                   datetime_today__in=distinct_dates)\
-                          .only(*fields)
+    qs =  main_qs & Q(datetime_today__in=distinct_dates)
+    records = survey_class.objects(qs).only(*fields)
     results = _summarize_for_stats_grouped_by(records, 'datetime_today')
     all_collected = False
     
@@ -91,16 +101,16 @@ def _build_stats_for_project_xform(xform, key, rebuild):
         alt_count = StatsBatch.objects(key=key).sum('count')
         if pure_count == alt_count:
             break
-        elif pure_count < alt_count:
+        else:
             StatsBatch.objects(key=key).delete()
         
-        records = survey_class.objects(_xform_id_string=xform.id_string).only(*fields)
+        records = survey_class.objects(main_qs).only(*fields)
         results = _summarize_for_stats_grouped_by(records, 'datetime_today')
         all_collected = True
     
     if not all_collected:
         # need to do this so that the xform summary stats turns out accurate 
-        records = survey_class.objects(_xform_id_string=xform.id_string).only(*fields)
+        records = survey_class.objects(main_qs).only(*fields)
         results = _summarize_for_stats_grouped_by(records, 'datetime_today')
     
     # save xform summary stats
