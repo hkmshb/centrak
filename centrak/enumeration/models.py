@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from collections import OrderedDict
 from django.utils.translation import ugettext_lazy as _
@@ -222,7 +223,6 @@ class Survey(Document, TimeStampedMixin):
     station = fields.StringField(required=True)
     upriser = fields.StringField(required=True)
     cin     = fields.StringField(required=True)
-    dropped = fields.BooleanField(default=False)
 
     datetime_start = fields.DateTimeField(required=True)
     datetime_end = fields.DateTimeField(required=True)
@@ -238,7 +238,7 @@ class Survey(Document, TimeStampedMixin):
     neighbour_cin = fields.StringField()
 
     rseq           = fields.StringField(required=True)
-    neighbour_rseq = fields.StringField(required=True)
+    neighbour_rseq = fields.StringField()
 
     kangis_no   = fields.StringField()
     addr_no     = fields.StringField()
@@ -247,7 +247,7 @@ class Survey(Document, TimeStampedMixin):
     addr_state  = fields.StringField()
     addr_lga    = fields.StringField()
     addr_landmark = fields.StringField()
-    gps = fields.ListField(fields.StringField())
+    gps = fields.ListField(fields.FloatField())
 
     plot_type = fields.StringField()
     multi     = fields.StringField()
@@ -283,10 +283,27 @@ class Survey(Document, TimeStampedMixin):
 
     remarks       = fields.ListField(fields.StringField())
     other_remarks = fields.StringField()
+    
+    dropped   = fields.BooleanField(default=False)
+    merged_by = fields.StringField()
 
     meta = {
         'abstract': True
     }
+    
+    def clean(self):
+        if self.remarks and isinstance(self.remarks, str):
+            self.remarks = self.remarks.split(' ')
+    
+    def to_dict(self):
+        survey = json.loads(self.to_json())
+        datetime_fields = ('datetime_start','datetime_end','datetime_today',
+            'date_created', 'last_updated', '_submission_time')
+        
+        for f in datetime_fields:
+            if f in survey:
+                survey[f] = datetime.fromtimestamp(survey[f]['$date']/1000)
+        return survey
 
 
 class Capture(Survey):
@@ -298,8 +315,18 @@ class Capture(Survey):
 
 
 class Update(Survey):
+    merged = fields.BooleanField(default=False)
     
     meta = {
         'collection': 'updates',
-        'ordering': ['object_id'],
+        'ordering': ['_id'],
     }
+
+
+class Snapshot(Survey):
+    
+    meta = {
+        'collection': 'snapshots',
+        'ordering': ['_id'],
+    }
+

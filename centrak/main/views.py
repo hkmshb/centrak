@@ -14,7 +14,7 @@ from enumeration.services import import_surveys
 from core.models import ApiServiceInfo
 from core.utils import MessageList
 from .forms import UserRegistrationForm
-from . import stats
+from . import stats, services
 
 
 

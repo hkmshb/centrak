@@ -1,13 +1,14 @@
 import copy
+import json
 import logging
-import requests
 from datetime import datetime
 
 from django.conf import settings
 
 from core.utils import get_survey_auth_token, ApiClient, Storage
-from .models import SyncLog, XForm, Capture, Update
+from .models import SyncLog, XForm, Capture, Update, Snapshot
 from . import signals
+
 
 
 
@@ -49,6 +50,18 @@ def import_surveys(xform_long_ids, synced_by=None):
                     logging.error(msg, str(ex2), exc_info=True)
     
     signals.post_survey_import.send(sender=None, results=results)
+    return results
+
+
+def merge_updates(uform_long_ids, merged_by=None):
+    merger = SurveyMerger()
+    
+    results = {}
+    for uform_long_id in uform_long_ids:
+        result = merger.execute(uform_long_id, merged_by)
+        results[uform_long_id] = result
+        
+    signals.post_survey_merge.send(sender=None, results=results)
     return results
 
 
@@ -249,8 +262,8 @@ class SurveyImporter(object):
         self.api_client = api_client
         self._exec_result = None
     
-    def __call__(self):
-        self.execute()
+    def __call__(self, xform_long_id):
+        self.execute(xform_long_id)
     
     def _add_error(self, message):
         self._exec_result.errors.append(message)
@@ -265,7 +278,7 @@ class SurveyImporter(object):
         if not xform:
             msg = "XForm with specified id '{}' not found."
             self._add_error(msg.format(xform_long_id))
-            return False
+            return self._exec_result
         
         # get total item count which would be used as the starting ref
         # for the record pull from the API rest service
@@ -295,6 +308,135 @@ class SurveyImporter(object):
                     transformed = []
         except ConnectionError:
             self._add_error("Sync failed. Ensure your Internet connection is active.")
+        except Exception as ex:
+            self._add_error("Sync failed. %s" % str(ex))
+            logging.error("Sync failed. %s", str(ex), exc_info=True)
+        return self._exec_result
+
+
+class SurveyMerger(object):
+    
+    DEFAULT_FIELDS = Capture._fields_ordered
+    DEFAULT_RULES = {
+        'exclude_re': [
+            '_*', 
+            'datetime_*'
+        ],
+        'exclude': [ 
+            'project_id', 
+            'date_created',
+            'last_updated',
+            'dropped',
+            'merged',
+            'merged_by'
+        ],
+        'match': ['cin', 'rseq'],
+        'list_fields': ['gps', 'remarks']
+    }
+    
+    def __init__(self, centrackb_compatible=False):
+        self.centrackb_compatible = centrackb_compatible
+        self._exec_result = None
+    
+    def __call__(self, uform_long_id, merged_by=None):
+        self.execute(uform_long_id, merged_by)
+    
+    def _add_error(self, message):
+        if self._exec_result == None:
+            self._exec_result = self._make_result_storage()
+        self._exec_result.errors.append(message)
+    
+    def _do_merge(self, capture, update, merged_by):
+        rules_all  = SurveyMerger.DEFAULT_RULES
+        rules_excl_re = rules_all['exclude_re']
+        rules_excl    = rules_all['exclude']
+        rules_match   = rules_all['match']
+        rules_lfield  = rules_all['list_fields']
+        
+        capture_snapshot = capture.to_dict()
+        for field in rules_match:
+            if capture[field] != update[field]:
+                msg = "Update with cin '{}' cannot be merged into capture with cin '{}'."
+                self._add_error(msg.format(update.cin, capture.cin))
+                return
+        
+        for field in SurveyMerger.DEFAULT_FIELDS:
+            if field in rules_excl or self._matches_any(rules_excl_re, field):
+                continue
+            capture[field] = update[field]
+            self._update_collection(capture_snapshot, capture, update, merged_by)
+    
+    def _matches_any(self, re_rules, field):
+        for r in re_rules:
+            if r.endswith('*') and field.startswith(r.replace('*','')):
+                return True
+            elif r.startswith('*') and field.endswith(r.replace('*','')):
+                return True
+        return False
+    
+    def _make_result_storage(self):
+        return Storage(
+            errors=[], merged_cins=[],
+            count=0, xform_long_id=None
+        )
+    
+    def _update_collection(self, capture_snapshot, capture, update, merged_by):
+        try:
+            last_updated = datetime.now()
+            capture['last_updated'] = last_updated
+            capture['merged_by'] = merged_by
+            capture.save()
+            
+            update['merged'] = True
+            update['dropped'] = True
+            update['merged_by'] = merged_by
+            update.save()
+            
+            snapshot = Snapshot(**capture_snapshot)
+            snapshot['merged_by'] = merged_by
+            snapshot.save()
+            
+            self._exec_result.merged_cins.append(capture.cin)
+        except Exception as ex:
+            # rollback captures
+            old_capture = Capture(**capture_snapshot)
+            old_capture.save()
+            
+            update['merged'] = False
+            update['dropped'] = False
+            update.save()
+            
+            Snapshot.objects(_id=capture_snapshot._id).delete()
+            raise
+    
+    def execute(self, uform_long_id, merged_by=None):
+        # startup exec result need to be set here
+        self._exec_result = self._make_result_storage()
+        self._exec_result.xform_long_id = uform_long_id
+        
+        # retrieve form
+        xform = XForm.objects.get(id_string=uform_long_id)
+        if not xform:
+            msg = "XForm with specified id '{}' not found."
+            self._add_error(msg.format(uform_long_id))
+            return self._exec_result
+        
+        if xform.type != XForm.TYPE_UPDATE:
+            self._add_error("Invalid form id provided. Expected id for an "
+                            "Update type XForm.")
+            return self._exec_result
+        
+        # get updates that haven't been dropped and merged
+        try:
+            updates = Update.objects(_xform_id_string=xform.id_string,
+                                     dropped=False, merged=False)
+            for update in updates:
+                capture = Capture.objects(cin=update.cin, rseq=update.rseq).first()
+                if capture == None:
+                    continue
+                self._do_merge(capture, update, merged_by)
+        except ConnectionError:
+            self._add_error("sync failed. Ensure your Internet connection is active.")
         except Exception as ex:
             self._add_error("Sync failed. %s" % str(ex))
             logging.error("Sync failed. %s", str(ex), exc_info=True)

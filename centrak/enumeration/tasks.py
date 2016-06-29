@@ -3,8 +3,7 @@ from celery.decorators import task
 from django.core.cache import cache
 
 from enumeration.models import Project
-from enumeration.services import import_surveys
-
+from enumeration.services import import_surveys, merge_updates
 
 
 
@@ -27,4 +26,12 @@ def scheduled_survey_import():
         
         for xform_long_id in xform_long_ids:
             cache.delete("{}.form.{}".format(cache_key, xform_long_id))
+
+
+@task(name="tasks.merge-updates")
+def merge_survey_updates(uform_long_ids, merged_by):
+    merge_updates(
+        uform_long_ids, 
+        merged_by
+    )
 

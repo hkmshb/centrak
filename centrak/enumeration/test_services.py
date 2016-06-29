@@ -1,14 +1,29 @@
 import pytest
-from .services import SurveyTransformer
+from datetime import datetime, timedelta
+from .models import Capture, Update
+from .services import SurveyTransformer, SurveyMerger
 
 
 
 class SurveyRuleTransformer(SurveyTransformer):
-    """Focuses on rule application and bypasses post transform logic."""
-
+    """Focuses on rule application and by-passes post transform logic."""
+    
     def _do_post_transform(self, transform_output, survey):
         return transform_output
 
+
+class SurveyRuleMerger(SurveyMerger):
+    """Focuses on rule application and by-passes collection update."""
+    
+    def __init__(self, test_callback):
+        super(SurveyRuleMerger, self).__init__()
+        self.test_callback = test_callback
+    
+    def _update_collection(self, capture_snapshot, merged_capture, update):
+        """Overriden to capture and pass onto test callback the resulting
+           survey object (capture) after the merge operation.
+        """
+        self.test_callback(self, merged_capture)
 
 
 class TestSurveyTransform(object):
@@ -86,3 +101,55 @@ class TestSurveyTransform(object):
         output = transformer.transform(capture)
         assert len(output) == 1
         assert output['key-a2'] == 'VALUE-A' 
+
+
+class TestSurveyMerger(object):
+    
+    def _get_surveys(self):
+        return (
+            Capture(_id=10, _version=15, _xform_id_string='f30b_cf_KN',
+                group='B', station='S30123', upriser='S30123/1',
+                cin='S30123/1/01/01/0001', rseq='S30123/1/0001', 
+                datetime_today=datetime.now(), device_imei='c:device-imei', 
+                project_id='c:pjt-id', last_updated=datetime.today()),
+            Update(_id=20, _version=25, _xform_id_string='f30b_cu_KN',
+                group='D', station='S30123', upriser='S30123/1',
+                cin='S30123/1/01/01/0001', rseq='S30123/1/0001',
+                datetime_today=datetime.now() + timedelta(3),
+                device_imei='u:device-imei', project_id='u:pjt-id',
+                acct_status='existing', acct_no='33/20/01/0098-01',
+                tariff='R1', plot_type='residential')
+        )
+    
+    def _do_test(self, test_func, capture, update):
+        merger = SurveyRuleMerger(test_func)
+        merger._do_merge(capture, update)
+    
+    def test_exclude_rules(self):
+        capture, update = self._get_surveys()
+        def t_(merger, merged_capture):
+            assert merged_capture._id == 10
+            assert merged_capture._xform_id_string == 'f30b_cf_KN'
+            assert merged_capture.project_id == 'c:pjt-id'
+            assert merged_capture.datetime_today.strftime('%Y-%m-%d')\
+                        == datetime.now().strftime('%Y-%m-%d')
+            assert merger._exec_result == None
+            
+        self._do_test(t_, capture, update)
+    
+    def test_match_rules_as_merge_fails_for_non_matching_fields(self):
+        merger = SurveyMerger(lambda x, y: None)
+        capture, update = self._get_surveys()
+        update.cin += 'X'
+        
+        merger._do_merge(capture, update)
+        assert len(merger._exec_result.errors) == 1
+    
+    def test_merged_attributes(self):
+        capture, update = self._get_surveys()
+        def t_(merger, merged_capture):
+            pass
+        
+        self._do_test(t_, capture, update)
+    
+    
