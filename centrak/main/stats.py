@@ -68,7 +68,8 @@ def _build_stats_for_project_xform(xform, key, rebuild):
     sync = SyncLog.objects(key=key).first() or _get_blank_sync_entry()
     
     # gets distinct dates for recently added records
-    distinct_dates = survey_class.objects(_id__gte=sync.start_id)\
+    distinct_dates = survey_class.objects(_xform_id_string=xform.id_string,
+                                          _id__gte=sync.start_id)\
                                  .distinct('datetime_today')
     
     if not rebuild and len(distinct_dates) == 0:
@@ -76,7 +77,9 @@ def _build_stats_for_project_xform(xform, key, rebuild):
     
     # pull records for distinct dates (new & old)
     fields = ('datetime_today','cin','rseq','acct_no','acct_status','meter_type')
-    records = survey_class.objects(datetime_today__in=distinct_dates).only(*fields)
+    records = survey_class.objects(_xform_id_string=xform.id_string,
+                                   datetime_today__in=distinct_dates)\
+                          .only(*fields)
     results = _summarize_for_stats_grouped_by(records, 'datetime_today')
     all_collected = False
     
@@ -88,6 +91,8 @@ def _build_stats_for_project_xform(xform, key, rebuild):
         alt_count = StatsBatch.objects(key=key).sum('count')
         if pure_count == alt_count:
             break
+        elif pure_count < alt_count:
+            StatsBatch.objects(key=key).delete()
         
         records = survey_class.objects(_xform_id_string=xform.id_string).only(*fields)
         results = _summarize_for_stats_grouped_by(records, 'datetime_today')
