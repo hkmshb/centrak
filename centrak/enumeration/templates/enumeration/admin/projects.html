@@ -11,6 +11,7 @@
     </div>
     <script type="application/json" id="bootstrap">
          {"choices": {{ choices|safe }},
+          "stats": {{ stats|safe }},
           "projects": {{ projects.to_json|safe }}}
     </script>
     <script type="text/template" id="list-template">
@@ -29,9 +30,15 @@
                     <% if (projects && projects.length > 0) { %>
                         <% _(projects.models).each(function(m) { %>
                         <tr><td><a href="#/<%- m.get('code') %>/"><%- m.get('name') %></a></td>
-                            <td><span title="Capture Forms" data-toggle="tooltip">0</span></td>
-                            <td><span title="Update Forms" data-toggle="tooltip">0</span></td>
-                            <td><span title="Total Captures" data-toggle="tooltip">0</span></td>
+                            <td><span title="Total Captures" data-toggle="tooltip">
+                                    <i class="fa fa-hashtag"></i>
+                                    <%- Humanize.intComma(stats[m.get('code')].count) %>
+                                </span></td>
+                            <td><span title="XForms (Capture, Update)" data-toggle="tooltip">
+                                    <i class="fa fa-md fa-file-text-o"></i>
+                                    <%- m.get('xforms').length %>, 
+                                    <%- m.get('uforms').length %>
+                                </span></td>
                             <td class="text-right">
                                 <i class="fa <%- m.getFaActive() %>" title="Active: <%- m.get('active') %>" data-toggle="tooltip"></i>
                             </td></tr>

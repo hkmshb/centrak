@@ -11,7 +11,7 @@
         </div>
     </div>
     <script type="application/json" id="bootstrap">
-        {"xforms": {{ xforms.to_json|safe }}}
+        {"xforms": {{ xforms.to_json|safe }}, "stats": {{stats|safe}} }
     </script>
     <script type="text/template" id="local-xforms-template">
         <div class="header-strip">
@@ -25,7 +25,10 @@
                         <% _.each(xforms.models, function(f) { %>
                         <tr <% if (!f.get('active')) { %>class="text-muted"<% } %>>
                             <td><a href="#/<%- f.get('object_id') %>"><%- f.get('title') %></a></td>
-                            <td><span title="Number of captures" data-toggle="tooltip">0</span></td>
+                            <td><span title="Number of captures" data-toggle="tooltip">
+                                    <i class="fa fa-hashtag"></i>
+                                    <%- Humanize.intComma(stats[f.get('id_string')].count) %>
+                                </span></td>
                             <td class="data-meta"><i class="fa fa-clock-o"></i>
                                 <span title="Last Synced" data-toggle="tooltip"><%- f.getLastSynced() %></span>
                             </td>

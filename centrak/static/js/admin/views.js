@@ -231,6 +231,7 @@
                 this.bs_data = JSON.parse($bs.text());
                 if (!_.isNull(this.bs_data.xforms)) {
                     app.xforms.reset(this.bs_data.xforms);
+                    self.stats = this.bs_data.stats;
                     this.bs_data.xforms = null;
                     $bs.text(JSON.stringify(this.bs_data));
                     self.render();
@@ -270,7 +271,10 @@
         },
         
         getContext: function() {
-            return {'xforms': app.xforms || null};
+            return {
+                'xforms': app.xforms || null,
+                'stats': this.stats
+            };
         }
     }),
     
@@ -578,6 +582,7 @@
                 this.bs_data = JSON.parse($bs.text());
                 if (!_.isNull(this.bs_data.projects)) {
                     app.projects.reset(this.bs_data.projects);
+                    self.stats = this.bs_data.stats;
                     this.bs_data.projects = null;
                     $bs.text(JSON.stringify(this.bs_data));
                     self.render();
@@ -599,7 +604,10 @@
         },
         
         getContext: function() {
-            return {'projects': app.projects};
+            return {
+                'projects': app.projects,
+                'stats': this.stats
+            };
         }
     }),
     

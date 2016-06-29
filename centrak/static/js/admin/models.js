@@ -111,6 +111,8 @@
             if (_.isEmpty(value)) {
                 return 'unknown';
             } else {
+                if (_.isObject(value))
+                    value = value.$date;
                 return moment(value).calendar();
             }
         },
