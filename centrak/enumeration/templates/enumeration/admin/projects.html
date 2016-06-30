@@ -32,7 +32,7 @@
                         <tr><td><a href="#/<%- m.get('code') %>/"><%- m.get('name') %></a></td>
                             <td><span title="Total Captures" data-toggle="tooltip">
                                     <i class="fa fa-hashtag"></i>
-                                    <%- Humanize.intComma(stats[m.get('code')].count) %>
+                                    <%- Humanize.intComma(m.getStat(stats, 'count')) %>
                                 </span></td>
                             <td><span title="XForms (Capture, Update)" data-toggle="tooltip">
                                     <i class="fa fa-md fa-file-text-o"></i>

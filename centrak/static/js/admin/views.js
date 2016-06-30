@@ -236,6 +236,7 @@
                     $bs.text(JSON.stringify(this.bs_data));
                     self.render();
                 } else {
+                    self.stats = this.bs_data.stats;
                     app.xforms.fetch({
                         reset: true,
                         success: $.proxy(self.render, self)
@@ -437,7 +438,10 @@
             };
             
             if (_.isEmpty(changes.description))
-                delete changes['description'];
+                delete changes.description;
+            if (_.isEmpty(changes.last_updated))
+                delete changes.last_updated;
+            
             return changes;
         },
         
@@ -587,6 +591,7 @@
                     $bs.text(JSON.stringify(this.bs_data));
                     self.render();
                 } else {
+                    self.stats = this.bs_data.stats;
                     app.projects.fetch({
                         reset: true,
                         success: $.proxy(self.render, self)

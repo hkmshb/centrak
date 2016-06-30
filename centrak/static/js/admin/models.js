@@ -102,6 +102,12 @@
                 return moment(value).format('DD/MM/YYYY HH:mm A');
             }
             return "";
+        },
+        getStat: function(stats, statType) {
+            var code = this.get('code');
+            if (_(stats).has(code))
+                return stats[code][statType];
+            return 0;
         }
     });
     
@@ -129,6 +135,12 @@
         getFaActive: function() {
             var active = this.get('active');
             return (active? 'fa-check-square-o': 'fa-square-o');
+        },
+        getStat: function(stats, statType) {
+            var id = this.get('id_string');
+            if (_(stats).has(id))
+                return stats[id][statType];
+            return 0
         }
     });
     

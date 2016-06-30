@@ -27,7 +27,7 @@
                             <td><a href="#/<%- f.get('object_id') %>"><%- f.get('title') %></a></td>
                             <td><span title="Number of captures" data-toggle="tooltip">
                                     <i class="fa fa-hashtag"></i>
-                                    <%- Humanize.intComma(stats[f.get('id_string')].count) %>
+                                    <%- Humanize.intComma(f.getStat(stats, 'count')) %>
                                 </span></td>
                             <td class="data-meta"><i class="fa fa-clock-o"></i>
                                 <span title="Last Synced" data-toggle="tooltip"><%- f.getLastSynced() %></span>
