@@ -2,11 +2,12 @@ import copy
 import json
 import logging
 from datetime import datetime
+from requests.exceptions import ConnectionError
 
 from django.conf import settings
 
 from core.utils import get_survey_auth_token, ApiClient, Storage
-from .models import SyncLog, XForm, Capture, Update, Snapshot
+from .models import SyncLog, XForm, Survey, Capture, Update, Snapshot
 from . import signals
 
 
@@ -196,7 +197,7 @@ class SurveyTransformer(object):
                 [float(v) for v in transform_output['gps'].split(' ')])
         
         pjt_id_parts = transform_output['_xform_id_string'].split('_')
-        project_id = "{}_{}".format(pjt_id_parts[0], pjt_id_parts[-1])
+        project_id = "{}".format(pjt_id_parts[0])
         transform_output['project_id'] = project_id
 
         transform_output['group'] = transform_output['enum_id'][0]
@@ -223,42 +224,9 @@ class SurveyTransformer(object):
         return transform_output
 
 
-class CentrackbSurveyTransformer(SurveyTransformer):
-    EXTRA_RULES = {
-        'name_change_map': {
-            'kangis_no': 'kg_Id',
-            'landlord_name': 'new_tholder',
-            'addr_no': 'addy_no',
-            'addr_street': 'addy_street',
-            'addr_state': 'addy_state',
-            'addr_lga': 'addy_lga',
-            'tariff_pp': 'tariff_new',
-        }
-    }
-
-    def __init__(self):
-        super(CentrackbSurveyTransformer, self).__init__()
-        self.merge_into_rules(CentrackbSurveyTransformer.EXTRA_RULES)
-    
-    def _do_post_transform(self, transform_output, survey):
-        output = super(CentrackbSurveyTransformer, self)._do_post_transform(
-                    transform_output, survey)
-        
-        output['snapshots'] = {}
-        output['rseq'] = "{}/{}".format(
-            output['upriser'], output['cin_custno'])
-        
-        key = 'neighbour_cin'
-        if key in output and output[key]:
-            output['neighbour_rseq'] = "{}/{}".format(
-                output['upriser'], output[key])
-        return output
-
-
 class SurveyImporter(object):
     
-    def __init__(self, api_client, centrackb_compatible=False):
-        self.centrackb_compatible = centrackb_compatible
+    def __init__(self, api_client):
         self.api_client = api_client
         self._exec_result = None
     
@@ -286,8 +254,6 @@ class SurveyImporter(object):
         record_count = model.objects(_xform_id_string=xform.id_string).count()
         
         transformer_class = SurveyTransformer
-        if self.centrackb_compatible:
-            transformer_class = CentrackbSurveyTransformer
         
         # pull new surveys
         try:
@@ -316,7 +282,7 @@ class SurveyImporter(object):
 
 class SurveyMerger(object):
     
-    DEFAULT_FIELDS = Capture._fields_ordered
+    DEFAULT_FIELDS = Survey._fields_ordered
     DEFAULT_RULES = {
         'exclude_re': [
             '_*', 
@@ -334,8 +300,7 @@ class SurveyMerger(object):
         'list_fields': ['gps', 'remarks']
     }
     
-    def __init__(self, centrackb_compatible=False):
-        self.centrackb_compatible = centrackb_compatible
+    def __init__(self):
         self._exec_result = None
     
     def __call__(self, uform_long_id, merged_by=None):

@@ -7,13 +7,11 @@ from mongoengine import Document, fields
 
 
 class TimeStampedMixin(object):
-    date_created = fields.DateTimeField()
-    last_updated = fields.DateTimeField(default=datetime.now())
+    date_created = fields.DateTimeField(default=datetime.now())
+    last_updated = fields.DateTimeField()
 
 
 class TimeStampedDocument(Document, TimeStampedMixin):
-    date_created = fields.DateTimeField()
-    last_updated = fields.DateTimeField(default=datetime.now())
     
     meta = {
         'abstract': True
@@ -280,9 +278,10 @@ class Survey(Document, TimeStampedMixin):
     meter_seal_properly = fields.StringField()
     meter_seal_location = fields.StringField()
     meter_seal_no       = fields.StringField()
-
+    
     remarks       = fields.ListField(fields.StringField())
     other_remarks = fields.StringField()
+    snapshots = fields.StringField()
     
     dropped   = fields.BooleanField(default=False)
     merged_by = fields.StringField()
@@ -307,6 +306,7 @@ class Survey(Document, TimeStampedMixin):
 
 
 class Capture(Survey):
+    validated = fields.BooleanField(default=False)
     
     meta = {
         'collection': 'captures',

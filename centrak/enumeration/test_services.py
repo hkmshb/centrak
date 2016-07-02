@@ -19,7 +19,7 @@ class SurveyRuleMerger(SurveyMerger):
         super(SurveyRuleMerger, self).__init__()
         self.test_callback = test_callback
     
-    def _update_collection(self, capture_snapshot, merged_capture, update):
+    def _update_collection(self, capture_snapshot, merged_capture, update, merged_by):
         """Overriden to capture and pass onto test callback the resulting
            survey object (capture) after the merge operation.
         """
@@ -123,7 +123,7 @@ class TestSurveyMerger(object):
     
     def _do_test(self, test_func, capture, update):
         merger = SurveyRuleMerger(test_func)
-        merger._do_merge(capture, update)
+        merger._do_merge(capture, update, None)
     
     def test_exclude_rules(self):
         capture, update = self._get_surveys()
@@ -138,11 +138,11 @@ class TestSurveyMerger(object):
         self._do_test(t_, capture, update)
     
     def test_match_rules_as_merge_fails_for_non_matching_fields(self):
-        merger = SurveyMerger(lambda x, y: None)
+        merger = SurveyRuleMerger(lambda x, y: None)
         capture, update = self._get_surveys()
         update.cin += 'X'
         
-        merger._do_merge(capture, update)
+        merger._do_merge(capture, update, None)
         assert len(merger._exec_result.errors) == 1
     
     def test_merged_attributes(self):
