@@ -281,10 +281,9 @@ class Survey(Document, TimeStampedMixin):
     
     remarks       = fields.ListField(fields.StringField())
     other_remarks = fields.StringField()
-    snapshots = fields.StringField()
     
-    dropped   = fields.BooleanField(default=False)
-    merged_by = fields.StringField()
+    dropped    = fields.BooleanField(default=False)
+    updated_by = fields.DictField()
 
     meta = {
         'abstract': True
@@ -307,6 +306,7 @@ class Survey(Document, TimeStampedMixin):
 
 class Capture(Survey):
     validated = fields.BooleanField(default=False)
+    snapshots = fields.DictField()
     
     meta = {
         'collection': 'captures',
@@ -319,14 +319,6 @@ class Update(Survey):
     
     meta = {
         'collection': 'updates',
-        'ordering': ['_id'],
-    }
-
-
-class Snapshot(Survey):
-    
-    meta = {
-        'collection': 'snapshots',
         'ordering': ['_id'],
     }
 

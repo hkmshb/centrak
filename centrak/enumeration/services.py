@@ -1,15 +1,14 @@
 import copy
-import json
 import logging
 from datetime import datetime
 from requests.exceptions import ConnectionError
 
 from django.conf import settings
+from mongoengine.queryset import Q
 
 from core.utils import get_survey_auth_token, ApiClient, Storage
-from .models import SyncLog, XForm, Survey, Capture, Update, Snapshot
+from .models import SyncLog, XForm, Survey, Capture, Update
 from . import signals
-
 
 
 
@@ -318,7 +317,11 @@ class SurveyMerger(object):
         rules_match   = rules_all['match']
         rules_lfield  = rules_all['list_fields']
         
-        capture_snapshot = capture.to_dict()
+        # get/make snapshot
+        snapshot = Capture(**capture.to_dict())
+        if capture.snapshots in (None, {}):
+            capture.snapshots = {'origin': {'capture': snapshot}}
+        
         for field in rules_match:
             if capture[field] != update[field]:
                 msg = "Update with cin '{}' cannot be merged into capture with cin '{}'."
@@ -328,8 +331,16 @@ class SurveyMerger(object):
         for field in SurveyMerger.DEFAULT_FIELDS:
             if field in rules_excl or self._matches_any(rules_excl_re, field):
                 continue
+            
+            if field in rules_lfield and field == 'gps':
+                if update[field] in (None, []):
+                    continue
+                
+                if capture[field][-1] < update[field][-1]:
+                    continue
+                
             capture[field] = update[field]
-            self._update_collection(capture_snapshot, capture, update, merged_by)
+            self._save_update(snapshot, capture, update, merged_by)
     
     def _matches_any(self, re_rules, field):
         for r in re_rules:
@@ -345,33 +356,27 @@ class SurveyMerger(object):
             count=0, xform_long_id=None
         )
     
-    def _update_collection(self, capture_snapshot, capture, update, merged_by):
+    def _save_update(self, capture_snapshot, capture, update, merged_by):
         try:
             last_updated = datetime.now()
             capture['last_updated'] = last_updated
-            capture['merged_by'] = merged_by
+            capture['updated_by'] = {'username': merged_by}
             capture.save()
             
             update['merged'] = True
             update['dropped'] = True
-            update['merged_by'] = merged_by
+            update['updated_by'] = {'username': merged_by}
             update.save()
-            
-            snapshot = Snapshot(**capture_snapshot)
-            snapshot['merged_by'] = merged_by
-            snapshot.save()
             
             self._exec_result.merged_cins.append(capture.cin)
         except Exception as ex:
             # rollback captures
-            old_capture = Capture(**capture_snapshot)
-            old_capture.save()
+            capture_snapshot.save()
             
             update['merged'] = False
             update['dropped'] = False
+            update['updated_by'] = {}
             update.save()
-            
-            Snapshot.objects(_id=capture_snapshot._id).delete()
             raise
     
     def execute(self, uform_long_id, merged_by=None):
@@ -393,8 +398,8 @@ class SurveyMerger(object):
         
         # get updates that haven't been dropped and merged
         try:
-            updates = Update.objects(_xform_id_string=xform.id_string,
-                                     dropped=False, merged=False)
+            updates = Update.objects(Q(_xform_id_string=xform.id_string) &
+                                     (Q(dropped=False) | Q(merged=False)))
             for update in updates:
                 capture = Capture.objects(cin=update.cin, rseq=update.rseq).first()
                 if capture == None:

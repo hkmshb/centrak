@@ -19,11 +19,11 @@ class SurveyRuleMerger(SurveyMerger):
         super(SurveyRuleMerger, self).__init__()
         self.test_callback = test_callback
     
-    def _update_collection(self, capture_snapshot, merged_capture, update, merged_by):
+    def _save_update(self, capture_snapshot, capture, update, merged_by):
         """Overriden to capture and pass onto test callback the resulting
            survey object (capture) after the merge operation.
         """
-        self.test_callback(self, merged_capture)
+        self.test_callback(self, capture)
 
 
 class TestSurveyTransform(object):
@@ -107,12 +107,13 @@ class TestSurveyMerger(object):
     
     def _get_surveys(self):
         return (
-            Capture(_id=10, _version=15, _xform_id_string='f30b_cf_KN',
+            Capture(_id=10, _version='15', _xform_id_string='f30b_cf_KN',
                 group='B', station='S30123', upriser='S30123/1',
                 cin='S30123/1/01/01/0001', rseq='S30123/1/0001', 
                 datetime_today=datetime.now(), device_imei='c:device-imei', 
                 project_id='c:pjt-id', last_updated=datetime.today()),
-            Update(_id=20, _version=25, _xform_id_string='f30b_cu_KN',
+                
+            Update(_id=20, _version='25', _xform_id_string='f30b_cu_KN',
                 group='D', station='S30123', upriser='S30123/1',
                 cin='S30123/1/01/01/0001', rseq='S30123/1/0001',
                 datetime_today=datetime.now() + timedelta(3),
@@ -151,5 +152,4 @@ class TestSurveyMerger(object):
             pass
         
         self._do_test(t_, capture, update)
-    
-    
+
