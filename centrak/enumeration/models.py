@@ -282,6 +282,7 @@ class Survey(Document, TimeStampedMixin):
     remarks       = fields.ListField(fields.StringField())
     other_remarks = fields.StringField()
     
+    validated = fields.BooleanField(default=False)
     dropped    = fields.BooleanField(default=False)
     updated_by = fields.DictField()
 
@@ -305,7 +306,6 @@ class Survey(Document, TimeStampedMixin):
 
 
 class Capture(Survey):
-    validated = fields.BooleanField(default=False)
     snapshots = fields.DictField()
     
     meta = {

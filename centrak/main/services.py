@@ -11,8 +11,7 @@ def handle_post_survey_import(sender, **kwargs):
     if not uform_long_ids:
         return
     tasks.merge_survey_updates.delay(uform_long_ids, merged_by='auto')
-    print('called-:-post_survey_import_handler')
- 
+
 
 def handle_post_survey_merge(sender, **kwargs):
     print('got some merge results')

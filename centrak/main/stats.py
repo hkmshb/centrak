@@ -35,14 +35,23 @@ def for_project_xform(xform, key, rebuild=False):
         * if counts equal, summaries captures by date of capture and update stats
         * if not equal summarize entire captures; per day then for all 
     """
-    survey_class = Capture if xform.type == xform.TYPE_CAPTURE else Update
-    pure_count = survey_class.objects(_xform_id_string=xform.id_string).count()
+    # excluded dropped objects in count
+    _xform_qs = Q(_xform_id_string=xform.id_string)
+    update_qs = (Q(dropped=False) | Q(dropped=False) & Q(merged=False))
+    
+    survey_class, main_qs = (Capture, (_xform_qs & Q(dropped=False)))
+    if xform.type == xform.TYPE_UPDATE:
+        survey_class = Update
+        main_qs = _xform_qs & update_qs
+    
+    pure_count = survey_class.objects(main_qs).count()
     blank_stats = _get_blank_stats_entry()
     fstats = Stats.objects(key=key).first() or blank_stats
     if not rebuild and pure_count == fstats.count:
         return fstats
     
-    _build_stats_for_project_xform(xform, key, rebuild)
+    _build_stats_for_project_xform(survey_class, main_qs, fstats, pure_count,
+                                   xform, key, rebuild)
     return Stats.objects(key=key).first() or blank_stats
 
 
@@ -60,22 +69,8 @@ def _build_stats_for_project(project, key, rebuild):
     Stats.objects(key=key).modify(upsert=True, **f)
 
 
-def _build_stats_for_project_xform(xform, key, rebuild):
-    # Q objects
-    _xform_qs = Q(_xform_id_string=xform.id_string)
-    update_qs = (Q(dropped__ne=True) | Q(merged__ne=True))
-    
-    survey_class, main_qs = (Capture, _xform_qs)
-    if xform.type == xform.TYPE_UPDATE:
-        survey_class = Update
-        main_qs = _xform_qs & update_qs
-    
-    pure_count = survey_class.objects(main_qs).count()
-    blank_stats = _get_blank_stats_entry()
-    fstats = Stats.objects(key=key).first() or blank_stats
-    if not rebuild and pure_count == fstats.count:
-        return fstats
-    
+def _build_stats_for_project_xform(survey_class, main_qs, fstats, pure_count,
+                                   xform, key, rebuild):
     sync = SyncLog.objects(key=key).first() or _get_blank_sync_entry()
     
     # gets distinct dates for recently added records

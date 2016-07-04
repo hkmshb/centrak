@@ -310,75 +310,6 @@ class SurveyMerger(object):
             self._exec_result = self._make_result_storage()
         self._exec_result.errors.append(message)
     
-    def _do_merge(self, capture, update, merged_by):
-        rules_all  = SurveyMerger.DEFAULT_RULES
-        rules_excl_re = rules_all['exclude_re']
-        rules_excl    = rules_all['exclude']
-        rules_match   = rules_all['match']
-        rules_lfield  = rules_all['list_fields']
-        
-        # get/make snapshot
-        snapshot = Capture(**capture.to_dict())
-        if capture.snapshots in (None, {}):
-            capture.snapshots = {'origin': {'capture': snapshot}}
-        
-        for field in rules_match:
-            if capture[field] != update[field]:
-                msg = "Update with cin '{}' cannot be merged into capture with cin '{}'."
-                self._add_error(msg.format(update.cin, capture.cin))
-                return
-        
-        for field in SurveyMerger.DEFAULT_FIELDS:
-            if field in rules_excl or self._matches_any(rules_excl_re, field):
-                continue
-            
-            if field in rules_lfield and field == 'gps':
-                if update[field] in (None, []):
-                    continue
-                
-                if capture[field][-1] < update[field][-1]:
-                    continue
-                
-            capture[field] = update[field]
-            self._save_update(snapshot, capture, update, merged_by)
-    
-    def _matches_any(self, re_rules, field):
-        for r in re_rules:
-            if r.endswith('*') and field.startswith(r.replace('*','')):
-                return True
-            elif r.startswith('*') and field.endswith(r.replace('*','')):
-                return True
-        return False
-    
-    def _make_result_storage(self):
-        return Storage(
-            errors=[], merged_cins=[],
-            count=0, xform_long_id=None
-        )
-    
-    def _save_update(self, capture_snapshot, capture, update, merged_by):
-        try:
-            last_updated = datetime.now()
-            capture['last_updated'] = last_updated
-            capture['updated_by'] = {'username': merged_by}
-            capture.save()
-            
-            update['merged'] = True
-            update['dropped'] = True
-            update['updated_by'] = {'username': merged_by}
-            update.save()
-            
-            self._exec_result.merged_cins.append(capture.cin)
-        except Exception as ex:
-            # rollback captures
-            capture_snapshot.save()
-            
-            update['merged'] = False
-            update['dropped'] = False
-            update['updated_by'] = {}
-            update.save()
-            raise
-    
     def execute(self, uform_long_id, merged_by=None):
         # startup exec result need to be set here
         self._exec_result = self._make_result_storage()
@@ -411,4 +342,77 @@ class SurveyMerger(object):
             self._add_error("Sync failed. %s" % str(ex))
             logging.error("Sync failed. %s", str(ex), exc_info=True)
         return self._exec_result
+    
+    def _do_merge(self, capture, update, merged_by):
+        rules_all  = SurveyMerger.DEFAULT_RULES
+        rules_excl_re = rules_all['exclude_re']
+        rules_excl    = rules_all['exclude']
+        rules_match   = rules_all['match']
+        rules_lfield  = rules_all['list_fields']
+        
+        # get/make snapshot
+        snapshot_dict = capture.to_dict()
+        if capture.snapshots in (None, {}):
+            capture.snapshots = {'origin': {'capture': snapshot_dict}}
+        
+        for field in rules_match:
+            if capture[field] != update[field]:
+                msg = "Update with cin '{}' cannot be merged into capture with cin '{}'."
+                self._add_error(msg.format(update.cin, capture.cin))
+                return
+        
+        for field in SurveyMerger.DEFAULT_FIELDS:
+            if field in rules_excl or self._matches_any(rules_excl_re, field):
+                continue
+            
+            if field in rules_lfield and field == 'gps':
+                if update[field] in (None, []):
+                    continue
+                
+                if capture[field][-1] < update[field][-1]:
+                    continue
+                
+            capture[field] = update[field]
+        
+        snapshot = Capture(**snapshot_dict)
+        self._save_update(snapshot, capture, update, merged_by)
+    
+    def _matches_any(self, re_rules, field):
+        for r in re_rules:
+            if r.endswith('*') and field.startswith(r.replace('*','')):
+                return True
+            elif r.startswith('*') and field.endswith(r.replace('*','')):
+                return True
+        return False
+    
+    def _make_result_storage(self):
+        return Storage(
+            errors=[], merged_cins=[],
+            count=0, xform_long_id=None
+        )
+    
+    def _save_update(self, capture_snapshot, capture, update, merged_by):
+        try:
+            last_updated = datetime.now()
+            capture.last_updated = last_updated
+            capture.updated_by = {'username': merged_by}
+            capture.save()
+            
+            update.merged = True
+            update.dropped = True
+            update.updated_by = {'username': merged_by}
+            update.save()
+            
+            self._exec_result.count += 1
+            self._exec_result.merged_cins.append(capture.cin)
+        except Exception as ex:
+            # rollback captures
+            capture_snapshot.save()
+            
+            update.merged = False
+            update.dropped = False
+            update.updated_by = {}
+            update.save()
+            raise
+
 

@@ -30,8 +30,13 @@ def scheduled_survey_import():
 
 @task(name="tasks.merge-updates")
 def merge_survey_updates(uform_long_ids, merged_by):
-    merge_updates(
-        uform_long_ids, 
-        merged_by
-    )
+    results = merge_updates(uform_long_ids, merged_by)
+    for uform_long_id in uform_long_ids:
+        result = results[uform_long_id]
+        if result.errors not in (None, []) and result.count > 0:
+            # invalidate caches for the forms
+            cache_key = "project.{}.form.{}".format(
+                uform_long_id[:4], uform_long_id)
+            
+            cache.delete(cache_key)
 
