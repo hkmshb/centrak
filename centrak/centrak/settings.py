@@ -17,6 +17,8 @@ from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
+VAR_DIR  = os.path.join(ROOT_DIR, 'var')
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,9 +30,7 @@ SECRET_KEY = 'hogjdcbnr$27pwn6#o6*b9c$*w@i%1_clyc+%utw-d41%2q0rv'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'on') == 'on'
 ALLOWED_HOSTS = []
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
+INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
 # Application definition
 
@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     
     # third-party
+    'compressor',
     'ezaddress',
     'mongoengine',
     'rest_framework',
@@ -99,7 +100,7 @@ WSGI_APPLICATION = 'centrak.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '..', 'db.sqlite3'),
+        'NAME': os.path.join(VAR_DIR, 'db.sqlite3'),
     }
 }
 
@@ -131,10 +132,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage'
+STATIC_ROOT = os.path.join(ROOT_DIR, 'public', 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(ROOT_DIR, 'fbower_comps'),
 ]
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders..
+    'compressor.finders.CompressorFinder',
+)
 
 LOGGING = {
     'version': 1,
@@ -143,12 +152,12 @@ LOGGING = {
         'file_debug': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, '..', 'centrak-debug.log')
+            'filename': os.path.join(VAR_DIR, 'logs', 'centrak-debug.log')
         },
         'file_error': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, '..', 'centrak-error.log')
+            'filename': os.path.join(VAR_DIR, 'logs', 'centrak-error.log')
         }
     },
     'loggers': {
@@ -162,7 +171,7 @@ LOGGING = {
 
 
 ##: ==+: mongo-engine settings
-_MONGODB_NAME = 'centrak_'
+_MONGODB_NAME = 'centrak'
 _MONGODB_HOST = ''
 _MONGODB_USER = ''
 _MONGODB_PWD  = ''
@@ -215,3 +224,4 @@ CENTRAK_TABLE_PAGE_SIZE = 20
 SURVEY_API_SERVICE_KEY = 'survey'
 SURVEY_API_ROOT = 'http://survey.kedco.ng/api/v1/data'
 SURVEY_AUTH_API_ROOT = 'http://survey.kedco.ng/api/v1/user'
+

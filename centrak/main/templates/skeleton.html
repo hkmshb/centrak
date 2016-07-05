@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles compress %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,13 +9,13 @@
     <meta name="keywords" content="{% block meta-keywords %}{% endblock %}">
     <meta name="description" content="{% block meta-description %}{% endblock %}">
     {% block meta-extra %}{% endblock %}
-    {% if debug %}
-    <link rel="stylesheet" href="{% static 'bower_comps/bootstrap/dist/css/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'bower_comps/font-awesome/css/font-awesome.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'bower_comps/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'bower_comps/select2/dist/css/select2.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'bower_comps/select2-bootstrap-theme/dist/select2-bootstrap.min.css' %}" />
-    {% endif %}
+    {% compress css %}
+    <link rel="stylesheet" href="{% static '_libs/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static '_libs/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static '_libs/css/bootstrap-datetimepicker.min.css' %}" />
+    <link rel="stylesheet" href="{% static '_libs/css/select2.min.css' %}" />
+    <link rel="stylesheet" href="{% static '_libs/select2-bootstrap.min.css' %}" />
+    {% endcompress %}
     {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}
     {% block head-extra %}{% endblock %}
 </head>
@@ -50,17 +50,17 @@
     </div>
     
     <!-- ===+: le scripts  -->
-    {% if debug %}
-    <script src="{% static 'bower_comps/jquery/dist/jquery.min.js' %}"></script>
-    <script src="{% static 'bower_comps/jquery-validation/dist/jquery.validate.min.js' %}"></script>
-    <script src="{% static 'bower_comps/bootstrap/dist/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'bower_comps/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'bower_comps/humanize-plus/dist/humanize.min.js' %}"></script>
-    <script src="{% static 'bower_comps/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js' %}"></script>
-    <script src="{% static 'bower_comps/select2/dist/js/select2.min.js' %}"></script>
-    <script src="{% static 'bower_comps/underscore/underscore-min.js' %}"></script>
-    <script src="{% static 'bower_comps/backbone/backbone-min.js' %}"></script>
-    {% endif %}
+    {% compress js %}
+    <script src="{% static '_libs/js/jquery.min.js' %}"></script>
+    <script src="{% static '_libs/js/jquery.validate.min.js' %}"></script>
+    <script src="{% static '_libs/js/bootstrap.min.js' %}"></script>
+    <script src="{% static '_libs/js/moment.min.js' %}"></script>
+    <script src="{% static '_libs/js/humanize.min.js' %}"></script>
+    <script src="{% static '_libs/js/bootstrap-datetimepicker.min.js' %}"></script>
+    <script src="{% static '_libs/js/select2.min.js' %}"></script>
+    <script src="{% static '_libs/js/underscore-min.js' %}"></script>
+    <script src="{% static '_libs/js/backbone-min.js' %}"></script>
+    {% endcompress %}
     {% block script-extra %}{% endblock %}
 </body>
 </html>

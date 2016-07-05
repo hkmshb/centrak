@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
+{% load staticfiles compress %}
 {% block body-class %}adm{% endblock %}
 {% block content %}
     <script id="config" type="text/json">
@@ -12,10 +12,10 @@
         }
     </script>
 {% endblock %}
-{% block script-extra %}
+{% block script-extra %}{% compress js %}
     <script src="{% static 'js/app.js' %}"></script>
     <script src="{% static 'js/admin/models.js' %}"></script>
     <script src="{% static 'js/admin/collections.js' %}"></script>
     <script src="{% static 'js/admin/views.js' %}"></script>
     <script src="{% static 'js/admin/router.js' %}"></script>
-{% endblock %}
+{% endcompress %}{% endblock %}

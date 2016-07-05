@@ -1,13 +1,21 @@
 node_modules/
-bower_comps/
 __pycache__/
 .settings/
+public/
+var/
 
 
 celerybeat*.*
-**/css/*.css
+centrak/**/css/*.css
 .*project
 *.sqlite3
 *.py[co]
 *.log
 .*
+
+##: special handling for bower components
+#:: ignore all components
+fbower_comps/*
+
+#:: exclude _libs
+!fbower_comps/_libs
