@@ -99,9 +99,15 @@ WSGI_APPLICATION = 'centrak.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default': { #;
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(VAR_DIR, 'db.sqlite3'),
+    },
+    'production': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'centrak',
+        'USER': '',
+        'PASSWORD': ''
     }
 }
 
@@ -226,3 +232,6 @@ SURVEY_API_SERVICE_KEY = 'survey'
 SURVEY_API_ROOT = 'http://survey.kedco.ng/api/v1/data'
 SURVEY_AUTH_API_ROOT = 'http://survey.kedco.ng/api/v1/user'
 
+
+## uncomment for staging/production deployment
+#: from .local_settings import *
