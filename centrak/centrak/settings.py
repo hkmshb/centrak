@@ -17,7 +17,8 @@ from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
+SOURCE_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
+ROOT_DIR = os.path.abspath(os.path.join(SOURCE_DIR, '..'))
 VAR_DIR  = os.path.join(ROOT_DIR, 'var')
 
 
@@ -136,7 +137,7 @@ STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage
 STATIC_ROOT = os.path.join(ROOT_DIR, 'public', 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(ROOT_DIR, 'fbower_comps'),
+    os.path.join(SOURCE_DIR, 'fbower_comps'),
 ]
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -152,12 +153,12 @@ LOGGING = {
         'file_debug': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(VAR_DIR, 'logs', 'centrak-debug.log')
+            'filename': os.path.join(VAR_DIR, 'log', 'centrak-debug.log')
         },
         'file_error': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(VAR_DIR, 'logs', 'centrak-error.log')
+            'filename': os.path.join(VAR_DIR, 'log', 'centrak-error.log')
         }
     },
     'loggers': {

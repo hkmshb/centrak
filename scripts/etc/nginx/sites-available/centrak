@@ -4,14 +4,14 @@ server {
     listen [::]:80;
     
     # server block/virtual host name
-    server_name centrak.kedco.ng;
+    server_name <host>;
     
     ## entity size
     client_max_body_size 50m;
     
     # static files
     location /static {
-        alias /home/<usr>/webapps/<site>/source/public/static;
+        alias /home/<usr>/webapps/<site>/public/static;
     } 
     
     location / {
