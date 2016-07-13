@@ -59,7 +59,7 @@ def _build_stats_for_project(project, key, rebuild):
     form_keys = []
     for xform in XForm.objects(id_string__in=project.xforms):
         form_key = "{}.form.{}".format(key, xform.id_string)
-        _build_stats_for_project_xform(xform, form_key, rebuild)
+        for_project_xform(xform, form_key, rebuild)
         form_keys.append(form_key)
     
     columns = _get_blank_stats_entry().keys()
