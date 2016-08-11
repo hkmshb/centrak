@@ -220,7 +220,6 @@ class Survey(Document, TimeStampedMixin):
     group = fields.StringField(required=True)
     station = fields.StringField(required=True)
     upriser = fields.StringField(required=True)
-    cin     = fields.StringField(required=True)
 
     datetime_start = fields.DateTimeField(required=True)
     datetime_end = fields.DateTimeField(required=True)
@@ -233,10 +232,10 @@ class Survey(Document, TimeStampedMixin):
     cin_ltroute = fields.StringField(required=True)
     cin_custno  = fields.StringField(required=True)
     cin         = fields.StringField(required=True)
-    neighbour_cin = fields.StringField()
+    neighbour_cin = fields.StringField(null=True)
 
     rseq           = fields.StringField(required=True)
-    neighbour_rseq = fields.StringField()
+    neighbour_rseq = fields.StringField(null=True)
 
     kangis_no   = fields.StringField()
     addr_no     = fields.StringField()
@@ -306,8 +305,8 @@ class Survey(Document, TimeStampedMixin):
 
 
 class Capture(Survey):
-    snapshots = fields.DictField()
-    
+    snapshots = fields.DictField(null=True)
+
     meta = {
         'collection': 'captures',
         'ordering': ['_id'],

@@ -161,13 +161,14 @@
         getToken: function(event) {
             event.preventDefault();
             var form = $(event.currentTarget)
+              , tstamp = new Date().getTime()
               , u = $(':input[name=username]', form).val()
               , p = $(':input[name=password]', form).val()
               , creds = btoa(u + ":" + p);
             $.ajax({
                 // hack: prevents browser from using cached credentials from a
                 // successful authentication thus api_url is caused to change.
-                url: app.conf.survey.authApiRoot,
+                url: app.conf.survey.authApiRoot + '?t' + tstamp,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader("Authorization", "Basic " + creds);
                 }

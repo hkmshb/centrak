@@ -27,7 +27,7 @@ server {
         proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header    X-Forwarded-Host $server_name;
         
-        # timeouts on unavailable backends(s)
+        # timeouts on unavailable backend(s)
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
     }
 }
