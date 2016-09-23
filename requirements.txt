@@ -1,6 +1,6 @@
-django==1.8.13
+django==1.8.14
 psycopg2==2.6.1
-django-ezaddress==0.2
+https://github.com/hkmshb/django-ezaddress/archive/v0.2.tar.gz
 djangorestframework==3.3.3
 mongoengine==0.10.6
 django-rest-framework-mongoengine==3.3.0
