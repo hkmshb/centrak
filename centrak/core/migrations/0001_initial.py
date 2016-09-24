@@ -40,7 +40,6 @@ class Migration(migrations.Migration):
                 'db_table': 'business_office',
                 'ordering': ['level', 'name'],
             },
-            bases=(models.Model, ezaddress.models.AddressGPSMixin),
         ),
         migrations.CreateModel(
             name='Organization',
@@ -56,6 +55,5 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'organization',
             },
-            bases=(models.Model, ezaddress.models.AddressGPSMixin),
         ),
     ]

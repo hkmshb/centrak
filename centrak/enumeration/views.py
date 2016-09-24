@@ -19,7 +19,7 @@ def admin_pstations(request):
     istations = PowerStation.objects(type=PowerStation.INJECTION)
     
     return render(request, 
-        'enumeration/admin/ntwk-pwr-stations.html',{
+        'enumeration/admin/ntwk-powerstations.html',{
         'tstations':tstations, 'istations':istations,
         'voltratio': json.dumps(Volt.Ratio.PS_CHOICES),
     })

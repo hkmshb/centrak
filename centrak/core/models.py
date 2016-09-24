@@ -6,7 +6,7 @@ from django.db import models
 
 from mongoengine import Document, fields
 
-from ezaddress.models import AddressGPSMixin
+from ezaddress.models import Addressable, GPSLocatable
 from core.exceptions import InvalidOperationError
 
 
@@ -23,7 +23,7 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class BusinessEntity(TimeStampedModel, AddressGPSMixin):
+class BusinessEntity(TimeStampedModel, Addressable, GPSLocatable):
     """
     An abstract base class which represents a Business entity.
     """
@@ -79,7 +79,15 @@ class Organization(BusinessEntity):
     class Meta:
         db_table = 'organization'
     
-    
+    def to_dict(self):
+        return dict(id=self.id,
+            name=self.name, email=self.email, phone=self.phone,
+            website=self.website, addr_street=self.addr_street,
+            addr_tonw=self.addr_town, postal_code=self.postal_code,
+            addr_state=self.addr_state, addr_raw=self.addr_raw,
+            date_created=self.date_created, last_updated=self.last_updated
+        )
+
     def _process_instance(self):
         """
         Determines whether to allow the processing of an instance if it wouldn't 
@@ -121,6 +129,17 @@ class BusinessOffice(BusinessEntity):
     class Meta:
         db_table = 'business_office'
         ordering = ['level', 'name']
+    
+    def to_dict(self, minimal=True):
+        return dict(id=self.id,
+            code=self.code, name=self.name, email=self.email, phone=self.phone,
+            website=self.website,  addr_street=self.addr_street,
+            addr_tonw=self.addr_town, postal_code=self.postal_code,
+            addr_state=self.addr_state, addr_raw=self.addr_raw,
+            level=self.level.code if self.level else '',
+            parent=self.parent.code if self.parent else '',
+            date_created=self.date_created, last_updated=self.last_updated
+        )
     
     def clean(self):
         super(BusinessOffice, self).clean()
