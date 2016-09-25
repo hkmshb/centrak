@@ -1,0 +1,123 @@
+{% extends 'base_admin.html' %}
+{% load main_tags %}
+{% block content %}
+    <h2 class="sub-heading">Organisation</h2>
+    <div id="org" class="app" data-r="adminOrg">
+        <div class="alert hide"></div>
+        <div id="l-content" class="col-md-6 rm-r-pad"></div>
+        <div id="r-content" class="col-md-6 rm-r-pad"></div>
+        <div class="loading text-center">
+            <i class="fa fa-3x fa-pulse fa-spinner"></i>
+        </div>
+    </div>
+    <script type="application/json" id="bootstrap">
+        {"orgs": [{{ org.to_dict|to_json|safe }}],
+         "states": {{ states|to_json|safe }}}
+    </script>
+    <script type="text/template" id="org-info">
+        <div class="header-strip">
+            <h3 class="text">INFO</h3>
+            <div class="buttons rm-r-margin">
+                <button class="btn btn-sm btn-slim btn-default edit" title="Edit Info" data-toggle="tooltip">
+                    <i class="fa fa-md fa-edit"></i>
+                </button>
+            </div>
+        </div>
+        <div class="panel panel-default panel-condensed flat-top">
+            <div class="panel-body table-form">
+                <table class="table table-stripped info">
+                    <tbody>
+                        <tr><td><b>Name</b></td><td>:</td>
+                            <td><%- org.get('name') %></td></tr>
+                        <tr><td><b>Phone</b></td><td>:</td>
+                            <td><%- org.get('phone') %></td></tr>
+                        <tr><td><b>Email</b></td><td>:</td>
+                            <td><%- org.get('email') %></td></tr>
+                        <tr><td><b>Website</b></td><td>:</td>
+                            <td><%- org.get('website') %></td></tr>
+                        <tr><td><b>Address</b></td><td>:</td>
+                            <td><%- org.getFullAddress() %></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </script>
+    <script type="text/template" id="org-form">
+        <div class="header-strip">
+            <h3 class="text">UPDATE INFO</h3>
+        </div>
+        <div class="panel panel-default panel-condensed flat-top">
+            <div class="panel-body">
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Name</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="name form-control input-sm" value="<%- org.get('name') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Phone</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="phone form-control input-sm" value="<%- org.get('phone') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Email</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="email form-control input-sm" value="<%- org.get('email') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Website</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="website form-control input-sm" value="<%- org.get('website') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <span class="col-sm-10" style="color:grey"><b>ADDRESS INFO</b></span>
+                    <hr style="margin-bottom:5px"/>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Street</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="addr_street form-control input-sm" value="<%- org.get('addr_street') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Town/City</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="addr_town form-control input-sm" value="<%- org.get('addr_town') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">Postal Code</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <input type="text" class="postal_code form-control input-sm" value="<%- org.get('postal_code') %>" />
+                    </div>
+                </div>
+                <div class="form-group clearfix">
+                    <label class="col-sm-3 rm-r-pad">State</label>
+                    <div class="col-sm-9 rm-l-pad">
+                        <select type="text" class="state form-control input-sm">
+                            <option value=""></option>
+                         <% _(states).each(function(s) { %>
+                            <option value="<%- s.id %>"><%- s.name %></option>
+                         <% }) %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-sm-3">&nbsp;</div>
+                    <div class="col-sm-9 rm-l-pad">
+                        <button class="update btn btn-sm btn-primary">Update</button>
+                        <button class="cancel btn btn-sm btn-default">Cancel</button>
+                    </div>
+                    <input type="hidden" class="id" value="<%- org.get('id') %>" />
+                    <input type="hidden" class="date_created hidden" value="<%- org.get('date_created') %>" />
+                </div>
+            </div>
+        </div>
+    </script>
+    {{ block.super }}
+{% endblock %}

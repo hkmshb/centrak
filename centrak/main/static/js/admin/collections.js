@@ -23,7 +23,17 @@
         
         app.collections.Stations = Backbone.Collection.extend({
             model: app.models.Station,
-            url: data.pstations,
+            url: data.stations,
+        });
+
+        app.collections.Organizations = Backbone.Collection.extend({
+            model: app.models.Organization,
+            url: data.organizations,
+        })
+
+        app.collections.Offices = Backbone.Collection.extend({
+            model: app.models.Office,
+            url: data.offices,
         });
         
         // create collection instances
@@ -32,7 +42,8 @@
         app.surveyXforms = new app.collections.SurveyXForms();
         app.tstations = new app.collections.Stations();
         app.istations = new app.collections.Stations();
-        
+        app.organizations = new app.collections.Organizations();
+        app.regions = new app.collections.Offices();
     });
     
     

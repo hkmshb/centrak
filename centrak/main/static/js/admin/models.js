@@ -140,7 +140,7 @@
             var id = this.get('id_string');
             if (_(stats).has(id))
                 return stats[id][statType];
-            return 0
+            return 0;
         }
     });
     
@@ -158,6 +158,26 @@
             return fullname.trim();
         }
     });
+
+    app.models.Organization = Backbone.Model.extend({
+        getFullAddress: function() {
+            var addr_street = this.get('addr_street')
+              , addr_town = this.get('addr_town')
+              , addr_state = this.get('addr_state')
+              , postal_code = this.get('postal_code')
+              , addr = addr_street;
+            
+            if (!_.isNull(addr_street)) {
+                if (!_.isEmpty(addr_town)) {
+                    if (!_.isEmpty(addr))
+                        addr += ', ';
+                    addr += addr_town;
+                }
+            };
+            return addr;
+        }
+    });
+    app.models.Office = Backbone.Model.extend({});
     
     
 })(jQuery, Backbone, _, app);

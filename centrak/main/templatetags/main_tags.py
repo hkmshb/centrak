@@ -1,6 +1,6 @@
 from core.utils import tag_registerer as register
 from django.utils import safestring
-
+import json
 
 
 @register.filter
@@ -16,3 +16,7 @@ def dictget(dict, key):
         return dict[key]
     return ""
 
+
+@register.filter
+def to_json(obj):
+    return json.dumps(obj)

@@ -1,16 +1,17 @@
 from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from django.conf import settings
-from . import views
+from .views import default as def_views
+from .views import admin as adm_views
 
 
 
 urlpatterns = [
-    #: ==+: registration + auth urls
-    url(r'^account/register$', views.register_account, name='register'),
-    url(r'^account/registration-complete/$', views.registration_complete,
+    #: ==+: registration + auth urls 
+    url(r'^account/register$', def_views.register_account, name='register'),
+    url(r'^account/registration-complete/$', def_views.registration_complete,
         name='registration-complete'),
-    url(r'^account/password-reset$', views.password_reset,
+    url(r'^account/password-reset$', def_views.password_reset,
         name='password-reset'),
     url(r'^account/login$', auth_views.login,
         {'template_name':'account/login.html'}, name='login'),
@@ -21,28 +22,29 @@ urlpatterns = [
     #: ==+: admin urls
     url(r'^admin/',
         include([ 
-            url('^$', views.admin_home, name='admin-home') ,
+            url('^$', adm_views.admin_home, name='admin-home') ,
+            url('^s/org/', adm_views.admin_org, name='admin-org'),
             
             #: external api services
             url('s/apiservices/{}/$'.format(settings.SURVEY_API_SERVICE_KEY), 
-                views.apiservice_survey, name='admin-api-services'),
+                adm_views.apiservice_survey, name='admin-api-services'),
         ]),
     ),
     
     #: ==+: temp api urls
-    url(r'^api/v1/services/survey/token$', views.api_services_set_survey_token,
+    url(r'^api/v1/services/survey/token$', adm_views.api_services_set_survey_token,
         name='api-services-survey-token'),
     
     #: ==+: main urls
-    url(r'^$', views.index, name='home-page'),
+    url(r'^$', def_views.index, name='home-page'),
 
     url(r'^projects/', 
         include([
-            url(r'^t/$', views.projects_list, name='projects-list'),
+            url(r'^t/$', def_views.projects_list, name='projects-list'),
             
             url(r'^(?P<code>f[0-9A-Fa-f]{3})/',
                 include([
-                    url(r'^xforms/$', views.projects_xform_list, name='projects-xform-list'),
+                    url(r'^xforms/$', def_views.projects_xform_list, name='projects-xform-list'),
                 ])
             )
         ])

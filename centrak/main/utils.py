@@ -54,7 +54,7 @@ class Menu(object):
         return (
             Menu.Item(self, _('Dashboard'), reverse('admin-home')),
             Menu.Item(self, _('Settings'), '/admin/s/', children=(
-                Menu.Item(self, _('Organization')),
+                Menu.Item(self, _('Organisation'), reverse('admin-org')),
                 Menu.Item(self, _('Business Offices')),
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('Power Stations'), reverse('admin-ntwk-ps')),

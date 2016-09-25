@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_mongoengine import serializers as mserializers
-from enumeration.models import PowerStation, PowerLine, Project, XForm
+
+from core.models import Organization, BusinessOffice
+from enumeration.models import Station, PowerLine, Project, XForm
 
 
 
@@ -8,12 +10,12 @@ from enumeration.models import PowerStation, PowerLine, Project, XForm
 #: NETWORK MODEL SERIALIZERS
 #:+--------------------------------------------------------------------------+
 
-class PowerStationSerializer(mserializers.DocumentSerializer):
+class StationSerializer(mserializers.DocumentSerializer):
     
     fullname = serializers.SerializerMethodField()
     
     class Meta:
-        model = PowerStation
+        model = Station
     
     def get_fullname(self, obj):
         return str(obj)
@@ -36,3 +38,16 @@ class XFormSerializer(mserializers.DocumentSerializer):
 class ProjectSerializer(mserializers.DocumentSerializer):
     class Meta:
         model = Project
+
+#:+--------------------------------------------------------------------------+
+#: CORE SERIALIZERS
+#:+--------------------------------------------------------------------------+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+
+
+class BusinessOfficeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessOffice

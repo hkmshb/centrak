@@ -72,15 +72,17 @@ class Volt:
             (MVOLTH_LVOLT, _Text[MVOLTH_LVOLT]), (MVOLTL_LVOLT, _Text[MVOLTL_LVOLT]))
 
 
-class PowerStation(TimeStampedDocument):
+class Station(TimeStampedDocument):
     """Represents a power station within an electricity distribution network."""
     
-    TRANSMISSION = 'T'
-    INJECTION    = 'I'
+    TRANSMISSION = 1
+    INJECTION    = 2
+    DISTRIBUTION = 3
     
     STATION_CHOICES = (
         (TRANSMISSION, 'Transmission'),
         (INJECTION,    'Injection'),
+        (DISTRIBUTION, 'Distribution'),
     )
     
     object_id = fields.IntField(unique=True)
@@ -111,8 +113,8 @@ class PowerLine(TimeStampedDocument):
     regulatory body prescribed format.
     """
     
-    FEEDER = 'F'
-    UPRISER = 'U'
+    FEEDER  = 1 
+    UPRISER = 2
     TYPE_CHOICES = (
         (FEEDER,  'Feeder'),
         (UPRISER, 'Upriser'),
@@ -125,7 +127,7 @@ class PowerLine(TimeStampedDocument):
     type  = fields.StringField(max_length=1, required=True, choices=TYPE_CHOICES)
     voltage = fields.IntField(required=True, choices=Volt.LINE_CHOICES)
     public = fields.BooleanField(default=True)
-    source = fields.ReferenceField(PowerStation)
+    source = fields.ReferenceField(Station)
     
     def tagcode(self):
         # nerc: combination of source station and assigned code

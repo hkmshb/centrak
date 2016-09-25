@@ -8,15 +8,15 @@ from mongoengine.queryset import Q
 
 from core import utils
 from .models import XForm, Project
-from enumeration.models import Volt, PowerStation, Capture, Update
+from enumeration.models import Volt, Station, Capture, Update
 
 
 
 #: ==+: admin view funcs :+==
 @login_required
 def admin_pstations(request):
-    tstations = PowerStation.objects(type=PowerStation.TRANSMISSION)
-    istations = PowerStation.objects(type=PowerStation.INJECTION)
+    tstations = Station.objects(type=Station.TRANSMISSION)
+    istations = Station.objects(type=Station.INJECTION)
     
     return render(request, 
         'enumeration/admin/ntwk-powerstations.html',{

@@ -96,6 +96,21 @@
             this.render(view);
         }
     }),
+
+    AdminOrgRouter = BaseRouter.extend({
+        routes: {
+            '': 'home',
+            'update': 'update',
+        },
+        home: function() {
+            var view = new app.views.AdminOrganizationView({el: this.contentElement});
+            this.render(view);
+        },
+        update: function() {
+            var view = new app.views.AdminOrganizationFormView({el: this.contentElement});
+            this.render(view);
+        }
+    }),
     
     RouterFactory = function(rname, vname){
         return {
@@ -104,6 +119,7 @@
                 'adminXform': AdminXFormRouter,
                 'adminPStation': AdminPowerStationRouter,
                 'adminProject': AdminProjectRouter,
+                'adminOrg': AdminOrgRouter,
             },
             route: function() {
                 if (_.isEmpty(rname)) {

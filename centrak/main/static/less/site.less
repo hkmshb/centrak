@@ -1,18 +1,25 @@
 @import 'base.less';
 
-// api-services
 
-#apiservice {
-    .table tr { 
+.table-form {
+    .table tr {
         td:first-child {
             width: 30px;
             white-space: nowrap;
         }
-        
         td:nth-child(3) {
             width: 90%;
         }
+        td {
+            padding: 4px 8px;
+            border: none;
+        }
     }
+}
+
+// api-services
+
+#apiservice {
     .buttons { margin-top: -10px; }
     #creds-strip {
         margin: 20px auto;

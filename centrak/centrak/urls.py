@@ -16,13 +16,14 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from rest_framework.authtoken.views import obtain_auth_token
-from api.urls import router
+from api.urls import api_urls
 
 
 
 urlpatterns = [
     url(r'^su:admin/', include(admin.site.urls)),
-    url(r'^api/v1/', include(router.urls)),
+    url(r'^api/token/', obtain_auth_token, name='api-token'),
+    url(r'^api/v1/', include(api_urls)),
     url(r'', include('main.urls')),
     url(r'', include('enumeration.urls')),
 ]

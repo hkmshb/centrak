@@ -280,7 +280,6 @@
         }
     }),
     
-    
     SurveyXFormComponent = TemplateView.extend({
         templateName: '#survey-xforms-template',
         initialize: function() {
@@ -571,8 +570,7 @@
             };
         }
     }),
-    
-    
+        
     AdminProjectListView = TemplateView.extend({
         innerEl: '#l-content',
         templateName: '#list-template',
@@ -756,9 +754,140 @@
             }
             return changes;
         }
+    }),
+    
+    
+    /*-----------------------------------------------------------------------+
+    | Admin Organization View 
+    +---------------------------------------------------------------------- */
+    AdminOrganizationView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#org-info',
+        initialize: function() {
+            $('.loading').addClass('hide');
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.url = window.location.href.replace('#', '');
+            var self = this, $bs = $('#bootstrap');
+
+            // load bootstrapped data
+            app.collections.ready.done(function() {
+                self.bs_data = JSON.parse($bs.text());
+                if (!_.isNull(self.bs_data.orgs)) {
+                    app.organizations.reset(self.bs_data.orgs);
+                    self.bs_data.orgs = null;
+                    $bs.text(JSON.stringify(self.bs_data));
+                    self.render();
+                } else {
+                    app.organizations.fetch({
+                        reset: true,
+                        success: $.proxy(self.render, self)
+                    })
+                }
+            });
+        },
+        events: {
+            'click button.edit': 'editOrg',
+        },
+        editOrg: function() {
+            app.router.r.navigate('#/update', {trigger:true});
+        },
+        getContext: function() {
+            return { 
+                'org': app.organizations.first(),
+                'org_addr': this.bs_data.org_addr 
+            };
+        }
+    }),
+    
+    AdminOrganizationFormView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#org-form',
+        initialize: function() {
+            $('.loading').addClass('hide');
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.bs_data = JSON.parse($('#bootstrap').text());
+            this.org = app.organizations.first();
+        },
+        events: {
+            'click button.update': 'update',
+            'click button.cancel': 'close',
+        },
+        close: function() {
+            app.router.r.navigate('', {trigger:true});
+        },
+        update: function() {
+            var self = this
+              , changes = this.getChanges();
+
+            this.org.save(changes, {
+                wait: true,
+                patch: true,
+                success: function(model, resp, options) {
+                    app.organizations.add(model, {merge: true});
+                    self.app = app.organizations.first();
+                    self.showMessage('Organization updated successfully', 'success');
+                },
+                error: function(model, resp, options) {
+                    self.showMessage('Update failed.', 'danger');
+                }
+            });
+        },
+        getContext: function() {
+            return { 
+                'org': this.org,
+                'states': this.bs_data.states 
+            }
+        },
+        getChanges: function() {
+            var field = null
+              , fields = [
+                  'name', 'phone', 'email', 'website', 'addr_street', 'addr_town',
+                  'postal_code', 'addr_state']
+              , changes = {
+                  // need to normalize these fields
+                  last_update: moment().format(),
+
+                  // actual changes
+                  name: this.$name.val(),
+                  phone: this.$phone.val(),
+                  email: this.$email.val(),
+                  website: this.$website.val(),
+                  addr_street: this.$addr_street.val(),
+                  addr_town: this.$addr_town.val(),
+                  postal_code: this.$postal_code.val(),
+                  addr_state: this.$addr_state.val(),
+                  date_created: this.$date_created.val(),
+              };
+              for (var i in fields) {
+                  field = fields[i];
+                  if (this.org && this.org.get(field) == changes[field]) {
+                      delete changes[field]
+                  } else if (_.isEqual(changes[field], "")) {
+                      changes[field] = null;
+                  }
+              }
+              if (!this.org.isNew()) {
+                  changes.id = (this.org.has('_id')
+                                    ? this.org.get('_id').$oid
+                                    : this.org.get('id'));
+              }
+              return changes;
+        },
+        render: function() {
+            TemplateView.prototype.render.apply(this, arguments);
+            this.$id = $('input.id', this.$el);
+            this.$name = $('input.name', this.$el);
+            this.$phone = $('input.phone', this.$el);
+            this.$email = $('input.email', this.$el);
+            this.$website = $('input.website', this.$el);
+            this.$addr_street = $('input.addr_street', this.$el);
+            this.$addr_town = $('input.addr_town', this.$el);
+            this.$postal_code = $('input.postal_code', this.$el);
+            this.$addr_state = $('input.addr_state', this.$el);
+            this.$date_created = $('input.date_created', this.$el);
+        }
     });
-    
-    
+
     
     // register views
     app.views.ApiServiceView = ApiServiceView;
@@ -770,5 +899,8 @@
     app.views.MultiViewManager = MultiViewManager;
     app.views.AdminStationFormView = AdminStationFormView;
     app.views.AdminStationListView = AdminStationListView;
+
+    app.views.AdminOrganizationView = AdminOrganizationView;
+    app.views.AdminOrganizationFormView = AdminOrganizationFormView;
     
 })(jQuery, Backbone, _, app);

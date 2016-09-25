@@ -7,14 +7,14 @@
                 <h3 class="text">SURVEY PLATFORM</h3>
             </div>
             <div class="panel panel-default panel-condensed flat-top">
-                <div class="panel-body">
+                <div class="panel-body table-form">
                     <table class="table table-stripped info">
                         <tbody>
-                            <tr><td>Service Key</td><td>:</td>
-                                <td colspan="2" class="key">{{ info.key }}</td>
-                            <tr><td>API Root</td><td>:</td>
+                            <tr><td><b>Service Key</b></td><td>:</td>
+                                <td colspan="2" class="key">{{ info.key }}</td></tr>
+                            <tr><td><b>API Root</b></td><td>:</td>
                                 <td colspan="2" class="api-root">{{ info.api_root }}</td></tr>
-                            <tr><td>API Token</td><td>:</td>
+                            <tr><td><b>API Token</b></td><td>:</td>
                                 <td class="api-token">{{ info.api_token|default:"" }}</td>
                                 <td class="validation-result"></td></tr>
                         </tbody>

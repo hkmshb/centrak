@@ -83,9 +83,10 @@ class Organization(BusinessEntity):
         return dict(id=self.id,
             name=self.name, email=self.email, phone=self.phone,
             website=self.website, addr_street=self.addr_street,
-            addr_tonw=self.addr_town, postal_code=self.postal_code,
+            addr_town=self.addr_town, postal_code=self.postal_code,
             addr_state=self.addr_state, addr_raw=self.addr_raw,
-            date_created=self.date_created, last_updated=self.last_updated
+            date_created=self.date_created.strftime('%Y-%m-%d'), 
+            last_updated=self.last_updated.strftime('%Y-%m-%d')
         )
 
     def _process_instance(self):
@@ -134,11 +135,12 @@ class BusinessOffice(BusinessEntity):
         return dict(id=self.id,
             code=self.code, name=self.name, email=self.email, phone=self.phone,
             website=self.website,  addr_street=self.addr_street,
-            addr_tonw=self.addr_town, postal_code=self.postal_code,
+            addr_town=self.addr_town, postal_code=self.postal_code,
             addr_state=self.addr_state, addr_raw=self.addr_raw,
             level=self.level.code if self.level else '',
             parent=self.parent.code if self.parent else '',
-            date_created=self.date_created, last_updated=self.last_updated
+            date_created=self.date_created.strftime('%Y-%m-%d'), 
+            last_updated=self.last_updated.strftime('%Y-%m-%d')
         )
     
     def clean(self):
