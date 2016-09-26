@@ -112,6 +112,38 @@
         }
     }),
     
+    AdminOfficeRouter = BaseRouter.extend({
+        routes: {
+            '': 'home',
+            'create': 'create',
+            ':office_code/': 'view',
+            ':office_code/update': 'update',
+        },
+        home: function() {
+            var view = new app.views.AdminOfficeListView({el: this.contentElement});
+            this.render(view);
+        },
+        create: function() {
+            this.manage({el: this.contentElement, edit: true});
+        },
+        view: function(office_code) {
+            this.manage({
+                el: this.contentElement,
+                office_code: office_code, edit: false
+            })
+        },
+        update: function(office_code) {
+            this.manage({
+                el: this.contentElement,
+                office_code: office_code, edit: true
+            })
+        },
+        manage: function(options) {
+            var view = new app.views.AdminOfficeFormView(options);
+            this.render(view);
+        }
+    }),
+
     RouterFactory = function(rname, vname){
         return {
             r: null,
@@ -120,6 +152,7 @@
                 'adminPStation': AdminPowerStationRouter,
                 'adminProject': AdminProjectRouter,
                 'adminOrg': AdminOrgRouter,
+                'adminOffices': AdminOfficeRouter,
             },
             route: function() {
                 if (_.isEmpty(rname)) {

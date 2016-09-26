@@ -20,3 +20,11 @@ def dictget(dict, key):
 @register.filter
 def to_json(obj):
     return json.dumps(obj)
+
+
+@register.filter
+def model_to_json(objects):
+    output = []
+    for obj in objects:
+        output.append(obj.to_dict())
+    return json.dumps(output)

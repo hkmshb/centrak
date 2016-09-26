@@ -861,7 +861,7 @@
               for (var i in fields) {
                   field = fields[i];
                   if (this.org && this.org.get(field) == changes[field]) {
-                      delete changes[field]
+                      delete changes[field];
                   } else if (_.isEqual(changes[field], "")) {
                       changes[field] = null;
                   }
@@ -886,9 +886,164 @@
             this.$addr_state = $('input.addr_state', this.$el);
             this.$date_created = $('input.date_created', this.$el);
         }
+    }),
+
+    AdminOfficeListView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#regions-template',
+        initialize: function() {
+            $('.loading').addClass('hide');
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.url = window.location.href.replace('#', '');
+            var self = this, $bs = $('#bootstrap');
+
+            app.collections.ready.done(function() {
+                this.bs_data = JSON.parse($bs.text());
+                if (!_.isNull(this.bs_data.offices)) {
+                    app.offices.reset(this.bs_data.offices);
+                    this.bs_data.offices = null;
+                    $bs.text(JSON.stringify(this.bs_data));
+                    self.render();
+                } else {
+                    app.offices.fetch({
+                        reset: true, 
+                        success: $.proxy(self.render, self)
+                    });
+                }
+            });
+        },
+        events: {
+            'click button.add': 'createOffice',
+        },
+        createOffice: function() {
+            window.location = (this.url + '#/create');
+        },
+        getContext: function() {
+            return {
+                'offices': app.offices
+            }
+        }
+    }),
+    
+    AdminOfficeFormView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#form-template',
+        initialize: function(options) {
+            $('.loading').addClass('hide');
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.office_code = options.office_code;
+            this.editable = options.edit || false;
+            var self = this;
+
+            // load bootstrapped data
+            this.bs_data = JSON.parse($('#bootstrap').text());
+            if (!_.isEmpty(options.office_code)) {
+                if (_.isEmpty(app.offices) || app.offices.length === 0) {
+                    this.close();
+                } else {
+                    var q = {code: options.office_code}
+                      , o = app.offices.findWhere(q);
+                    
+                    if (_.isEmpty(o)) this.close();
+                    self.office = o;
+                }
+            }
+        },
+        events: {
+            'click button.save': 'manageOne',
+            'click button.edit': 'updateOne',
+            'click button.cancel': 'close',
+        },
+        close: function() {
+            var r = '';
+            if (!_.isEmpty(this.office) && this.editable) {
+                r = '/' + this.office.get('code') + '/';
+            }
+            app.router.r.navigate(r, {trigger: true});
+        },
+        manageOne: function() {
+            var self = this, changes = null;
+            if (_.isEmpty(this.office)) {
+                changes = this.getChanges();
+                app.offices.create(changes, {
+                    wait: true,
+                    success: function(model, resp, options) {
+                        self.showMessage('Office created successfully', 'success');
+                    },
+                    fail: function(model, resp, options) {
+                        self.showMessage(resp, 'danger');
+                    }
+                })
+            } else {
+                changes = this.getChanges(true);
+                this.office.save(changes, {
+                    wait: true, patch: true,
+                    success: function(model, resp, options) {
+                        app.offices.add(model, {merge: true});
+                        self.office = app.offices.findWhere({code: self.office_code});
+                        self.showMessage('Office update successfully', 'success');
+                    },
+                    error: function(model, resp, options) {
+                        self.showMessage('Update failed.', 'danger');
+                    }
+                })
+            }
+        },
+        updateOne: function() {
+
+        },
+        getChanges: function(isUpdate) {
+            var field = null
+              , fields = ['code','name','phone','email','addr_street','addr_town',
+                    'postal_code','addr_state']
+              , changes = {
+                  last_updated: moment().format(),
+                  code: this.$code.val(),
+                  name: this.$name.val(),
+                  phone: this.$phone.val(),
+                  email: this.$email.val(),
+                  addr_street: this.$addr_street.val(),
+                  addr_town: this.$addr_town.val(),
+                  addr_state: this.$addr_state.val(),
+                  postal_code: this.$postal_code.val(),
+                  level: 'L1', parent: null
+              };
+            
+            for (var i in fields) {
+                field = fields[i];
+                if (this.office && this.office.get(field) == changes[field]) {
+                    delete changes[field];
+                }
+            }
+            if (isUpdate) {
+                changes.id = (this.office.has('_id')
+                                  ? this.office.get('_id').$oid
+                                  : this.office.get('id'));
+            }
+            return changes;
+        },
+        getContext: function() {
+            return {
+                office: this.office,
+                states: this.bs_data.states,
+                editable: this.editable
+            }
+        },
+        render: function() {
+            TemplateView.prototype.render.apply(this, arguments);
+            $('#r-content', this.$el).html('');
+
+            this.$code = $('input.code', this.$el);
+            this.$name = $('input.name', this.$el);
+            this.$phone = $('input.phone', this.$el);
+            this.$email = $('input.email', this.$el);
+            this.$addr_street = $('input.addr_street', this.$el);
+            this.$addr_town = $('input.addr_town', this.$el);
+            this.$addr_state = $('input.addr_state', this.$el);
+            this.$postal_code = $('input.postal_code', this.$el);
+        }
     });
 
-    
     // register views
     app.views.ApiServiceView = ApiServiceView;
     app.views.AdminXFormView = AdminXFormView;
@@ -902,5 +1057,8 @@
 
     app.views.AdminOrganizationView = AdminOrganizationView;
     app.views.AdminOrganizationFormView = AdminOrganizationFormView;
+
+    app.views.AdminOfficeListView = AdminOfficeListView;
+    app.views.AdminOfficeFormView = AdminOfficeFormView;
     
 })(jQuery, Backbone, _, app);

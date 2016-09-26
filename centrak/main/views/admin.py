@@ -69,5 +69,18 @@ def admin_org(request):
     states = State.objects.all() 
     return render(request, 'main/admin/org_info.html', {
         'org': org,
-        'states': [{'id': x.id, 'name': x.name} for x in states]
+        'states': [{'id': x.id, 'name': x.name, 'country': x.country.name} 
+                    for x in states]
+    })
+
+
+@login_required
+def admin_offices(request):
+    offices = BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1)\
+                            .order_by('code')
+    states = State.objects.all()
+    return render(request, 'main/admin/org_offices.html', {
+        'offices': offices,
+        'states': [{'id': x.id, 'name': x.name, 'country': x.country.name}
+                    for x in states]
     })

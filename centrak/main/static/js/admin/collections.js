@@ -43,7 +43,7 @@
         app.tstations = new app.collections.Stations();
         app.istations = new app.collections.Stations();
         app.organizations = new app.collections.Organizations();
-        app.regions = new app.collections.Offices();
+        app.offices = new app.collections.Offices();
     });
     
     

@@ -24,6 +24,7 @@ urlpatterns = [
         include([ 
             url('^$', adm_views.admin_home, name='admin-home') ,
             url('^s/org/', adm_views.admin_org, name='admin-org'),
+            url('^s/offices/', adm_views.admin_offices, name='admin-offices'),
             
             #: external api services
             url('s/apiservices/{}/$'.format(settings.SURVEY_API_SERVICE_KEY), 
