@@ -67,8 +67,8 @@ def get_org_or_create_default():
 def admin_org(request):
     org = get_org_or_create_default
     states = State.objects.all() 
-    return render(request, 'main/admin/org_info.html', {
-        'org': org,
+    return render(request, 'main/admin/offices.html', {
+        'office': org, 'jsrouter': 'adminOrg',
         'states': [{'id': x.id, 'name': x.name, 'country': x.country.name} 
                     for x in states]
     })
@@ -79,8 +79,8 @@ def admin_offices(request):
     offices = BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1)\
                             .order_by('code')
     states = State.objects.all()
-    return render(request, 'main/admin/org_offices.html', {
-        'offices': offices,
+    return render(request, 'main/admin/offices.html', {
+        'offices': offices, 'jsrouter': 'adminOffices',
         'states': [{'id': x.id, 'name': x.name, 'country': x.country.name}
                     for x in states]
     })

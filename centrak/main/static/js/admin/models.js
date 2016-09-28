@@ -159,7 +159,7 @@
         }
     });
 
-    app.models.Organization = Backbone.Model.extend({
+    app.models.Office = Backbone.Model.extend({
         getFullAddress: function() {
             var addr_street = this.get('addr_street')
               , addr_town = this.get('addr_town')
@@ -177,7 +177,6 @@
             return addr;
         }
     });
-    app.models.Office = Backbone.Model.extend({});
     
     
 })(jQuery, Backbone, _, app);

@@ -1,0 +1,20 @@
+{% extends 'base_admin.html' %}
+{% load main_tags %}
+{% block content %}
+    <h2 class="sub-heading">Organisation</h2>
+    <div id="org" class="app" data-r="{{ jsrouter }}">
+        <div class="alert hide"></div>
+        <div id="l-content" class="col-md-6 rm-r-pad"></div>
+        <div id="r-content" class="col-md-6 rm-r-pad"></div>
+        <div class="loading text-center">
+            <i class="fa fa-3x fa-pulse fa-spinner"></i>
+        </div>
+    </div>
+    <script type="application/json" id="bootstrap">
+        {"item": {% if office %}{{ office.to_dict|to_json|safe }}{% else %}""{% endif %},
+         "items": {% if offices %}{{ offices|model_to_json|safe }}{% else %}[]{% endif %},
+         "itemId": {% if office %}{{ office.id }}{% else %}""{% endif %}, "ext": {"states": {{ states|to_json|safe }}}}
+    </script>
+    {% include 'js_office_templates.html' %}
+    {{ block.super }}
+{% endblock %}

@@ -84,7 +84,8 @@ class Organization(BusinessEntity):
             name=self.name, email=self.email, phone=self.phone,
             website=self.website, addr_street=self.addr_street,
             addr_town=self.addr_town, postal_code=self.postal_code,
-            addr_state=self.addr_state, addr_raw=self.addr_raw,
+            addr_raw=self.addr_raw,
+            addr_state=(self.addr_state.id if self.addr_state else 0),
             date_created=self.date_created.strftime('%Y-%m-%d'), 
             last_updated=self.last_updated.strftime('%Y-%m-%d')
         )
@@ -136,7 +137,8 @@ class BusinessOffice(BusinessEntity):
             code=self.code, name=self.name, email=self.email, phone=self.phone,
             website=self.website,  addr_street=self.addr_street,
             addr_town=self.addr_town, postal_code=self.postal_code,
-            addr_state=self.addr_state, addr_raw=self.addr_raw,
+            addr_raw=self.addr_raw, 
+            addr_state=(self.addr_state.id if self.addr_state else 0),
             level=self.level.code if self.level else '',
             parent=self.parent.code if self.parent else '',
             date_created=self.date_created.strftime('%Y-%m-%d'), 

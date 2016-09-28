@@ -2,9 +2,199 @@
 
 (function($, Backbone, _, app) {
     'use strict';
+
+    var TemplateView = Backbone.View.extend({
+        title: null,
+        innerEl: null,
+        templateName: '',
+        initialize: function(options) {
+            this._options = (options || {});
+            this.innerEl = this.innerEl || this._options.innerEl;
+            this.templateName = this.templateName || this._options.templateName;            
+            this._template = _.template($(this.templateName).html());
+            this._url = window.location.href.replace('#', '');
+        },
+        render: function() {
+            var context = this.getContext()
+              , html = this._template(context)
+              , canvas = this.getCanvas();
+            
+            canvas.html(html);
+            this.$alert = $('.alert');
+            this.$alert.addClass('hide').text('');
+            $('.loading').addClass('hide');
+
+            $('.date').datetimepicker({
+                showClear: true,
+                format: 'DD/MM/YYYY HH:mm A',
+                userCurrent: false
+            }).on('dp.show', function() {
+                if ($(this).data('DateTimePicker').date() === null)
+                    $(this).data('DateTimePicker').date(moment());
+            });
+
+            $('select.2').select2({theme: "bootstrap"});
+        },
+        getCanvas: function() {
+            if (!_.isEmpty(this.innerEl)) {
+                if (_.isEmpty(this.$innerEl))
+                    this.$innerEl = $(this.innerEl, this.$el);
+                return this.$innerEl;
+            } else {
+                this.$innerEl = null;
+                return this.$el;
+            }
+        },
+        getContext: function() {
+            return {};
+        },
+        showMessage: function(message, tag) {
+            if (_.isEmpty(message)) {
+                this.$alert.addClass('hide');
+            } else {
+                this.$alert
+                    .removeClass('hide alert-danger alert-success')
+                    .addClass('alert-' + (tag || 'danger'))
+                    .text(message);
+            }
+        }
+    }),
+    
+    ItemDisplayView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#view-template',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this._itemCtor = options.itemCtor;
+        
+            // load boostrapped data
+            var self = this, $bs = $('#bootstrap');
+            self._bs_data = JSON.parse($bs.text());
+            if (!_.isNull(self._bs_data.item)) {
+                self._item = new self._itemCtor(self._bs_data.item);
+                self._bs_data.item = null;
+                $bs.text(JSON.stringify(self._bs_data));
+            } else {
+                self._item = new self._itemCtor({id: self._bs_data.itemId});
+                self._item.fetch({
+                    success: $.proxy(self.render, self),
+                    error: $.proxy(function(m, r, o) {
+                        this.showMessage(r.statusText);
+                    }, self)
+                })
+            }
+        },
+        events: {
+            'click button.edit': 'update'
+        },
+        update: function() {
+            app.router.r.navigate('#/update', {trigger: true});
+        },
+        getContext: function() {
+            return {
+                title: this.title,
+                item: this._item,
+                ext: this._bs_data.ext
+            }
+        }
+    }),
+    
+    ListDisplayView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#list-template',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this._collection = options.collection;
+            var self = this, $bs = $('#bootstrap');
+            
+            this._bs_data = JSON.parse($bs.text());
+            if (!_.isNull(this._bs_data.items)) {
+                this._collection.reset(this._bs_data.items);
+                this._bs_data.items = null;
+                $bs.text(JSON.stringify(this._bs_data));
+            } else {
+                this._collection.fetch({
+                    reset: true,
+                    success: $.proxy(self.render, self)
+                });
+            }
+        },
+        getContext: function() {
+            return {
+                title: this.title,
+                items: this._collection,
+                ext: this._bs_data.ext,
+            }
+        }
+    }),
+
+    ItemFormView = TemplateView.extend({
+        innerEl: '#l-content',
+        templateName: '#form-template',
+        initialize: function(options) {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this._bs_data = JSON.parse($('#bootstrap').text());
+            this._itemCtor = options.itemCtor;
+            
+            var self = this;
+            this._item = new self._itemCtor({id: this._bs_data.itemId});
+            this._item.fetch({
+                success: $.proxy(self.render, self),
+                error: $.proxy(function(m, r, o) {
+                    self.showMessage(r.statusText);
+                }, self)
+            });
+        },
+        events: {
+            'click button.save': 'saveUpdate',
+            'click button.cancel': 'close'
+        },
+        close: function() {
+            app.router.r.navigate(this._options.urlBack, {trigger: true});
+        },
+        saveUpdate: function() {
+            var self = this
+              , changes = this.getChanges();
+
+            if (changes && _(changes).size() > 0) { 
+                this._item.save(changes, {
+                    wait: true, patch: true,
+                    success: function(model, resp, opts) {
+                        self._item = model;
+                        self.showMessage('Update successful.', 'success');
+                    },
+                    error: function(model, resp, opts) {
+                        self.showMessage('Update failed.', 'danger');
+                    }
+                });
+            }
+        },
+        getChanges: function() {
+            var self = this, changes = {}
+              , data = this.serializeForm($('form'));
+            
+            _(data).each(function(value, key) {
+                if ((self._item.get(key) || '') != value) {
+                    changes[key] = value;
+                }
+            });
+            return changes;
+        },
+        getContext: function() {
+            return {
+                item: this._item,
+                ext: this._bs_data.ext
+            }
+        },
+        serializeForm: function(form) {
+            return _.object(_.map(form.serializeArray(), function(item) {
+                return [item.name, item.value];
+            }));
+        }
+    });
     
     // BaseView ..
-    var TemplateView = Backbone.View.extend({
+    var TemplateView2 = Backbone.View.extend({
         innerEl: null,
         templateName: '',
         initialize: function() {
@@ -93,7 +283,6 @@
             });
         }
     }),
-    
     
     /*-----------------------------------------------------------------------+
      | API Service View 
@@ -760,135 +949,57 @@
     /*-----------------------------------------------------------------------+
     | Admin Organization View 
     +---------------------------------------------------------------------- */
-    AdminOrganizationView = TemplateView.extend({
-        innerEl: '#l-content',
-        templateName: '#org-info',
-        initialize: function() {
-            $('.loading').addClass('hide');
-            TemplateView.prototype.initialize.apply(this, arguments);
-            this.url = window.location.href.replace('#', '');
-            var self = this, $bs = $('#bootstrap');
-
-            // load bootstrapped data
+    AdminOrgDisplayView = ItemDisplayView.extend({
+        title: 'Info',
+        initialize: function(options) {
+            var self=this, args=arguments;
             app.collections.ready.done(function() {
-                self.bs_data = JSON.parse($bs.text());
-                if (!_.isNull(self.bs_data.orgs)) {
-                    app.organizations.reset(self.bs_data.orgs);
-                    self.bs_data.orgs = null;
-                    $bs.text(JSON.stringify(self.bs_data));
-                    self.render();
-                } else {
-                    app.organizations.fetch({
-                        reset: true,
-                        success: $.proxy(self.render, self)
-                    })
-                }
+                options.itemCtor = app.models.Office.extend({
+                    urlRoot: app.organizations.url
+                });
+                ItemDisplayView.prototype.initialize.apply(self, args);
             });
-        },
-        events: {
-            'click button.edit': 'editOrg',
-        },
-        editOrg: function() {
-            app.router.r.navigate('#/update', {trigger:true});
-        },
-        getContext: function() {
-            return { 
-                'org': app.organizations.first(),
-                'org_addr': this.bs_data.org_addr 
-            };
         }
     }),
     
-    AdminOrganizationFormView = TemplateView.extend({
-        innerEl: '#l-content',
-        templateName: '#org-form',
-        initialize: function() {
-            $('.loading').addClass('hide');
-            TemplateView.prototype.initialize.apply(this, arguments);
-            this.bs_data = JSON.parse($('#bootstrap').text());
-            this.org = app.organizations.first();
-        },
-        events: {
-            'click button.update': 'update',
-            'click button.cancel': 'close',
-        },
-        close: function() {
-            app.router.r.navigate('', {trigger:true});
-        },
-        update: function() {
-            var self = this
-              , changes = this.getChanges();
-
-            this.org.save(changes, {
-                wait: true,
-                patch: true,
-                success: function(model, resp, options) {
-                    app.organizations.add(model, {merge: true});
-                    self.app = app.organizations.first();
-                    self.showMessage('Organization updated successfully', 'success');
-                },
-                error: function(model, resp, options) {
-                    self.showMessage('Update failed.', 'danger');
-                }
+    AdminOrgFormView = ItemFormView.extend({
+        title: 'Update Info',
+        initialize: function(options) {
+            var self=this, args=arguments;
+            app.collections.ready.done(function(){
+                options.itemCtor = app.models.Office.extend({
+                    urlRoot: app.organizations.url
+                });
+                ItemFormView.prototype.initialize.apply(self, args);
             });
-        },
-        getContext: function() {
-            return { 
-                'org': this.org,
-                'states': this.bs_data.states 
-            }
-        },
-        getChanges: function() {
-            var field = null
-              , fields = [
-                  'name', 'phone', 'email', 'website', 'addr_street', 'addr_town',
-                  'postal_code', 'addr_state']
-              , changes = {
-                  // need to normalize these fields
-                  last_update: moment().format(),
-
-                  // actual changes
-                  name: this.$name.val(),
-                  phone: this.$phone.val(),
-                  email: this.$email.val(),
-                  website: this.$website.val(),
-                  addr_street: this.$addr_street.val(),
-                  addr_town: this.$addr_town.val(),
-                  postal_code: this.$postal_code.val(),
-                  addr_state: this.$addr_state.val(),
-                  date_created: this.$date_created.val(),
-              };
-              for (var i in fields) {
-                  field = fields[i];
-                  if (this.org && this.org.get(field) == changes[field]) {
-                      delete changes[field];
-                  } else if (_.isEqual(changes[field], "")) {
-                      changes[field] = null;
-                  }
-              }
-              if (!this.org.isNew()) {
-                  changes.id = (this.org.has('_id')
-                                    ? this.org.get('_id').$oid
-                                    : this.org.get('id'));
-              }
-              return changes;
-        },
-        render: function() {
-            TemplateView.prototype.render.apply(this, arguments);
-            this.$id = $('input.id', this.$el);
-            this.$name = $('input.name', this.$el);
-            this.$phone = $('input.phone', this.$el);
-            this.$email = $('input.email', this.$el);
-            this.$website = $('input.website', this.$el);
-            this.$addr_street = $('input.addr_street', this.$el);
-            this.$addr_town = $('input.addr_town', this.$el);
-            this.$postal_code = $('input.postal_code', this.$el);
-            this.$addr_state = $('input.addr_state', this.$el);
-            this.$date_created = $('input.date_created', this.$el);
         }
     }),
 
-    AdminOfficeListView = TemplateView.extend({
+    AdminOfficeListView = ListDisplayView.extend({
+        title: 'Regions',
+        initialize: function(options) {
+            var self=this, args=arguments;
+            options.collection = app.offices;
+            app.collections.ready.done(function() {
+                ListDisplayView.prototype.initialize.apply(self, args);
+            });
+        }
+    }),
+
+    AdminOfficeDisplayView = ItemDisplayView.extend({
+        title: '?',
+        initialize: function(options) {
+            var self = this, args = arguments;
+            app.collections.ready.done(function() {
+                options.itemCtor = app.models.Office.extend({
+                    urlRoot: app.offices.url
+                });
+                ItemDisplayView.prototype.initialize.apply(self, args);
+            });
+        }
+    }),
+
+    AdminOfficeListView2 = TemplateView.extend({
         innerEl: '#l-content',
         templateName: '#regions-template',
         initialize: function() {
@@ -925,12 +1036,13 @@
         }
     }),
     
-    AdminOfficeFormView = TemplateView.extend({
+    AdminOfficeFormView = TemplateView2.extend({
+        title: 'boo',
         innerEl: '#l-content',
         templateName: '#form-template',
         initialize: function(options) {
             $('.loading').addClass('hide');
-            TemplateView.prototype.initialize.apply(this, arguments);
+            TemplateView2.prototype.initialize.apply(this, arguments);
             this.office_code = options.office_code;
             this.editable = options.edit || false;
             var self = this;
@@ -1024,13 +1136,14 @@
         },
         getContext: function() {
             return {
-                office: this.office,
-                states: this.bs_data.states,
+                title: this.title,
+                item: this.office,
+                ext: this.bs_data.ext,
                 editable: this.editable
             }
         },
         render: function() {
-            TemplateView.prototype.render.apply(this, arguments);
+            TemplateView2.prototype.render.apply(this, arguments);
             $('#r-content', this.$el).html('');
 
             this.$code = $('input.code', this.$el);
@@ -1055,10 +1168,15 @@
     app.views.AdminStationFormView = AdminStationFormView;
     app.views.AdminStationListView = AdminStationListView;
 
-    app.views.AdminOrganizationView = AdminOrganizationView;
-    app.views.AdminOrganizationFormView = AdminOrganizationFormView;
+    app.views.AdminOrgDisplayView = AdminOrgDisplayView;
+    app.views.AdminOrgFormView = AdminOrgFormView;
 
+    app.views.AdminOfficeDisplayView = AdminOfficeDisplayView;
     app.views.AdminOfficeListView = AdminOfficeListView;
     app.views.AdminOfficeFormView = AdminOfficeFormView;
+    
+    app.views.ItemDisplayView = ItemDisplayView;
+    app.views.ItemFormView = ItemFormView;
+    
     
 })(jQuery, Backbone, _, app);

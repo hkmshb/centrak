@@ -103,11 +103,11 @@
             'update': 'update',
         },
         home: function() {
-            var view = new app.views.AdminOrganizationView({el: this.contentElement});
+            var view = new app.views.AdminOrgDisplayView({el: this.contentElement});
             this.render(view);
         },
         update: function() {
-            var view = new app.views.AdminOrganizationFormView({el: this.contentElement});
+            var view = new app.views.AdminOrgFormView({el: this.contentElement});
             this.render(view);
         }
     }),
@@ -127,10 +127,11 @@
             this.manage({el: this.contentElement, edit: true});
         },
         view: function(office_code) {
-            this.manage({
+            var view = new app.views.AdminOfficeDisplayView({
                 el: this.contentElement,
-                office_code: office_code, edit: false
-            })
+                itemId: office_code
+            });
+            this.render(view);
         },
         update: function(office_code) {
             this.manage({
