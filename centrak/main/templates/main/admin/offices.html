@@ -13,7 +13,7 @@
     <script type="application/json" id="bootstrap">
         {"item": {% if office %}{{ office.to_dict|to_json|safe }}{% else %}""{% endif %},
          "items": {% if offices %}{{ offices|model_to_json|safe }}{% else %}[]{% endif %},
-         "itemId": {% if office %}{{ office.id }}{% else %}""{% endif %}, "ext": {"states": {{ states|to_json|safe }}}}
+         "itemId": {% if office %}{{ office.id }}{% else %}null{% endif %}, "ext": {"states": {{ states|to_json|safe }}}}
     </script>
     {% include 'js_office_templates.html' %}
     {{ block.super }}

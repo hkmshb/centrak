@@ -27,7 +27,7 @@
         });
 
         app.collections.Organizations = Backbone.Collection.extend({
-            model: app.models.Organization,
+            model: app.models.Office,
             url: data.organizations,
         })
 

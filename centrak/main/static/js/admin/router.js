@@ -107,7 +107,10 @@
             this.render(view);
         },
         update: function() {
-            var view = new app.views.AdminOrgFormView({el: this.contentElement});
+            var view = new app.views.AdminOrgFormView({
+                el: this.contentElement, 
+                edit: true
+            });
             this.render(view);
         }
     }),
@@ -116,31 +119,34 @@
         routes: {
             '': 'home',
             'create': 'create',
-            ':office_code/': 'view',
-            ':office_code/update': 'update',
+            ':officeId/': 'view',
+            ':officeId/update': 'update',
         },
         home: function() {
             var view = new app.views.AdminOfficeListView({el: this.contentElement});
             this.render(view);
         },
         create: function() {
-            this.manage({el: this.contentElement, edit: true});
+            this.manage({
+                el: this.contentElement, 
+                edit: true, isHQ: false
+            });
         },
-        view: function(office_code) {
+        view: function(officeId) {
             var view = new app.views.AdminOfficeDisplayView({
                 el: this.contentElement,
-                itemId: office_code
+                itemId: officeId
             });
             this.render(view);
         },
-        update: function(office_code) {
+        update: function(officeId) {
             this.manage({
                 el: this.contentElement,
-                office_code: office_code, edit: true
-            })
+                itemId: officeId, edit: true
+            });
         },
         manage: function(options) {
-            var view = new app.views.AdminOfficeFormView(options);
+            var view = new app.views.AdminRegionFormView(options);
             this.render(view);
         }
     }),

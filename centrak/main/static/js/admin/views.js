@@ -15,8 +15,12 @@
             this._url = window.location.href.replace('#', '');
         },
         render: function() {
-            var context = this.getContext()
-              , html = this._template(context)
+            // safe guard against attempt to render view when all
+            // context parameters aren't available yet...
+            var context = this.getContext();
+            if (_.isEmpty(context)) return;
+
+            var html = this._template(context)
               , canvas = this.getCanvas();
             
             canvas.html(html);
@@ -70,32 +74,37 @@
             // load boostrapped data
             var self = this, $bs = $('#bootstrap');
             self._bs_data = JSON.parse($bs.text());
-            if (!_.isNull(self._bs_data.item)) {
+            if (!_.isEmpty(self._bs_data.item)) {
                 self._item = new self._itemCtor(self._bs_data.item);
                 self._bs_data.item = null;
                 $bs.text(JSON.stringify(self._bs_data));
             } else {
-                self._item = new self._itemCtor({id: self._bs_data.itemId});
+                var id = (options.itemId || self._bs_data.itemId);
+                self._item = new self._itemCtor({id: id});
                 self._item.fetch({
                     success: $.proxy(self.render, self),
                     error: $.proxy(function(m, r, o) {
                         this.showMessage(r.statusText);
                     }, self)
-                })
+                });
             }
         },
         events: {
             'click button.edit': 'update'
         },
         update: function() {
-            app.router.r.navigate('#/update', {trigger: true});
+            var id = this._item.has('code')? '/' + this._item.get('id'): '';
+            app.router.r.navigate('#' + id + '/update', {trigger: true});
         },
         getContext: function() {
-            return {
-                title: this.title,
-                item: this._item,
-                ext: this._bs_data.ext
+            if (!_.isEmpty(this._item)) {
+                return {
+                    title: this.title,
+                    item: this._item,
+                    ext: this._bs_data.ext
+                };
             }
+            return null;
         }
     }),
     
@@ -119,12 +128,21 @@
                 });
             }
         },
+        events: {
+            'click button.add': 'create',
+        },
+        create: function() {
+            window.location = (this._url + '#/create');
+        },
         getContext: function() {
-            return {
-                title: this.title,
-                items: this._collection,
-                ext: this._bs_data.ext,
+            if (!_.isEmpty(this._collection)) {
+                return {
+                    title: this.title,
+                    items: this._collection,
+                    ext: this._bs_data.ext
+                };
             }
+            return null;
         }
     }),
 
@@ -136,14 +154,20 @@
             this._bs_data = JSON.parse($('#bootstrap').text());
             this._itemCtor = options.itemCtor;
             
-            var self = this;
-            this._item = new self._itemCtor({id: this._bs_data.itemId});
-            this._item.fetch({
-                success: $.proxy(self.render, self),
-                error: $.proxy(function(m, r, o) {
-                    self.showMessage(r.statusText);
-                }, self)
-            });
+            var self = this
+              , itemId = (this._bs_data.itemId || options.itemId);
+            if (!_.isNull(itemId)) {
+                this._item = new self._itemCtor({id: itemId});
+                this._item.fetch({
+                    success: $.proxy(self.render, self),
+                    error: $.proxy(function(m, r, o) {
+                        self.showMessage(r.statusText);
+                    }, self)
+                });
+            } else {
+                this._item = new self._itemCtor();
+                self.render();
+            }
         },
         events: {
             'click button.save': 'saveUpdate',
@@ -181,10 +205,14 @@
             return changes;
         },
         getContext: function() {
-            return {
-                item: this._item,
-                ext: this._bs_data.ext
+            if (!_.isEmpty(this._item)) {
+                return {
+                    title: this.title,
+                    item: this._item,
+                    ext: this._bs_data.ext
+                };
             }
+            return null;
         },
         serializeForm: function(form) {
             return _.object(_.map(form.serializeArray(), function(item) {
@@ -958,6 +986,7 @@
                     urlRoot: app.organizations.url
                 });
                 ItemDisplayView.prototype.initialize.apply(self, args);
+                self.render();
             });
         }
     }),
@@ -971,6 +1000,9 @@
                     urlRoot: app.organizations.url
                 });
                 ItemFormView.prototype.initialize.apply(self, args);
+                self._bs_data.ext.edit = options.edit;
+                self._bs_data.ext.isHQ = true;
+                self.render();
             });
         }
     }),
@@ -979,15 +1011,16 @@
         title: 'Regions',
         initialize: function(options) {
             var self=this, args=arguments;
-            options.collection = app.offices;
             app.collections.ready.done(function() {
+                options.collection = app.offices;
                 ListDisplayView.prototype.initialize.apply(self, args);
+                self.render();
             });
         }
     }),
 
     AdminOfficeDisplayView = ItemDisplayView.extend({
-        title: '?',
+        title: 'Regional Office',
         initialize: function(options) {
             var self = this, args = arguments;
             app.collections.ready.done(function() {
@@ -999,161 +1032,19 @@
         }
     }),
 
-    AdminOfficeListView2 = TemplateView.extend({
-        innerEl: '#l-content',
-        templateName: '#regions-template',
-        initialize: function() {
-            $('.loading').addClass('hide');
-            TemplateView.prototype.initialize.apply(this, arguments);
-            this.url = window.location.href.replace('#', '');
-            var self = this, $bs = $('#bootstrap');
-
-            app.collections.ready.done(function() {
-                this.bs_data = JSON.parse($bs.text());
-                if (!_.isNull(this.bs_data.offices)) {
-                    app.offices.reset(this.bs_data.offices);
-                    this.bs_data.offices = null;
-                    $bs.text(JSON.stringify(this.bs_data));
-                    self.render();
-                } else {
-                    app.offices.fetch({
-                        reset: true, 
-                        success: $.proxy(self.render, self)
-                    });
-                }
-            });
-        },
-        events: {
-            'click button.add': 'createOffice',
-        },
-        createOffice: function() {
-            window.location = (this.url + '#/create');
-        },
-        getContext: function() {
-            return {
-                'offices': app.offices
-            }
-        }
-    }),
-    
-    AdminOfficeFormView = TemplateView2.extend({
-        title: 'boo',
-        innerEl: '#l-content',
-        templateName: '#form-template',
+    AdminRegionFormView = ItemFormView.extend({
+        title: 'Region',
         initialize: function(options) {
-            $('.loading').addClass('hide');
-            TemplateView2.prototype.initialize.apply(this, arguments);
-            this.office_code = options.office_code;
-            this.editable = options.edit || false;
-            var self = this;
-
-            // load bootstrapped data
-            this.bs_data = JSON.parse($('#bootstrap').text());
-            if (!_.isEmpty(options.office_code)) {
-                if (_.isEmpty(app.offices) || app.offices.length === 0) {
-                    this.close();
-                } else {
-                    var q = {code: options.office_code}
-                      , o = app.offices.findWhere(q);
-                    
-                    if (_.isEmpty(o)) this.close();
-                    self.office = o;
-                }
-            }
-        },
-        events: {
-            'click button.save': 'manageOne',
-            'click button.edit': 'updateOne',
-            'click button.cancel': 'close',
-        },
-        close: function() {
-            var r = '';
-            if (!_.isEmpty(this.office) && this.editable) {
-                r = '/' + this.office.get('code') + '/';
-            }
-            app.router.r.navigate(r, {trigger: true});
-        },
-        manageOne: function() {
-            var self = this, changes = null;
-            if (_.isEmpty(this.office)) {
-                changes = this.getChanges();
-                app.offices.create(changes, {
-                    wait: true,
-                    success: function(model, resp, options) {
-                        self.showMessage('Office created successfully', 'success');
-                    },
-                    fail: function(model, resp, options) {
-                        self.showMessage(resp, 'danger');
-                    }
-                })
-            } else {
-                changes = this.getChanges(true);
-                this.office.save(changes, {
-                    wait: true, patch: true,
-                    success: function(model, resp, options) {
-                        app.offices.add(model, {merge: true});
-                        self.office = app.offices.findWhere({code: self.office_code});
-                        self.showMessage('Office update successfully', 'success');
-                    },
-                    error: function(model, resp, options) {
-                        self.showMessage('Update failed.', 'danger');
-                    }
-                })
-            }
-        },
-        updateOne: function() {
-
-        },
-        getChanges: function(isUpdate) {
-            var field = null
-              , fields = ['code','name','phone','email','addr_street','addr_town',
-                    'postal_code','addr_state']
-              , changes = {
-                  last_updated: moment().format(),
-                  code: this.$code.val(),
-                  name: this.$name.val(),
-                  phone: this.$phone.val(),
-                  email: this.$email.val(),
-                  addr_street: this.$addr_street.val(),
-                  addr_town: this.$addr_town.val(),
-                  addr_state: this.$addr_state.val(),
-                  postal_code: this.$postal_code.val(),
-                  level: 'L1', parent: null
-              };
-            
-            for (var i in fields) {
-                field = fields[i];
-                if (this.office && this.office.get(field) == changes[field]) {
-                    delete changes[field];
-                }
-            }
-            if (isUpdate) {
-                changes.id = (this.office.has('_id')
-                                  ? this.office.get('_id').$oid
-                                  : this.office.get('id'));
-            }
-            return changes;
-        },
-        getContext: function() {
-            return {
-                title: this.title,
-                item: this.office,
-                ext: this.bs_data.ext,
-                editable: this.editable
-            }
-        },
-        render: function() {
-            TemplateView2.prototype.render.apply(this, arguments);
-            $('#r-content', this.$el).html('');
-
-            this.$code = $('input.code', this.$el);
-            this.$name = $('input.name', this.$el);
-            this.$phone = $('input.phone', this.$el);
-            this.$email = $('input.email', this.$el);
-            this.$addr_street = $('input.addr_street', this.$el);
-            this.$addr_town = $('input.addr_town', this.$el);
-            this.$addr_state = $('input.addr_state', this.$el);
-            this.$postal_code = $('input.postal_code', this.$el);
+            var self=this, args=arguments;
+            app.collections.ready.done(function() {
+                options.itemCtor = app.models.Office.extend({
+                    urlRoot: app.offices.url
+                });
+                ItemFormView.prototype.initialize.apply(self, args);
+                self._bs_data.ext.edit = options.edit;
+                self._bs_data.ext.isHQ = false;
+                self._bs_data.ext.level = 'L1';
+            });
         }
     });
 
@@ -1173,10 +1064,7 @@
 
     app.views.AdminOfficeDisplayView = AdminOfficeDisplayView;
     app.views.AdminOfficeListView = AdminOfficeListView;
-    app.views.AdminOfficeFormView = AdminOfficeFormView;
-    
-    app.views.ItemDisplayView = ItemDisplayView;
-    app.views.ItemFormView = ItemFormView;
+    app.views.AdminRegionFormView = AdminRegionFormView;
     
     
 })(jQuery, Backbone, _, app);
