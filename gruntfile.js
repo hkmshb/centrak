@@ -34,9 +34,10 @@ module.exports = function(grunt) {
                     {dest:destCSS, src:['fbower_comps/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'], expand:true, flatten:true},
                     {dest:destCSS, src:['fbower_comps/select2/dist/css/select2.min.css'], expand:true, flatten:true},
                     {dest:destCSS, src:['fbower_comps/select2-bootstrap-theme/dist/select2-bootstrap.min.css'], expand:true, flatten:true},
-                    
-                    // font-awesome
                     {dest:destCSS, src:['fbower_comps/font-awesome/css/font-awesome.min.css'], expand:true, flatten:true},
+
+                    // fonts
+                    {dest:destFONT, src:['fbower_comps/bootstrap/dist/fonts/*.*'], expand:true, flatten:true},
                     {dest:destFONT, src:['fbower_comps/font-awesome/fonts/*.*'], expand:true, flatten:true},
                     
                     // scripts
