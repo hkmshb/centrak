@@ -3,8 +3,9 @@ __pycache__
 .settings
 
 
-celerybeat*.*
 centrak/**/css/*.css
+local_settings.py
+celerybeat*.*
 .*project
 *.sqlite3
 *.py[co]

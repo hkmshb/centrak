@@ -143,7 +143,7 @@ STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage
 STATIC_ROOT = os.path.join(ROOT_DIR, 'public', 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(SOURCE_DIR, 'fbower_comps'),
+    os.path.join(SOURCE_DIR, 'fbower_comps', '_libs'),
 ]
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -233,5 +233,5 @@ SURVEY_API_ROOT = 'http://survey.kedco.ng/api/v1/data'
 SURVEY_AUTH_API_ROOT = 'http://survey.kedco.ng/api/v1/user'
 
 
-## uncomment for staging/production deployment
-#: from .local_settings import *
+# create/alter local_settings to change settings herein
+from .local_settings import *
