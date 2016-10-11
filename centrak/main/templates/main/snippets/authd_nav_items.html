@@ -3,6 +3,7 @@
 <li class="strip-admin">
     <a href="{% url 'admin-home' %}">
         <i class="fa fa-fw fa-lg fa-wrench"></i>
+        <span class="text">Admin</span>
     </a>
 </li>
 <li class="sep">|</li>
@@ -11,6 +12,7 @@
     <a href="#">
         <i class="fa fa-fw fa-lg fa-bell-o"></i> 
         <span class="badge text-sm bg-danger">0</span>
+        <span class="text">Messages & Notifications</span>
     </a>
 </li>
 <li class="sep">|</li>
@@ -24,6 +26,6 @@
         <li><a href="#"><i class="fa fa-fw"></i> Edit Profile</a></li>
         <li><a href="#"><i class="fa fa-fw fa-cog"></i> Settings</a></li>
         <li class="divider"></li>
-        <li><a href="{% url 'logout' %}"><i class="fa fa-fw fa-sign-out"></i> Log Out</a></li>
+        <li class="logout"><a href="{% url 'logout' %}"><i class="fa fa-fw fa-sign-out"></i> Log Out</a></li>
     </ul>
 </li>

@@ -44,7 +44,7 @@
         syncSelection: function(event) {
             var count = this.getCheckedControls().length;
             if (count === 0) {
-                app.$fn.dialog.alert('XForm Sync', 
+                app.$hs.dialog.alert('XForm Sync', 
                     'Need to select at least 1 form to sync.');
             } else {
                 $('form.xforms').submit();

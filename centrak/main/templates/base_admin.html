@@ -13,7 +13,7 @@
     </script>
 {% endblock %}
 {% block script-extra %}{% compress js %}
-    <script src="{% static 'js/app.js' %}"></script>
+    {{ block.super }}
     <script src="{% static 'js/admin/models.js' %}"></script>
     <script src="{% static 'js/admin/collections.js' %}"></script>
     <script src="{% static 'js/admin/views.js' %}"></script>

@@ -1,5 +1,5 @@
 {% extends 'skeleton.html' %}
-{% load staticfiles %}
+{% load staticfiles compress %}
 {% block skeleton-content %}
     <div class="navbar navbar-default navbar-fixed-top light-shadow">
         <div class="container">
@@ -75,3 +75,7 @@
         </div>
     </footer>
 {% endblock %}
+{% block script-extra %}{% compress js %}
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/common.js' %}"></script>
+{% endcompress %}{% endblock %}

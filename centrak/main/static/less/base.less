@@ -339,30 +339,55 @@ p.mini {
 
 
 // navbar-nav
-
 .navbar-nav {
+    background: #eee;
     li.strip-user > a {
-        padding: 5px 5px 5px 5px;
-        margin: 10px auto auto;
-        
+        margin: 0px;
+        padding: 5px 15px;
+
         img {
-            margin-top: -3px;
-            margin-right: 3px;
+            margin: 0px;
         }
     }
-    
+
     li.strip-notification {
         .badge {
-            margin-top: -18px;
-            margin-left: -10px;
+            float: right;
         }
-        .badge.text-sm {
-            padding: 2px 4px;
-            font-size: 10px;
-            font-weight: normal;
+    }
+}
+    
+@media (min-width: 768px) {
+    .navbar-nav {
+        background: transparent;
+        li > a > span.text {
+            display: none;
         }
-        .badge.bg-danger {
-            background-color: @brand-danger;
+
+        li.strip-notification {
+            .badge {
+                float: none;
+                margin-top: -18px;
+                margin-left: -10px;
+            }
+            .badge.text-sm {
+                padding: 2px 4px;
+                font-size: 10px;
+                font-weight: normal;
+            }
+            .badge.bg-danger {
+                background-color: @brand-danger;
+            }
+        }
+
+        li.strip-user > a {
+            padding: 5px 5px 5px 5px;
+            margin: 10px auto auto;
+            
+            img {
+                margin-top: -3px;
+                margin-right: 3px;
+            }
         }
     }
 }

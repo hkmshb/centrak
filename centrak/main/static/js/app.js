@@ -13,7 +13,7 @@ var app = (function($){
         app.conf = JSON.parse(config.text());
     }
     
-    app.$fn = {
+    app.$hs = {
         dialog: {
             alert: function(title, message) {
                 var f = $('#modal-alert');
@@ -36,10 +36,22 @@ var app = (function($){
     };
     
     $(document).ready(function(){
-        // routing
-        var ri = $('.app');
-        app.router =  app.router(ri.data('r'), ri.data('v'));
-        app.router.route();
+        try {
+            var $rf = $('.app'), $lk = $('li.logout');
+
+            // removes apiToken on logout
+            if (!_.isEmpty($lk)) {
+                $lk.on('click', function() {
+                    app.$hs.auth.initForLogout();
+                });
+            }
+
+            // initiates SPA routing...
+            app.router =  app.router($rf.data('r'), $rf.data('v'));
+            app.router.route();
+        } catch (e) {
+            // do nothing
+        }
     });
     
     return app;

@@ -16,14 +16,14 @@
             <div class="form-body form-border">
                 <div class="form-group">
                     <label for="username">User KEDCO Email Address</label>
-                    <input type="email" name="username" class="form-control input-sm
+                    <input type="email" name="username" class="username form-control input-sm"
                            autocomplete="off" tabindex="1" value="{{ form.username.value|default:'' }}" 
                            required="" />
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
                     <span><a href="{% url 'password-reset' %}" tabindex="4">Forgot Password?</a></span>
-                    <input type="password" name="password" class="form-control input-sm"
+                    <input type="password" name="password" class="password form-control input-sm"
                            tabindex="2" required="" />
                 </div>
                 <button type="submit" class="btn btn-success btn-block" tabindex="3">Login</button>
@@ -40,4 +40,18 @@
 {% endblock %}
 {% block style-extra %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}" />
+{% endblock %}
+{% block script-extra %}
+    <script id="config" type="text/json">
+        { "apiLogin": "{% url 'api-token' %}" }
+    </script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/common.js' %}"></script>
+    <script type="text/javascript">
+        (function($){
+            $(document).ready(function() {
+                app.$hs.auth.initForLogin();
+            });
+        })(jQuery);
+    </script>
 {% endblock %}

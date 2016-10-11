@@ -339,7 +339,7 @@
               , title='Clear Token'
               , message = 'Are you sure you want to clear the token?';
             
-            app.$fn.dialog.confirm(title, message, function() {
+            app.$hs.dialog.confirm(title, message, function() {
                 $.post(self.survey_token_url, {'value':null})
                     .success($.proxy(self.tokenApplyPass, self))
                     .fail($.proxy(self.displayError, self));
@@ -556,7 +556,7 @@
         sendAuth: function(xhr) {
             xhr.setRequestHeader(
                 'Authorization', 
-                'Token ' + app.$fn.getCookie('survey_auth_token'));
+                'Token ' + app.$hs.getCookie('survey_auth_token'));
         }
     }),
     
