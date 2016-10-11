@@ -988,6 +988,10 @@
                 ItemDisplayView.prototype.initialize.apply(self, args);
                 self.render();
             });
+        },
+        render: function() {
+            ItemDisplayView.prototype.render.apply(this, arguments);
+            $('button.done', this.$innerEl).addClass('hide');
         }
     }),
     
@@ -1029,6 +1033,14 @@
                 });
                 ItemDisplayView.prototype.initialize.apply(self, args);
             });
+        },
+        events: function() {
+            return _.extend({}, ItemDisplayView.prototype.events, {
+                'click button.done': 'done',
+            });
+        },
+        done: function() {
+            app.router.r.navigate('#', {trigger: true});   
         }
     }),
 

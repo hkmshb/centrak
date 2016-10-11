@@ -141,6 +141,7 @@
         },
         update: function(officeId) {
             this.manage({
+                urlBack: '#/' + officeId + '/',
                 el: this.contentElement,
                 itemId: officeId, edit: true
             });
