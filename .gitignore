@@ -1,20 +1,11 @@
 node_modules
+fbower_comps
 __pycache__
 .settings
 
 
-centrak/**/css/*.css
-local_settings.py
-celerybeat*.*
 .*project
 *.sqlite3
 *.py[co]
 *.log
 .*
-
-##: special handling for bower components
-#:: ignore all components
-fbower_comps/*
-
-#:: exclude _libs
-!fbower_comps/_libs
