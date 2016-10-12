@@ -9,8 +9,9 @@
         templateName: '',
         initialize: function(options) {
             this._options = (options || {});
-            this.innerEl = this.innerEl || this._options.innerEl;
-            this.templateName = this.templateName || this._options.templateName;            
+            this.title = this._options.title || this.title;
+            this.innerEl = this._options.innerEl || this.innerEl;
+            this.templateName = this._options.templateName || this.templateName;
             this._template = _.template($(this.templateName).html());
             this._url = window.location.href.replace('#', '');
         },
@@ -109,21 +110,28 @@
     }),
     
     ListDisplayView = TemplateView.extend({
+        _filter: null,
+        _ignoreBS: false,
         innerEl: '#l-content',
         templateName: '#list-template',
         initialize: function(options) {
             TemplateView.prototype.initialize.apply(this, arguments);
             this._collection = options.collection;
-            var self = this, $bs = $('#bootstrap');
             
+            var self = this, $bs = $('#bootstrap');
             this._bs_data = JSON.parse($bs.text());
-            if (!_.isNull(this._bs_data.items)) {
+            if (!this._ignoreBS && !_.isNull(this._bs_data.items)) {
                 this._collection.reset(this._bs_data.items);
                 this._bs_data.items = null;
                 $bs.text(JSON.stringify(this._bs_data));
+
+                // filter the collection
+                this._collection = this.filter(this._collection);
             } else {
                 this._collection.fetch({
                     reset: true,
+                    processData: true,
+                    data: (self._filter || {}),
                     success: $.proxy(self.render, self)
                 });
             }
@@ -132,7 +140,11 @@
             'click button.add': 'create',
         },
         create: function() {
-            window.location = (this._url + '#/create');
+            // window.location = (this._url + '#/create');
+            app.router.r.navigate('#/create', {trigger:true});
+        },
+        filter: function(coll) {
+            return coll;
         },
         getContext: function() {
             if (!_.isEmpty(this._collection)) {
@@ -299,15 +311,22 @@
         }
     }),
     
-    MultiViewManager = TemplateView.extend({
+    MultiViewManager = Backbone.View.extend({
         _comps: null,
         initialize: function(options) {
-            $('.loading').addClass('hide');
             this._comps = (options.comps || []);
         },
         render: function() {
+            $('.loading').addClass('hide');
             _(this._comps).each(function(c) {
                 c.render();
+            });
+        },
+        remove: function() {
+            Backbone.View.prototype.remove.apply(this, arguments);
+            _(this._comps).each(function(c) {
+                $(c.innerEl, c.el).html('');
+                c.undelegateEvents();
             });
         }
     }),
@@ -974,7 +993,7 @@
     }),
     
     
-    /*-----------------------------------------------------------------------+
+   /*-----------------------------------------------------------------------+
     | Admin Organization View 
     +---------------------------------------------------------------------- */
     AdminOrgDisplayView = ItemDisplayView.extend({
@@ -1012,14 +1031,21 @@
     }),
 
     AdminOfficeListView = ListDisplayView.extend({
+        level: 'L1',
         title: 'Regions',
         initialize: function(options) {
-            var self=this, args=arguments;
+            var self = this , args = arguments;
+            this.level = (options.level || this.level);
+            this._filter = {'level': this.level};
+
             app.collections.ready.done(function() {
                 options.collection = app.offices;
                 ListDisplayView.prototype.initialize.apply(self, args);
                 self.render();
             });
+        },
+        filter: function(collection) {
+            return collection.byLevel(this.level);
         }
     }),
 
@@ -1058,7 +1084,53 @@
                 self._bs_data.ext.level = 'L1';
             });
         }
-    });
+    }),
+    
+    AdminServicePointListView = ListDisplayView.extend({
+        level: 'L2',
+        _ignoreBS: true,
+        title: 'Service Points',
+        initialize: function(options) {
+            var self = this , args = arguments;
+            this.level = (options.level || this.level);
+            this._ignoreBS = true;
+            this._filter = {'level': this.level,
+                            'parent': options.parentId };
+            app.collections.ready.done(function() {
+                options.collection = app.offices;
+                ListDisplayView.prototype.initialize.apply(self, args);
+                self.render();
+            });
+        },
+        filter: function(collection) {
+            return collection.byLevel(this.level);
+        },
+        events: {
+            'click button.add': 'create',
+        },
+        create: function() {
+            var hash = '#/' + this._options.parentId + '/sp/create';
+            app.router.r.navigate(hash, {trigger: true});
+        }
+    }),
+    
+    AdminServicePointFormView = ItemFormView.extend({
+        title: 'Service Point',
+        initialize: function(options) {
+            var self=this, args=arguments;
+            app.collections.ready.done(function() {
+                options.itemCtor = app.models.Office.extend({
+                    urlRoot: app.offices.url
+                });
+                ItemFormView.prototype.initialize.apply(self, args);
+                self._bs_data.ext.parent = options.parentId;
+                self._bs_data.ext.edit = options.edit;
+                self._bs_data.ext.level = 'L2';
+            })
+        }
+    }),
+    
+    AdminServicePoint;
 
     // register views
     app.views.ApiServiceView = ApiServiceView;
@@ -1077,6 +1149,9 @@
     app.views.AdminOfficeDisplayView = AdminOfficeDisplayView;
     app.views.AdminOfficeListView = AdminOfficeListView;
     app.views.AdminRegionFormView = AdminRegionFormView;
+
+    app.views.AdminServicePointListView = AdminServicePointListView;
+    app.views.AdminServicePointFormView = AdminServicePointFormView;
     
     
 })(jQuery, Backbone, _, app);

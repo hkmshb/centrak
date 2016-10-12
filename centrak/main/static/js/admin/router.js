@@ -121,6 +121,7 @@
             'create': 'create',
             ':officeId/': 'view',
             ':officeId/update': 'update',
+            ':officeId/sp/create': 'createServicePoint',
         },
         home: function() {
             var view = new app.views.AdminOfficeListView({el: this.contentElement});
@@ -133,10 +134,17 @@
             });
         },
         view: function(officeId) {
-            var view = new app.views.AdminOfficeDisplayView({
-                el: this.contentElement,
-                itemId: officeId
-            });
+            var comp1 = new app.views.AdminOfficeDisplayView({
+                            el: this.contentElement,
+                            innerEl: '#l-content',
+                            itemId: officeId}),
+                comp2 = new app.views.AdminServicePointListView({
+                            el: this.contentElement,
+                            innerEl: '#r-content',
+                            parentId: officeId}),
+                view  = new app.views.MultiViewManager({
+                            comps: {'l': comp1, 'r': comp2}
+                        });
             this.render(view);
         },
         update: function(officeId) {
@@ -148,6 +156,21 @@
         },
         manage: function(options) {
             var view = new app.views.AdminRegionFormView(options);
+            this.render(view);
+        },
+        createServicePoint: function(officeId) {
+            var comp1 = new app.views.AdminOfficeDisplayView({
+                            el: this.contentElement,
+                            innerEl: '#l-content',
+                            itemId: officeId}),
+                comp2 = new app.views.AdminServicePointFormView({
+                            urlBack: '#/' + officeId + '/',
+                            el: this.contentElement,
+                            innerEl: '#r-content',
+                            parentId: officeId}),
+                view  = new app.views.MultiViewManager({
+                            comps: {'l': comp1, 'r': comp2}
+                        });
             this.render(view);
         }
     }),

@@ -1,9 +1,11 @@
-from rest_framework import authentication, permissions
+from rest_framework import authentication, permissions, filters
 from rest_framework import viewsets as drf_viewsets
 from rest_framework_mongoengine import viewsets
 
 from core.models import Organization, BusinessOffice
 from enumeration.models import Station, PowerLine, Project, XForm
+
+from .forms import BusinessOfficeFilter
 
 from .serializers import StationSerializer, PowerLineSerializer, \
         ProjectSerializer, XFormSerializer, OrganizationSerializer, \
@@ -26,7 +28,11 @@ class DefaultMixin(object):
     paginate_by_param = 'page_size'
     max_paginate_by = 100
     paginate_by = 25
-
+    filter_backends = (
+        filters.DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    )
 
 
 class StationViewSet(DefaultMixin, viewsets.ModelViewSet):
@@ -69,3 +75,6 @@ class BusinessOfficeViewSet(DefaultMixin, drf_viewsets.ModelViewSet):
 
     queryset = BusinessOffice.objects.order_by('level', 'id')
     serializer_class = BusinessOfficeSerializer
+    filter_class = BusinessOfficeFilter
+    ordering_fields = ('name', 'code',)
+

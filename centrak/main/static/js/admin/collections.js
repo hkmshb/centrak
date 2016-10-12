@@ -34,6 +34,13 @@
         app.collections.Offices = Backbone.Collection.extend({
             model: app.models.Office,
             url: data.offices,
+
+            byLevel: function(level) {
+                var filtered = this.filter(function(m) {
+                    return m.get("level") === level;
+                });
+                return new app.collections.Offices(filtered);
+            }
         });
         
         // create collection instances

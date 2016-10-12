@@ -116,7 +116,7 @@ class Organization(BusinessEntity):
 
 
 class BusinessOffice(BusinessEntity):
-    code = models.CharField(_('Code'), max_length=5, unique=True)
+    code = models.CharField(_('Code'), max_length=10, unique=True)
     level = models.ForeignKey(BusinessLevel, verbose_name=_('Level'), 
                 null=True, on_delete=models.SET_NULL)
     parent = models.ForeignKey('self', verbose_name=_('Parent Office'),
