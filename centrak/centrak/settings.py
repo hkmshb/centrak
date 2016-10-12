@@ -23,7 +23,7 @@ INST_DIR = os.path.join(ROOT_DIR, 'instance')
 SECRET_KEY = '-g!@ij9zw4vfk+nso%+blz@9@-=)lwe-+(kt+x=ojlpg6ph(8p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'on') == 'on'
 ALLOWED_HOSTS = []
 
 
@@ -36,7 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # centrak
+    # third-party
+    
+    # internal
     'main'
 )
 
@@ -96,3 +98,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(ROOT_DIR, 'static')
+]

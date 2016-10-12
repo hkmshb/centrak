@@ -1,0 +1,29 @@
+{
+  "name": "centrak",
+  "description": "Customer Enumeration Activity Tracking Portal",
+  "main": "",
+  "authors": [
+    "hkmshb <hkmshb@gmail.com>"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "centrak",
+    "enumeration",
+    "customer-enumeration"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "fbower_comps",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.4",
+    "jquery-validation": "^1.15.0",
+    "bootstrap": "^3.3.6",
+    "font-awesome": "^4.5.0"
+  }
+}

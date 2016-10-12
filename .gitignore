@@ -9,3 +9,5 @@ instance
 *.py[co]
 *.log
 .*
+
+static/css/*.css

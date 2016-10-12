@@ -1,0 +1,53 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}CENTrak{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="{% block meta-keywords %}{% endblock %}">
+    <meta name="description" content="{% block meta-description %}{% endblock %}">
+    {% block meta-extra %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/libs/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/libs/font-awesome.min.css' %}" />
+    {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}
+    {% block head-extra %}{% endblock %}
+</head>
+<body id="{% block body-id %}body{% endblock %}" class="{% block body-class %}{% endblock %}">
+    {% block skeleton-content %}{% endblock %}
+    
+    <div id="modals">
+        <div id="modal-alert" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header"><h3>Title</h3></div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary ok" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="modal-confirm" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header"><h3>Title</h3></div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-primary yes">Yes</button>
+                        <button class="btn btn-sm btn-danger no" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ===+: le scripts  -->
+    <script src="{% static 'js/libs/jquery.min.js' %}"></script>
+    <script src="{% static 'js/libs/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'js/libs/bootstrap.min.js' %}"></script>
+    {% block script-extra %}{% endblock %}
+</body>
+</html>
