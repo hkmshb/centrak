@@ -160,3 +160,77 @@ footer {
         color: red;
     }
 }
+
+
+/* ==============================+
+ |  extras
+ + =====================================================================*/
+@import "components.less";
+
+/* ==============================+
+ |  bootstrap overrides
+ + =====================================================================*/
+
+@media (min-width: 768px) {
+    .container {
+        width: 980px;
+    }
+}
+
+ // dropdown-menu
+ ul.dropdown-menu {
+     font-family: @b-font-stack;
+     font-size: 13px;
+ }
+
+ ul.dropdown-menu.wide-menu {
+     li > a { padding: 3px 10px; }
+ }
+
+// navbar-nav
+.navbar-nav {
+    background: #eeeeee;
+    li.strip-user > a {
+        margin: 0px;
+        padding: 5px 15px;
+        img { margin: 0px; }
+    }
+    li.strip-notification {
+        .badge { float: right; }
+    }
+}
+
+@media (min-width: 768px) {
+    .navbar-nav {
+        background: transparent;
+        li > a > span.text {
+            display: none;
+        }
+
+        li.strip-notification {
+            .badge {
+                float: none;
+                margin-top: -18px;
+                margin-left: -10px;
+            }
+            .badge.text-sm {
+                padding: 2px 4px;
+                font-size: 10px;
+                font-weight: normal;
+            }
+            .badge.bg-danger {
+                background-color: @brand-danger;
+            }
+        }
+
+        li.strip-user > a {
+            padding: 5px 5px 5px 5px;
+            margin: 10px auto auto;
+            
+            img {
+                margin-top: -3px;
+                margin-right: 3px;
+            }
+        }
+    }
+}

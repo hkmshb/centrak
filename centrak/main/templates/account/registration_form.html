@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<div class="panel panel-default panel-sq form-column">
+    <div class="panel-heading">
+        Create a CENTrak Account
+    </div>
+    <div class="panel-body">
+        <form method="post" class="form-register">
+            <div class="form-group {% if form.first_name.errors %}has-error{% endif %}">
+                <label for="{{ form.first_name.id_for_label }}">First Name
+                {% if form.first_name.errors %}
+                    <span class="text-danger" title="{{ form.first_name.errors|first }}"><i class="fa fa-wa fa-info-circle"></i></span>
+                {% endif %}
+                </label>
+                {{ form.first_name }} 
+            </div>
+            <div class="form-group {% if form.last_name.errors %}has-error{% endif %}">
+                <label for="{{ form.last_name.id_for_label }}"> Last Name
+                {% if form.last_name.errors %}
+                    <span class="text-danger" title="{{ form.last_name.errors|first }}"><i class="fa fa-wa fa-info-circle"></i></span>
+                {% endif %}
+                </label>
+                {{ form.last_name }}
+            </div>
+            <div class="form-group {% if form.email.errors %}has-error{% endif %}">
+                <label for="{{ form.email.id_for_label }}">KEDCO Email
+                {% if form.email.errors %}
+                    <span class="text-danger" title="{{ form.email.errors|first }}"><i class="fa fa-wa fa-info-circle"></i></span>
+                {% endif %}
+                </label>
+                {{ form.email }} 
+                <p class="note">This will be your username - would be verified before account activation.</p>
+            </div>
+            <div class="form-group {% if form.password1.errors %}has-error{% endif %}">
+                <label for="{{ form.password1.id_for_label }}">Password
+                {% if form.password1.errors %}
+                    <span class="text-danger" title="{{ form.password1.errors|first }}"><i class="fa fa-wa fa-info-circle"></i></span>
+                {% endif %}
+                </label>
+                {{ form.password1 }} 
+            </div>
+            <div class="form-group {% if form.password2.errors %}has-error{% endif %}">
+                <label for="{{ form.password2.id_for_label }}">Confirm Password
+                {% if form.password2.errors %}
+                    <span class="text-danger" title="{{ form.password2.errors|first }}"><i class="fa fa-wa fa-info-circle"></i></span>
+                {% endif %}
+                </label>
+                {{ form.password2 }} 
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success pull-right">Create An Account</button>
+                {% csrf_token %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block style-extra %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}" />
+{% endblock %}

@@ -10,6 +10,7 @@ module.exports = function(grunt) {
             dist: {
                 files: {
                     'static/css/site.css': 'static/less/site.less',
+                    'static/css/account.css': 'static/less/account.less',
                 }
             }
         },

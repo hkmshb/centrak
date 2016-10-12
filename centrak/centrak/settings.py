@@ -66,6 +66,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # internal
+                'main.context_processors.current_date',
             ],
         },
     },
@@ -101,3 +104,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(ROOT_DIR, 'static')
 ]
+
+
+##: ==+: Auth:
+LOGIN_URL = '/account/login'
+LOGIN_REDIRECT_URL = '/'
+
+
+##: ==+: Internal
+CENTRAK_KEDCO_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']

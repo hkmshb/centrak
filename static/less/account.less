@@ -1,0 +1,60 @@
+@import 'site.less';
+
+
+a, label {
+    font-size: 13px;
+    font-weight: normal;
+    margin-bottom: 0px;
+}
+
+.form-border {
+    border-radius: @border-radius-base;
+    border: solid 1px @panel-inner-border;
+}
+
+.form-column {
+    max-width: 450px;
+    margin-left: 10px;
+}
+
+.form-register {
+    .form-group {
+        p, span.text-danger {
+            font-size: 11px;
+            padding: 2px 0 0 5px;
+        }
+        p.note,
+        p.text-danger,
+        span.text-danger {
+            margin-bottom: 0px;
+        }
+    }
+}
+
+.form-auth {
+    max-width: 330px;
+    padding: 15px;
+    margin: 30px auto;
+    
+    .form-header {
+        padding-bottom: 20px;
+        text-align: center;
+    }
+    .form-body {
+        padding: 15px;
+    }
+    span > a {
+        float: right;
+        
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+
+p.callout-flat {
+    margin-top: 10px;
+    padding: 7px 15px;
+    text-align: center;
+}
+  
