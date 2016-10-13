@@ -1,0 +1,27 @@
+{% if not item.menu.is_admin_view %}
+    {% if item.is_separator %}<li class="divider"></li>{% else %}
+    {% if not item.children %}<li{% if item.is_active %} class="active"{% endif %}>
+        <a href="{{ item.url }}"><i class="fa fa-fw {{ item.icon }}"></i> {{ item.text }}</a></li>{% else %}
+    <li class="dropdown{% if item.is_active %} active{% endif %}">
+        <a href="" class="dropdown-toggle" data-toggle="dropdown">{{ item.text }} <i class="caret"></i></a>
+        <ul class="dropdown-menu">
+        {% for child in item.children %}
+            {% include 'snippets/app_menu_item.html' with item=child %}
+        {% endfor %}
+        </ul>
+    </li> 
+    {% endif %}{% endif %}
+{% else %}
+    {% if item.is_separator %}<hr/>{% else %}
+    {% if not item.children %}<li {% if item.is_active %}class="active"{% endif %}>
+        <a href="{{ item.url }}"><i class="fa fa-fw {{ item.icon }}"></i> {{ item.text }}</a></li>{% else %}
+    <li class="sub-menu">
+        <div>{{ item.text }}</div>
+        <ul class="nav">
+        {% for child in item.children %}
+            {% include 'snippets/app_menu_item.html' with item=child %}
+        {% endfor %}
+        </ul>
+    </li>
+    {% endif %}{% endif %}
+{% endif %}

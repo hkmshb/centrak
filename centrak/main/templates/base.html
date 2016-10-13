@@ -25,22 +25,24 @@
             </div>
         </div>
     </div>
+    {% if request.user.is_authenticated and not menu.is_admin_view %}
     <nav class="header light-shadow header-fixed-top">
         <div class="container">
-            <div class="header-title hide">
+            <div class="header-title">
                 <h1 class="small">{% block header-title %}{% endblock %}</h1>
             </div>
             {% if request.user.is_authenticated %}
             <div class="header-body">
-                <ul class="nav nav-flattabs">
-                {# for item in menu.children #}
-                    {# include 'snippets/app_menu_item.html' with item=item #}
-                {# endfor #}
+                <ul class="nav nav-tabs nav-flattabs">
+                {% for item in menu.children %}
+                    {% include 'snippets/app_menu_item.html' with item=item %}
+                {% endfor %}
                 </ul>
             </div>
             {% endif %}
         </div>
     </nav>
+    {% endif %}
     {% block content-wrapper %}
     <div id="content-wrapper">
         <div class="container">

@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% if request.user.is_staff %}
 <li class="strip-admin">
-    <a href="{# url 'admin-home' #}">
+    <a href="{% url 'admin-home' %}">
         <i class="fa fa-fw fa-lg fa-wrench"></i>
         <span class="text">Admin</span>
     </a>

@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # internal
+                'main.context_processors.menu',
                 'main.context_processors.current_date',
             ],
         },
@@ -113,3 +114,4 @@ LOGIN_REDIRECT_URL = '/'
 
 ##: ==+: Internal
 CENTRAK_KEDCO_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']
+CENTRAK_ADMIN_PREFIX_URL = '/admin/'

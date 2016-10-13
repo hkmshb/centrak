@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block body-class %}adm{% endblock %}
+{% block content %}
+    <div class="side-menu pull-left">
+        <ul class="nav nav-stacked nav-nested">
+        {% for item in menu.children %}
+            {% include 'snippets/app_menu_item.html' with item=item %}
+        {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
