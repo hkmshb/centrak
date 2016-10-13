@@ -1,11 +1,14 @@
 @charset "utf-8";
-@import "../../fbower_comps/bootstrap/less/variables.less";
+@import "variables.less";
+
+
+
+@text-muted2: #999;
 
 
 /* ==============================+
  |  callout
  + =====================================================================*/
-
 .callout {
     padding: 5px 10px;
     margin: 20px 0;
@@ -25,13 +28,113 @@
 
 
 /* ==============================+
+ |  nav-flattabs
+ + =====================================================================*/
+.nav.nav-flattabs {
+    & > li {
+        &  > a {
+            color: @text-color;
+            margin-right: 2px;
+            padding: 12px 15px 6px;
+            line-height: @line-height-base;
+            border-bottom: solid @nav-flattabs-border-size transparent;
+
+            &:focus { background-color: #fff; }
+            &:hover {
+                border-radius: none;
+                background-color: #fff;
+                border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 20%);
+            }
+        }
+
+        &.active > a,
+        &.active > span {
+            &, &:hover, &:focus {
+                color: @nav-tabs-active-link-hover-color;
+                background-color: #fff; // @nav-link-hover-bg;
+                border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 5%);                
+            }
+        }
+    }
+}
+
+
+/* ==============================+
+ |  nav-nested
+ + =====================================================================*/
+.nav.nav-nested {
+    hr { margin: 2px 0px; }
+    li {
+        & > a { 
+            padding: 4px 3px;
+            color:  @text-muted2;  
+            &:hover {
+                background: none;
+                color: @link-color;
+            }
+        }
+        &.active > a,
+        &.active > span {
+            &, &:hover, &:focus {
+                color: @link-color;
+            }
+        }
+    }
+    li > div {
+        margin-top: 5px;
+        padding-left: 5px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+}
+
+
+/* ==============================+
  |  panel-sq
  + =====================================================================*/
-.panel.panel-sq {
+.panel.panel-sq,
+.panel.panel-sqi {
     border-radius: 0px;
     box-shadow: 3px 3px 10px rgba(0,0,0,.3);    // h-len, v-len, blur, spread, colour
 
     .panel-heading {
         font-size: 14px;
+    }
+}
+
+.panel.panel-sqi {
+    .panel-heading {
+        background: #fff;
+    }
+}
+
+
+/* ==============================+
+ |  action-notice
+ + =====================================================================*/
+.action-notice {
+    margin: 40px auto;
+    text-align: center;
+    &, .btn { color: @text-muted2; }
+    .btn {
+        margin-top: 5px;
+    }
+ }
+
+.data-card {
+    .data-row {
+        width: 100%;
+        margin: 1px 0;
+        display: table;
+
+        span {
+            color: @text-muted2; 
+        }
+
+        label {
+            display: block;
+            margin: -3px 0 5px;
+            color: #444;
+        }
     }
 }

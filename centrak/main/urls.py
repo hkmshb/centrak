@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'admin/',
         include([
             url(r'^$', adm_views.admin_home, name='admin-home'),
+            url(r'^org/$', adm_views.org_info, name='admin-org-detail'),
+            url(r'^org/update$', adm_views.manage_org, name='admin-org-update'),
         ])
     ),
 

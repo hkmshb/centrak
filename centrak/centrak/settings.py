@@ -37,9 +37,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # third-party
+    'ezaddress',
     
     # internal
-    'main'
+    'main',
+    'core',
 )
 
 MIDDLEWARE_CLASSES = (

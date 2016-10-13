@@ -1,0 +1,86 @@
+{% extends 'base_admin.html' %}
+{% block content-pane %}
+<div class="hook" data-v="AdminOrganisationForm">
+    <div class="panel panel-default panel-sq">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-building-o"></i> Organisation
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim done" href="{% url 'admin-org-detail' %}">
+                    <i class="fa fa-fw fa-check"></i> Done</a>
+                <button class="btn btn-default btn-sm btn-slim save">
+                    <i class="fa fa-fw fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form method="post">
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}{% if form.name.errors %}
+                        <span class="text-danger" title="{{ form.name.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.name }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.short_name.id_for_label }}">{{ form.short_name.label }}{% if form.short_name.errors %}
+                        <span class="text-danger" title="{{ form.short_name.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.short_name }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}{% if form.phone.errors %}
+                        <span class="text-danger" title="{{ form.phone.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.phone }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}{% if form.email.errors %}
+                        <span class="text-danger" title="{{ form.email.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.email }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.website.id_for_label }}">{{ form.website.label }}{% if form.website.errors %}
+                        <span class="text-danger" title="{{ form.website.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.website }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.addr_street.id_for_label }}">{{ form.addr_street.label }}{% if form.addr_street.errors %}
+                        <span class="text-danger" title="{{ form.addr_street.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.addr_street }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.addr_town.id_for_label }}">{{ form.addr_town.label }}{% if form.addr_town.errors %}
+                        <span class="text-danger" title="{{ form.addr_town.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.addr_town }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}{% if form.postal_code.errors %}
+                        <span class="text-danger" title="{{ form.postal_code.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.postal_code }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.addr_state.id_for_label }}">{{ form.addr_state.label }}{% if form.addr_state.errors %}
+                        <span class="text-danger" title="{{ form.addr_state.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label> 
+                    {{ form.addr_state }}
+                </div>
+            </div>
+            {% csrf_token %}
+            </form>
+        </body>
+    </div>
+</div>
+{% endblock %}

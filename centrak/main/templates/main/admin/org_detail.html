@@ -1,0 +1,71 @@
+{% extends 'base_admin.html' %}
+{% block content-pane %}
+<div class="hook">
+    <div class="panel panel-default panel-sq">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-building-o"></i> Organisation
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-org-update' %}">
+                    <i class="fa fa-fw fa-pencil"></i> Update
+                </a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="data-card col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad">
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Name</span><label>{{ org.name }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Short Name</span><label>{{ org.short_name }} </label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Phone</span> <label> {{ org.phone }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Email</span> <label>{{ org.email }}</label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Website</span> <label> {{ org.website }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Address</span> <label>{{ org.addr_street}} {{ org.addr_town }}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-home"></i> Regions
+        </div>
+        <div class="panel-body">
+            {% if not regions %}
+            <div class="action-notice">
+                No Regions found <br/>
+                <button class="btn btn-default btn-sm">Create a new Region</button>
+            </div>
+            {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Code</th><th>Name</th><th>Contact Phone</th>
+                        <th title="Service Points">SPs</td><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for r in regions %}
+                    <tr><td>{{ r.code }}</td><td>{{ r.name }}</td>
+                        <td>{{ r.phone }}</td><td>0</td>
+                        <td><i class="fa fa-fw fa-trash"></i>
+                            <i class="fa fa-fw fa-pencil"></i></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

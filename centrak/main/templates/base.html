@@ -46,21 +46,7 @@
     {% block content-wrapper %}
     <div id="content-wrapper">
         <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-message alert-{{ message.extra_tags }}">
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-                {{ message }}
-            </div>
-            {% endfor %}
-        {% endif %}
-        {% if form.non_field_errors %}
-            <div class="alert alert-message alert-danger">
-                <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-        
+        {% block messages %}{% include 'snippets/messages.html' %}{% endblock %}
         {% block content %}{% endblock %}
         </div>
     </div>
@@ -76,4 +62,7 @@
             </div>
         </div>
     </footer>
+{% endblock %}
+{% block script-extra %}
+    <script src="{% static 'js/app.js' %}"></script>
 {% endblock %}

@@ -38,6 +38,8 @@ module.exports = function(grunt) {
                     {dest:destJS, src:['fbower_comps/jquery/dist/jquery.min.js'], expand:true, flatten:true},
                     {dest:destJS, src:['fbower_comps/jquery-validation/dist/jquery.validate.min.js'], expand:true, flatten:true},
                     {dest:destJS, src:['fbower_comps/bootstrap/dist/js/bootstrap.min.js'], expand:true, flatten:true},
+                    {dest:destJS, src:['fbower_comps/underscore/underscore-min.js'], expand:true, flatten:true},
+                    {dest:destJS, src:['fbower_comps/backbone/backbone-min.js'], expand:true, flatten:true},
                 ],
             }
         }

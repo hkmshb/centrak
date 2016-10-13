@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block body-class %}adm{% endblock %}
+{% block messages %}{% endblock %}
 {% block content %}
-    <div class="side-menu pull-left">
+    {% block side-pane %}
+    <div class="side-pane pull-left">
         <ul class="nav nav-stacked nav-nested">
         {% for item in menu.children %}
             {% include 'snippets/app_menu_item.html' with item=item %}
         {% endfor %}
         </ul>
     </div>
+    {% endblock %}
+    {% block content-pane-wrapper %}
+    <div class="content-pane">
+        {% include 'snippets/messages.html' %}
+        {% block content-pane %}{% endblock %}
+    </div>
+    {% endblock %}
+{% endblock %}
+{% block script-extra %}{{ block.super }}
+    <script src="{% static 'js/views.js' %}"></script>
 {% endblock %}
