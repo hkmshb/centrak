@@ -3,9 +3,9 @@
 <div class="hook">
     <div class="panel panel-default panel-sq">
         <div class="panel-heading">
-            <i class="fa fa-fw fa-building-o"></i> Organisation
+            <i class="fa fa-fw fa-home"></i> Service Point
             <div class="buttons pull-right">
-                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-org-upd' %}">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-office-upd' office.code %}">
                     <i class="fa fa-fw fa-pencil"></i> Update
                 </a>
             </div>
@@ -14,58 +14,63 @@
             <div class="data-card col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad">
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Name</span><label>{{ org.name }}</label>
+                        <span>Region</span><label><a href="{% url 'admin-region-info' office.parent.code %}">{{ office.parent }}</a></label>
                     </div>
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Short Name</span><label>{{ org.short_name }} </label>
-                    </div>
-                </div>
-                <div class="data-row">
-                    <div class="col-sm-6 rd-l-pad">
-                        <span>Phone</span> <label> {{ org.phone }}</label>
-                    </div>
-                    <div class="col-sm-6 rd-l-pad">
-                        <span>Email</span> <label>{{ org.email }}</label>
+                        <span>Category</span><label>{{ office.get_category_display }} </label>
                     </div>
                 </div>
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Website</span> <label> {{ org.website }}</label>
+                        <span>Code</span><label>{{ office.code }}</label>
                     </div>
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Address</span> <label>{{ org.addr_street}} {{ org.addr_town }}</label>
+                        <span>Name</span><label>{{ office.name }} </label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Phone</span> <label> {{ office.phone }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Email</span> <label>{{ office.email }}</label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Address</span> <label>{{ office.addr_street}} {{ office.addr_town }}</label>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="panel panel-default panel-sqi">
-        <div class="panel-heading">
-            <i class="fa fa-fw fa-building"></i> Regions
-            {% if regions %}
+        <div class="panel-heading tabbed">
+            <ul class="nav nav-tabs nav-flattabs">
+                <li class="active"><a href="{# url 'admin-region-info' office.code #}"><i class="fa fa-fw fa-adjust"></i> Distribution Stations</a></li>
+            </ul>
+            {% if stations %}
             <div class="buttons pull-right">
-                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-region-add' %}">
+                <a class="btn btn-default btn-sm btn-slim" href="{# url 'admin-office-add' #}?for={{ office.code }}">
                     <i class="fa fa-fw fa-plus"></i> Add
                 </a>
             </div>
             {% endif %}            
         </div>
         <div class="panel-body">
-            {% if not regions %}
+            {% if not stations %}
             <div class="action-notice">
-                No Regions found <br/>
-                <a class="btn btn-default btn-sm" href="{% url 'admin-region-add' %}">Create a new Region</a>
+                No Distribution Stations found <br/>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ office.code }}">Add a new Distribution Station</a>
             </div>
             {% else %}
             <table class="table table-stripped table-condensed">
                 <thead>
-                    <tr><th>Code</th><th>Name</th><th>Contact Phone</th>
-                        <th title="Service Points">SPs</td><th></th></tr>
+                    <tr><th>Code</th><th>Name</th><th></th></tr>
                 </thead>
                 <tbody>
-                    {% for r in regions %}
-                    <tr><td><a href="{% url 'admin-region-info' r.code %}">{{ r.code }}</a></td><td>{{ r.name }}</td>
-                        <td>{{ r.phone|default:"-" }}</td><td>{{ r.num_points }}</td>
+                    {% for s in stations %}
+                    <tr><td><a href="">{{ s.code }}</a></td><td>{{ s.name }}</td>
                         <td><i class="fa fa-fw fa-trash"></i></tr>
                     {% endfor %}
                 </tbody>

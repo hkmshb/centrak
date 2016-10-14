@@ -52,6 +52,7 @@
             &, &:hover, &:focus {
                 color: @nav-tabs-active-link-hover-color;
                 background-color: #fff; // @nav-link-hover-bg;
+                border-color: transparent;
                 border-bottom: solid @nav-flattabs-border-size lighten(@component-active-bg, 5%);                
             }
         }
@@ -121,20 +122,22 @@
     }
  }
 
-.data-card {
+form, .data-card {
+
+    span, .form-group label {
+        color: @text-muted2; 
+    }
+
+    label, .form-group label.b {
+        color: #444;
+        display: block;
+        margin: -3px 0 5px;
+        font-weight: bold;
+    }
+
     .data-row {
         width: 100%;
         margin: 1px 0;
         display: table;
-
-        span {
-            color: @text-muted2; 
-        }
-
-        label {
-            display: block;
-            margin: -3px 0 5px;
-            color: #444;
-        }
     }
 }

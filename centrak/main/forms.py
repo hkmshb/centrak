@@ -4,8 +4,6 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django import forms
 
-from core.models import Organisation
-
 User = get_user_model()
 
 
@@ -86,25 +84,3 @@ class UserRegistrationForm(UserCreationForm):
         return False
 
 
-class OrganisationForm(forms.ModelForm):
-    """Form for updating organisation model object."""
-
-    _error_messages = {
-    }
-
-    class Meta:
-        model = Organisation
-        fields = ('name', 'short_name', 'phone', 'email', 'website', 'addr_street',
-                  'addr_town', 'postal_code', 'addr_state')
-        attrs_ = {'class': 'form-control input-sm'}
-        widgets = {
-            'name': forms.TextInput(attrs=attrs_),
-            'short_name': forms.TextInput(attrs=attrs_),
-            'phone': forms.TextInput(attrs=attrs_),
-            'email': forms.EmailInput(attrs=attrs_),
-            'website': forms.URLInput(attrs=attrs_),
-            'addr_street': forms.TextInput(attrs=attrs_),
-            'addr_town': forms.TextInput(attrs=attrs_),
-            'postal_code': forms.TextInput(attrs=attrs_),
-            'addr_state': forms.Select(attrs=attrs_)
-        }

@@ -59,7 +59,7 @@ class Menu(object):
                 Menu.Item(self, _('External API Services'), 'fa-cloud'))),
             Menu.Item(self, _('DISCO Setup'), 'fa-institution', children=(
                 Menu.Item(self, _('Organisation'), 'fa-building-o', reverse('admin-org-detail')),
-                Menu.Item(self, _('Business Offices'), 'fa-home'),
+                Menu.Item(self, _('Business Offices'), 'fa-home', reverse('admin-offices')),
                 Menu.Item(self, '---'),
                 Menu.Item(self, _('Power Stations'), 'fa-shield fa-flip-horizontal'),
                 Menu.Item(self, _('Powerlines (Feeders)'), 'fa-flash'),

@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from ezaddress.models import Addressable, GPSLocatable
@@ -152,3 +153,10 @@ class BusinessOffice(BusinessEntity):
                 if self.category not in (None, ""):
                     message = self._error_messages['category-not-required']
                     raise ValidationError(message)
+    
+    def get_absolute_url(self):
+        if self.level.code == BusinessLevel.LEVEL1:
+            return reverse('admin-region-info', args=[self.code])
+        elif self.level.code == BusinessLevel.LEVEL2:
+            return reverse('admin-office-info', args=[self.code])
+        return None

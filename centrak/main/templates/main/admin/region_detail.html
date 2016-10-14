@@ -1,0 +1,98 @@
+{% extends 'base_admin.html' %}
+{% block content-pane %}
+<div class="hook">
+    <div class="panel panel-default panel-sq">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-building"></i> Region
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-region-upd' region.code %}">
+                    <i class="fa fa-fw fa-pencil"></i> Update
+                </a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="data-card col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad">
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Code</span><label>{{ region.code }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Name</span><label>{{ region.name }} </label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Phone</span> <label> {{ region.phone }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Email</span> <label>{{ region.email }}</label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Address</span> <label>{{ region.addr_street}} {{ region.addr_town }}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading tabbed">
+            <ul class="nav nav-tabs nav-flattabs">
+                <li{% if not tab %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}"><i class="fa fa-fw fa-home"></i> Service Points</a></li>
+                <li{% if tab == 'powerlines/' %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}powerlines/"><i class="fa fa-fw fa-flash"></i> Powerlines</a></li>
+            </ul>
+            {% if offices %}
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">
+                    <i class="fa fa-fw fa-plus"></i> Add
+                </a>
+            </div>
+            {% endif %}            
+        </div>
+        <div class="panel-body">
+        {% if not tab or tab == 'offices' %}
+            {% if not offices %}
+            <div class="action-notice">
+                No Service Points found <br/>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">Add a new Service Point</a>
+            </div>
+            {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Code</th><th>Name</th><th>Category</th><th>Contact Phone</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for o in offices %}
+                    <tr><td><a href="{% url 'admin-office-info' o.code %}">{{ o.code }}</a></td><td>{{ o.name }}</td>
+                        <td>{{ o.category }}</td>
+                        <td>{{ o.phone|default:"-" }}</td>
+                        <td><i class="fa fa-fw fa-trash"></i></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        {% elif tab == 'powerlines/' %}
+            {% if not powerlines %}
+            <div class="action-notice">
+                No Powerlines found <br/>
+                <a class="btn btn-default btn-sm" href="{# url 'admin-office-add' #}?for={{ region.code }}">Add a new Powerline</a>
+            </div>
+            {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Code</th><th>Name</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for p in powerlines %}
+                    <tr><td><a href="">{{ p.code }}</a></td><td>{{ p.name }}</td>
+                        <td><i class="fa fa-fw fa-trash"></i></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
