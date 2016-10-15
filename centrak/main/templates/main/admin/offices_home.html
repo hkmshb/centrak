@@ -1,9 +1,32 @@
 {% extends 'base_admin.html' %}
 {% block content-pane %}
-<div class="text-center">
-    <h1>Offices</h1>
-    <p>
-        <i class="fa fa-md fa-exclamation-triangle"></i> Underconstruction
-    </p>
+<div class="panel panel-default panel-sqi">
+    <div class="panel-heading">
+        <i class="fa fa-fw fa-home"></i> Business Offices
+    </div>
+    <div class="panel-body">
+    {% if not offices.exists %}
+        <div class="action-notice">
+            No Business Offices found
+        </div>
+    {% else %}
+        <table class="table table-stripped table-condensed">
+            <thead>
+                <tr><th>Code</th><th>Name</th><th>Type</th><th>Category</th><th></th></tr>
+            </thead>
+            <tbody>
+            {% for o in offices %}
+                <tr><td><a href="{{ o.get_absolute_url }}">{{ o.code }}</a></td>
+                    <td>{{ o.name }}</td><td>{{ o.level }}</td>
+                    <td>{{ o.category|default:"-" }}</td>
+                    <td>{% if o.level.code != 'L1' %}
+                        <i class="fa fa-fw fa-trash"></i> 
+                        <i class="fa fa-fw fa-pencil"></i> {% endif %}
+                    </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    </div>
 </div>
 {% endblock %}

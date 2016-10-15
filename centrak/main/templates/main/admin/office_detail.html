@@ -49,7 +49,7 @@
             <ul class="nav nav-tabs nav-flattabs">
                 <li class="active"><a href="{# url 'admin-region-info' office.code #}"><i class="fa fa-fw fa-adjust"></i> Distribution Stations</a></li>
             </ul>
-            {% if stations %}
+            {% if stations.exists %}
             <div class="buttons pull-right">
                 <a class="btn btn-default btn-sm btn-slim" href="{# url 'admin-office-add' #}?for={{ office.code }}">
                     <i class="fa fa-fw fa-plus"></i> Add
@@ -58,7 +58,7 @@
             {% endif %}            
         </div>
         <div class="panel-body">
-            {% if not stations %}
+            {% if not stations.exists %}
             <div class="action-notice">
                 No Distribution Stations found <br/>
                 <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ office.code }}">Add a new Distribution Station</a>
@@ -71,7 +71,7 @@
                 <tbody>
                     {% for s in stations %}
                     <tr><td><a href="">{{ s.code }}</a></td><td>{{ s.name }}</td>
-                        <td><i class="fa fa-fw fa-trash"></i></tr>
+                        <td><i class="fa fa-fw fa-trash"></i></td></tr>
                     {% endfor %}
                 </tbody>
             </table>

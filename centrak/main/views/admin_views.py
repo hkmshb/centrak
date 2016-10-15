@@ -64,7 +64,10 @@ def manage_org(request):
 
 @login_required
 def offices_home(request):
-    return render(request, 'main/admin/offices_home.html')
+    offices = BusinessOffice.objects.all().order_by('level', 'code')
+    return render(request, 'main/admin/offices_home.html', {
+        'offices': offices
+    })
 
 
 @login_required
