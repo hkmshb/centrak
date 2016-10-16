@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -160,3 +162,94 @@ class BusinessOffice(BusinessEntity):
         elif self.level.code == BusinessLevel.LEVEL2:
             return reverse('admin-office-info', args=[self.code])
         return None
+
+
+#*----------------------------------------------------------------------------+
+#| Network Models
+#+----------------------------------------------------------------------------+
+class Voltage:
+    """
+    Defines voltage levels within an electricity distribution network.
+    """
+    HVOLTH, HVOLTL, MVOLTH, MVOLTL, LVOLT = range(5, 0, -1)
+
+    _TEXT = OrderedDict({
+        HVOLTH: '330KV', HVOLTL: '132KV', MVOLTH: '33KV', MVOLTL: '11KV',
+        LVOLT: '0.415KV' })
+
+    ALL_CHOICES = (
+        (HVOLTH, _TEXT[HVOLTH]), (HVOLTL, _TEXT[HVOLTL]),
+        (MVOLTH, _TEXT[MVOLTH]), (MVOLTL, _TEXT[MVOLTL]),
+        (LVOLT,  _TEXT[LVOLT]))
+    
+    class Ratio:
+        """
+        Defines voltage ratios within an electricity distribution network.
+        """
+        HVOLTH_HVOLTL, HVOLTL_MVOLTH, HVOLTL_MVOLTL = range(6, 3, -1)
+        MVOLTH_MVOLTL, MVOLTH_LVOLT, MVOLTL_LVOLT = range(3, 0, -1)
+
+        _TEXT = OrderedDict({
+            HVOLTH_HVOLTL: '330/132KV', HVOLTL_MVOLTH: '132/33KV',
+            HVOLTL_MVOLTL: '132/11KV',  MVOLTH_MVOLTL: '33/11KV',
+            MVOLTH_LVOLT: '33/0.415KV', MVOLTL_LVOLT: '11/0.415KV'
+        })
+
+        ALL_CHOICES = (
+            (HVOLTH_HVOLTL, _TEXT[HVOLTH_HVOLTL]), (HVOLTL_MVOLTH, _TEXT[HVOLTL_MVOLTH]),
+            (HVOLTL_MVOLTL, _TEXT[HVOLTL_MVOLTL]), (MVOLTH_MVOLTL, _TEXT[MVOLTH_MVOLTL]),
+            (MVOLTH_LVOLT, _TEXT[MVOLTH_LVOLT]),  (MVOLTL_LVOLT, _TEXT[MVOLTL_LVOLT]))
+
+
+class NetworkEntity(TimeStampedModel):
+    """
+    Abstract base class for network model objects.
+    """
+    code  = models.CharField(_('Code'), max_length=20, unique=True)
+    altcode = models.CharField(_('Alternative Code'), max_length=20, 
+                unique=True, blank=True)
+    name = models.CharField(_('Name'), max_length=100, unique=True)
+    is_public = models.BooleanField(_('Is Public'), default=True)
+    last_synced = models.DateTimeField(_('Last Synced'), null=True)
+    ext_id = models.IntegerField(null=False, unique=True)
+    date_commissioned = models.DateField(null=True)
+    
+    class Meta:
+        abstract = True
+
+
+class Station(NetworkEntity, Addressable, GPSLocatable):
+    """
+    Represents a power station within an electricity distribution network.
+    """
+    TRANSMISSION = 1
+    INJECTION    = 2
+    DISTRIBUTION = 3
+    STATION_CHOICES = (
+        (TRANSMISSION, 'Transmission'),
+        (INJECTION,    'Injection'),
+        (DISTRIBUTION, 'Distribution')
+    )
+    type = models.PositiveSmallIntegerField(_('Type'), choices=STATION_CHOICES)
+    voltage_ratio = models.PositiveSmallIntegerField(_('Voltage Ratio'), 
+                        choices=Voltage.Ratio.ALL_CHOICES)
+    source_powerline = models.ForeignKey('Powerline', blank=True, null=True)
+    source_powerline_ext_id = models.IntegerField(blank=True, null=True)
+
+
+class Powerline(NetworkEntity):
+    """
+    Represents a power line within an electricity distribution network.
+    """
+    FEEDER  = 1
+    UPRISER = 2
+    POWERLINE_CHOICES = (
+        (FEEDER,  'Feeder'),
+        (UPRISER, 'Upriser')
+    )
+    type = models.PositiveSmallIntegerField(_('Type'), choices=POWERLINE_CHOICES)
+    voltage = models.PositiveSmallIntegerField(_('Voltage'), choices=Voltage.ALL_CHOICES)
+    source_station = models.ForeignKey(Station, blank=True, null=True)
+    line_length = models.IntegerField(_('Line Length'), blank=True, null=True)
+    pole_count = models.IntegerField(_('Pole Count'), blank=True, null=True)
+    source_station_ext_id = models.IntegerField(blank=True, null=True)

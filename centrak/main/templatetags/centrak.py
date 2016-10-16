@@ -10,3 +10,10 @@ def urlcancel(form, default_url):
         elif form.instance.id:
             return form.instance.get_absolute_url()            
     return default_url
+
+
+@register.filter
+def split(s, sep=','):
+    if s and sep in s:
+        return s.split(sep)
+    return s

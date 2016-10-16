@@ -40,9 +40,9 @@
         <div class="panel-heading tabbed">
             <ul class="nav nav-tabs nav-flattabs">
                 <li{% if not tab %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}"><i class="fa fa-fw fa-home"></i> Service Points</a></li>
-                <li{% if tab == 'powerlines/' %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}powerlines/"><i class="fa fa-fw fa-flash"></i> Powerlines</a></li>
+                <li{% if tab == 'powerlines' %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}powerlines/"><i class="fa fa-fw fa-flash"></i> Powerlines</a></li>
             </ul>
-            {% if offices %}
+            {% if offices.exists %}
             <div class="buttons pull-right">
                 <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">
                     <i class="fa fa-fw fa-plus"></i> Add
@@ -52,7 +52,7 @@
         </div>
         <div class="panel-body">
         {% if not tab or tab == 'offices' %}
-            {% if not offices %}
+            {% if not offices.exists %}
             <div class="action-notice">
                 No Service Points found <br/>
                 <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">Add a new Service Point</a>
@@ -73,7 +73,7 @@
             </table>
             {% endif %}
         {% elif tab == 'powerlines/' %}
-            {% if not powerlines %}
+            {% if not powerlines.exists %}
             <div class="action-notice">
                 No Powerlines found <br/>
                 <a class="btn btn-default btn-sm" href="{# url 'admin-office-add' #}?for={{ region.code }}">Add a new Powerline</a>

@@ -5,7 +5,8 @@ from django.contrib import messages
 from django.db.models import Q, Count
 
 from ezaddress.models import State
-from core.models import BusinessLevel, BusinessOffice, Organisation
+from core.models import BusinessLevel, BusinessOffice, Organisation, \
+        Voltage, Station, Powerline 
 from core.forms import OrganisationForm, OfficeForm
 from .. import utils
 
@@ -19,6 +20,12 @@ def get_org_or_create_default():
                 phone='<080-0000-0000>', website='<http://centrak>',
                 addr_street='<Address Street>', addr_town='<Address Town>')
     return org
+
+
+def get_station_type_id(tab_key):
+    if tab_key in (None, '', 'transmission'):
+        return Station.TRANSMISSION
+    return (Station.INJECTION if tab_key == 'injection' else Station.DISTRIBUTION)
 
 
 #: ==+: admin view functions
@@ -154,4 +161,25 @@ def office_detail(request, office_code=None):
     stations = None
     return render(request, 'main/admin/office_detail.html', {
         'office': office, 'stations': stations 
+    })
+
+
+@login_required
+def powerstation_list(request, tab=None):
+    station_type = get_station_type_id(tab)
+    stations = Station.objects.filter(type=station_type).order_by('code')
+    return render(request, 'main/admin/station_list.html', {
+        'stations': stations, 'tab': tab
+    })
+
+
+@login_required
+def powerline_list(request, tab=None):
+    powerline_type = Powerline.FEEDER
+    voltage = Voltage.MVOLTL if tab == '11' else Voltage.MVOLTH
+    print([powerline_type, voltage])
+    powerlines = Powerline.objects.filter(type=powerline_type, voltage=voltage)\
+                          .order_by('code')
+    return render(request, 'main/admin/powerline_list.html', {
+        'powerlines': powerlines, 'tab': tab
     })

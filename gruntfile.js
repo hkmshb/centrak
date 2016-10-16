@@ -28,7 +28,7 @@ module.exports = function(grunt) {
                 files: [
                     // style-sheets
                     {dest:destCSS, src:['fbower_comps/bootstrap/dist/css/bootstrap.min.css'], expand:true, flatten:true},
-                    {dest:destCSS, src:['fbower_comps/font-awesome/css/font-awesome.min.css'], expand:true, flatten:true},
+                    // {dest:destCSS, src:['fbower_comps/font-awesome/css/font-awesome.min.css'], expand:true, flatten:true},
 
                     // fonts
                     {dest:destFONT, src:['fbower_comps/bootstrap/dist/fonts/*.*'], expand:true, flatten:true},

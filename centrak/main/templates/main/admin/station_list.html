@@ -1,0 +1,43 @@
+{% extends 'base_admin.html' %}
+{% load centrak %}
+{% block content-pane %}
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading tabbed">
+            <ul class="nav nav-tabs nav-flattabs">
+                <li{% if tab not in 'injection,distribution'|split %} class="active"{% endif %}><a href="{% url 'admin-station-list' %}"><i class="fa fa-fw fa-shield fa-flip-horizontal"></i> Transmission</a></li>
+                <li{% if tab == 'injection' %} class="active"{% endif %}><a href="{% url 'admin-station-list' %}injection/"><i class="fa fa-fw fa-shield fa-flip-horizontal"></i> Injection</a></li>
+                <li{% if tab == 'distribution' %} class="active"{% endif %}><a href="{% url 'admin-station-list' %}distribution/"><i class="fa fa-fw fa-adjust"></i> Distribution</a></li>
+            </ul>
+            {% if stations.exists %}
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{# url #}">
+                    <i class="fa fa-fw fa-download"></i> Import
+                </a>
+            </div>
+            {% endif %}            
+        </div>
+        <div class="panel-body">
+        {% if not stations.exists %}
+            <div class="action-notice">{% with label=tab|default:"transmission"|title %}
+                No {{ label }} Station found <br/>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}">Import {{ label }} Stations</a>{% endwith %}
+            </div>
+        {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Code</th><th>AltCode</th><th>Name</th><th>Voltage Ratio</th>
+                        <th>Is Public</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for s in stations %}
+                    <tr><td><a href="{# url 'admin-office-info' o.code #}">{{ s.code }}</a></td>
+                        <td>{{ s.altcode }}</td> <td>{{ s.name }}</td>
+                        <td>{{ s.get_voltage_ratio_display }}</td> <td>{{ s.is_public }}</td>
+                        <td><i class="fa fa-fw fa-refresh"></i></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}

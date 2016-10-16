@@ -1,0 +1,41 @@
+{% extends 'base_admin.html' %}
+{% block content-pane %}
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading tabbed">
+            <ul class="nav nav-tabs nav-flattabs">
+                <li{% if tab != '11' %} class="active"{% endif %}><a href="{% url 'admin-powerline-list' %}"><i class="fa fa-fw fa-flash"></i> 33KV Feeders</a></li>
+                <li{% if tab == '11' %} class="active"{% endif %}><a href="{% url 'admin-powerline-list' %}11/"><i class="fa fa-fw fa-flash"></i> 11KV Feeders</a></li>
+            </ul>
+            {% if stations.exists %}
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{# url #}">
+                    <i class="fa fa-fw fa-download"></i> Import
+                </a>
+            </div>
+            {% endif %}            
+        </div>
+        <div class="panel-body">
+        {% if not powerlines.exists %}
+            <div class="action-notice">{% with label=tab|default:"33"|title %}
+                No {{ label }}KV Feeder found <br/>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}">Import {{ label }}KV Feeders</a>{% endwith %}
+            </div>
+        {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Code</th><th>AltCode</th><th>Name</th><th>Voltage</th>
+                        <th>Is Public</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for p in powerlines %}
+                    <tr><td><a href="{# url 'admin-office-info' o.code #}">{{ p.code }}</a></td>
+                        <td>{{ p.altcode }}</td> <td>{{ p.name }}</td>
+                        <td>{{ p.get_voltage_display }}</td> <td>{{ p.is_public }}</td>
+                        <td><i class="fa fa-fw fa-refresh"></i></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}

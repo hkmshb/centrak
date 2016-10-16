@@ -53,7 +53,7 @@ class Menu(object):
             Menu.Item(self, _('Dashboard'), 'fa-dashboard', reverse('admin-home')),
             Menu.Item(self, _('Projects'), 'fa-cubes'),
             Menu.Item(self, _('Survey Forms'), 'fa-wpforms'),
-            Menu.Item(self, _('System'), 'fa-gears', '/admin/system/', children=(
+            Menu.Item(self, _('System'), 'fa-gears', children=(
                 Menu.Item(self, _('Settings'), 'fa-gears'),
                 Menu.Item(self, _('Users'), 'fa-users'),
                 Menu.Item(self, _('External API Services'), 'fa-cloud'))),
@@ -61,9 +61,8 @@ class Menu(object):
                 Menu.Item(self, _('Organisation'), 'fa-building-o', reverse('admin-org-detail')),
                 Menu.Item(self, _('Business Offices'), 'fa-home', reverse('admin-offices')),
                 Menu.Item(self, '---'),
-                Menu.Item(self, _('Power Stations'), 'fa-shield fa-flip-horizontal'),
-                Menu.Item(self, _('Powerlines (Feeders)'), 'fa-flash'),
-                Menu.Item(self, _('Distribution Stations'), 'fa-adjust'))),
+                Menu.Item(self, _('Network Stations'), 'fa-shield fa-flip-horizontal', reverse('admin-station-list')),
+                Menu.Item(self, _('Powerlines (Feeders)'), 'fa-flash', reverse('admin-powerline-list')))),
         )
     
     @property

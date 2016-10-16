@@ -30,7 +30,7 @@ urlpatterns = [
 
                 url(r'^regions/create$', adm_views.manage_region, 
                     name='admin-region-add'),
-                url(r'^regions/(?P<region_code>[0-9]+)/(?P<tab>powerlines/)?$', 
+                url(r'^regions/(?P<region_code>[0-9]+)/((?P<tab>powerlines)/)?$', 
                     adm_views.region_detail, name='admin-region-info'),
                 url(r'^regions/(?P<region_code>[0-9]+)/update',
                     adm_views.manage_region, name='admin-region-upd'),
@@ -42,6 +42,11 @@ urlpatterns = [
                 url(r'^spoints/(?P<office_code>[0-9]+)/update$', adm_views.manage_office,
                     name='admin-office-upd'),
             ])),
+                
+            url(r'^stations/((?P<tab>(transmission|injection|distribution))/)?$', 
+                adm_views.powerstation_list, name='admin-station-list'),
+            url(r'^powerlines/((?P<tab>(33|11))/)?$', adm_views.powerline_list,
+                name='admin-powerline-list'),
         ])
     ),
 
