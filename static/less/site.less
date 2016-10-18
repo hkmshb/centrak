@@ -248,6 +248,19 @@ footer {
  |  styling...
  + =====================================================================*/
 // panel
+
+.panel a.plain {
+    color: @text-color;
+    &:hover, &:focus {
+        text-decoration: none;
+    }
+}
+.sub-panel a.plain {
+    &:hover, &:focus {
+        .fa { color: @link-color; }
+    }
+}
+
 .panel-heading .buttons {
     margin-top: -4px; padding: 0;
     .btn-slim {
@@ -305,6 +318,15 @@ footer {
 .border-b { border: solid 1px mediumseagreen; }
 .border-c { border: solid 1px lightseagreen; }
 
+.em { font-style: italic; }
+.text-sm { font-size: 10px; }
+.text-success2 { color: limegreen; }
+
+a.dourow {
+    color: @text-color;
+    &:hover { color: @link-color; }
+}
+
 // table
 .table {
     th:last-child,
@@ -313,4 +335,10 @@ footer {
         white-space: nowrap;
     }
 }
- 
+
+.sub-panel {
+    border-top: solid 1px #efefef;
+    .panel-heading {
+        border-bottom: solid 1px @table-border-color;
+    }
+}

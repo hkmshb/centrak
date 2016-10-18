@@ -4,6 +4,9 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django import forms
 
+from core import models, utils, forms as core_forms
+
+
 User = get_user_model()
 
 
@@ -11,13 +14,7 @@ User = get_user_model()
 class UserRegistrationForm(UserCreationForm):
     """Form for registering/creating a new user for CENTrak."""
     
-    _error_messages = {
-        'invalid-email-domain': _("KEDCO email address required."),
-        'invalid-email-format': _(
-                "Invalid KEDCO email provided. It does not match expected "
-                "format. Contact the CENTrak administrator for help if in "
-                "fact the email is an officially assigned email."),
-    }
+    _error_messages = core_forms.UserProfileForm._error_messages.copy()
     
     class Meta:
         model = User
@@ -36,7 +33,7 @@ class UserRegistrationForm(UserCreationForm):
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if not self.has_valid_email_domain(email):
+        if not utils.has_valid_email_domain(email):
             msg = self._error_messages['invalid-email-domain']
             raise forms.ValidationError(msg)
         
@@ -52,35 +49,19 @@ class UserRegistrationForm(UserCreationForm):
         lname = cleaned_data.get('last_name')
         email = cleaned_data.get('email')
         
-        if not self.is_valid_kedco_email_format(email, fname, lname):
+        if not utils.is_valid_official_email_format(email, fname, lname):
             msg = self._error_messages['invalid-email-format']
             raise forms.ValidationError(msg)
         return cleaned_data
     
-    def save(self, commit=True):
+    def save(self):
+        # TODO: also set default group aka role for user...
         user = super(UserRegistrationForm, self).save(commit=False)
         user.username = self.cleaned_data.get('email')
         user.is_active = False
-        # TODO: also set default group aka role for user...
-        if commit:
-            user.save()
+        user.save()
+        
+        # create the associated profile
+        profile = models.UserProfile(user_id=user.id)
+        profile.save()
         return user
-    
-    @staticmethod
-    def has_valid_email_domain(email):
-        if email:
-            domain = email.split('@')[1]
-            return domain.lower() in settings.CENTRAK_KEDCO_DOMAINS
-        return False
-    
-    @staticmethod
-    def is_valid_kedco_email_format(email, fname, lname):
-        if email and fname and lname:
-            name_parts = [n for n in (email.split('@')[0]).split('.') if n]
-            if len(name_parts) == 2:
-                for name in name_parts:
-                    if name == fname.lower() or name == lname.lower():
-                        return True
-        return False
-
-

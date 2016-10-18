@@ -1,7 +1,12 @@
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 from django import forms
-from .models import Organisation, BusinessOffice
+
+from .models import UserProfile, Organisation, BusinessOffice, BusinessLevel
+from . import utils
 
 
+User = get_user_model()
 
 class BaseModelForm(forms.ModelForm):
 
@@ -15,7 +20,7 @@ class BaseModelForm(forms.ModelForm):
     @property
     def is_new(self):
         if self.instance:
-            return (self.instance.id not in (None, ''))
+            return (self.instance.id in ('', None))
         return False
 
     @property
@@ -23,6 +28,105 @@ class BaseModelForm(forms.ModelForm):
         if self.instance:
             return ("Update" if self.instance.id else "New")
         return ""
+
+
+class UserProfileForm(BaseModelForm):
+    """
+    UserProfile creation and change form.
+    """
+
+    _error_messages = {
+        'invalid-email-domain': _("KEDCO email address required."),
+        'invalid-email-format': _(
+                "Invalid KEDCO email provided. It does not match expected "
+                "format. Contact the CENTrak administrator for help if in "
+                "fact the email is an officially assigned email."),
+    }
+
+    username = forms.EmailField(label=_('Username/Email'), max_length=50)
+    first_name = forms.CharField(label=_('First Name'), max_length=30)
+    last_name = forms.CharField(label=_('Last Name'), max_length=30)
+    phone = forms.CharField(label=_('Phone'), max_length=50, required=False)
+    is_active = forms.BooleanField(label=_('Status: Is Active'), required=False)
+    location = forms.ModelChoiceField(label=_("Region"), empty_label="<Select One>",
+                    queryset=BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1),
+                    required=False)
+    location1 = forms.ModelChoiceField(label=_("Service Point"), required=False,
+                    empty_label="<Select One>", queryset=BusinessOffice.objects.filter(level='L2'))
+    
+    def __init__(self, user, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+        if instance and instance.location:
+            if instance.location.level.code == BusinessLevel.LEVEL2:
+                kwargs['initial'].update({
+                    'location':  instance.location.parent.id,
+                    'location1': instance.location.id
+                })
+
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+        self._current_user = user
+
+        attrs_ = {'class': 'form-control input-sm'}
+        for fn, field in self.fields.items():
+            if fn != 'is_active':
+                field.widget.attrs = attrs_
+
+    class Meta:
+        model = UserProfile
+        fields = ('username', 'first_name', 'last_name', 'phone', 'is_active', 
+                  'location', 'location1')
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if not self._current_user.is_superuser:
+            if not utils.has_valid_email_domain(username):
+                msg = self._error_messages['invalid-email-domain']
+                raise forms.ValidationError(msg)
+        
+        try:
+            usr = User.objects.get(username=username)
+            if self.instance and self.instance.user:
+                if usr.id == self.instance.user.id:
+                    return username
+        except User.DoesNotExist:
+            return username
+        raise forms.ValidationError(_("'%s' is already in use.") % username)
+    
+    def clean(self):
+        cleaned_data = super(UserProfileForm, self).clean()
+        if not self._current_user.is_superuser:
+            fname = cleaned_data.get('first_name')
+            lname = cleaned_data.get('last_name')
+            email = cleaned_data.get('email')
+
+            if not utils.is_valid_official_email_format(email, fname, lname):
+                msg = self._error_messages['invalid-email-format']
+                raise forms.ValidationError(msg)
+        return cleaned_data
+
+    def save(self, commit=True):
+        profile, user = self.instance, self.instance.user
+        user.username = self.cleaned_data.get('username')
+        user.email = self.cleaned_data.get('username')
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.is_active = self.cleaned_data.get('is_active')
+        
+        location1 = self.cleaned_data.get('location1')
+        if hasattr(profile, 'location') and location1:
+            profile.location = location1
+        
+        is_new_user = profile.user.id == None
+        try:
+            profile.user.save()
+            if is_new_user:
+                profile.user_id = user.id
+            profile.save()
+            return profile
+        except Exception as ex:
+            if is_new_user and profile.user.id:
+                profile.user.delete()
+            raise ex
 
 
 class BusinessEntityForm(BaseModelForm):

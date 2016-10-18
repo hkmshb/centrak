@@ -1,0 +1,91 @@
+{% extends 'base_admin.html' %}
+{% load centrak %}
+{% block content-pane %}
+<div class="hook">
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-user"></i> User
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-user-upd' user.id %}">
+                    <i class="fa fa-fw fa-pencil"></i> Update
+                </a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="data-card col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad">
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>First Name</span><label>{{ user.first_name|default:"-" }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Last Name</span><label>{{ user.last_name|default:"-" }} </label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Username/Email</span> <label>{{ user.username }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Phone</span> <label> {{ user.profile.phone|default:"-" }}</label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-12 rd-l-pad">
+                        <span>Roles</span> <label>{{ user|user_roles|default:"-" }}</label>
+                    </div>
+                    <div class="col-sm-12 rd-l-pad">
+                        <span>Location</span> <label>{{ user.profile.full_location|default:"-" }}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sub-panel">
+            <div class="panel-body">
+                <div class="section col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad"> 
+                    &nbsp; Status: &nbsp;{% if user.is_active %}
+                    <i class="fa fa-fw fa-toggle-on text-success2"></i> ACTIVE {% else %}
+                    <i class="fa fa-fw fa-toggle-off"></i> INACTIVE {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="sub-panel manage-pwd">
+            <a class="plain" href="#pwd-panel" data-toggle="collapse">
+                <div class="panel-heading">
+                    <i class="fa fa-fw fa-key"></i> Manage Password
+                    <div class="buttons pull-right" style="padding-top: 5px; color: #ddd;">
+                        <i class="fa fa-chevron-left"></i>
+                    </div>
+                </div>
+            </a>
+            <div id="pwd-panel" class="panel-body collapse">{% with form=form_pwd %}
+                <form method="post" action="{% url 'admin-passwd-set' user.id %}">
+                    <div class="form-group">{% if form.old_password.label %}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad"><!--
+                            <label for="{{ form.old_password.id_for_label }}">{{ form.old_password.label }}{% if form.old_password.errors %}
+                                <span class="text-danger" title="{{ form.old_password.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                            {% endif %}</label> -->
+                            {{ form.old_password }}
+                        </div>{% endif %}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad"><!--
+                            <label for="{{ form.new_password1.id_for_label }}">{{ form.new_password1.label }}{% if form.new_password1.errors %}
+                                <span class="text-danger" title="{{ form.new_password1.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                            {% endif %}</label>-->
+                            {{ form.new_password1 }}
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad"><!--
+                            <label for="{{ form.new_password2.id_for_label }}">{{ form.new_password2.label }}{% if form.new_password2.errors %}
+                                <span class="text-danger" title="{{ form.new_password2.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                            {% endif %}</label>-->
+                            {{ form.new_password2 }}
+                        </div>
+                        <div class="cols-sm-1 rd-l-pad rd-r-pad">
+                            <button class="btn btn-success btn-sm" style="margin-top: 0px;">Change</button>
+                        </div>
+                    </div>
+                    {% csrf_token %}
+                </form>{% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,12 +3,57 @@ from collections import OrderedDict
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.db import models
 
 from ezaddress.models import Addressable, GPSLocatable
 from .exceptions import InvalidOperationError
 
 
+
+#*----------------------------------------------------------------------------+
+#| UserProfile and other User related models.
+#+----------------------------------------------------------------------------+
+class UserProfile(models.Model):
+    """
+    Extension of the User model.
+    """
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='profile')
+    phone   = models.CharField(_('Phone'), max_length=20, blank=True)
+    location = models.ForeignKey('BusinessOffice', null=True)
+
+    @property
+    def full_location(self):
+        value, loc = None, self.location
+        if loc:
+            value = loc.name
+            if loc.level.code == BusinessLevel.LEVEL2 and loc.parent:
+                value = "%s, %s" % (loc.parent.name, value)
+        return value
+    
+    def get_absolute_url(self):
+        return reverse('admin-user-info', args=[self.user.id])
+
+    def __str__(self):
+        if self.user:
+            return self.user.first_name
+        return ""
+
+
+class UserSettings(models.Model):
+    """
+    Represents user application settings.
+    """
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='settings')
+    page_size = models.PositiveSmallIntegerField(_('General Page Size'), 
+                    default=settings.CENTRAK_DEFAULT_PAGE_SIZE)
+    capture_page_size = models.PositiveIntegerField(_('Capture Page Size'),
+                    default=settings.CENTRAK_CAPTURE_PAGE_SIZE)
+
+
+#*----------------------------------------------------------------------------+
+#| Abstract Core Models
+#+----------------------------------------------------------------------------+
 class TimeStampedModel(models.Model):
     """
     Abstract base model with fields for tracking object creation and last
@@ -21,6 +66,9 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+#*----------------------------------------------------------------------------+
+#| BusinessEntity Models
+#+----------------------------------------------------------------------------+
 class BusinessEntity(TimeStampedModel, Addressable, GPSLocatable):
     """
     Abstract base class which represents a Business entity.
@@ -134,6 +182,11 @@ class BusinessOffice(BusinessEntity):
     class Meta:
         db_table = 'business_office'
         ordering = ['level', 'name']
+        permissions = (
+            ('can_manage_region', "Can add, change and delete Level1 objects"),
+            ('can_import', "Can import LEVEL2 objects."),
+            ('can_export', "Can export LEVEL2 objects.")
+        )
     
     def clean(self):
         super(BusinessOffice, self).clean()
@@ -216,6 +269,10 @@ class NetworkEntity(TimeStampedModel):
     
     class Meta:
         abstract = True
+        permissions = (
+            ('can_sync_data', "Can pull in data from external service"),
+            ('can_export', "Can export entity data")
+        )
 
 
 class Station(NetworkEntity, Addressable, GPSLocatable):

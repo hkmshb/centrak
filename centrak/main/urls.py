@@ -23,7 +23,14 @@ urlpatterns = [
             url(r'^$', adm_views.admin_home, name='admin-home'),
             url(r'^org/$', adm_views.org_info, name='admin-org-detail'),
             url(r'^org/update$', adm_views.manage_org, name='admin-org-upd'),
-
+            
+            url(r'^users/$', adm_views.user_list, name='admin-user-list'),
+            url(r'^users/new$', adm_views.manage_user, name='admin-user-add'),
+            url(r'^users/(?P<user_id>[0-9]+)/', include([
+                url(r'^$', adm_views.user_detail, name='admin-user-info'),
+                url(r'^update$', adm_views.manage_user, name='admin-user-upd'),
+                url(r'^set-password$', adm_views.user_set_password, name='admin-passwd-set'),
+            ])),
 
             url(r'^offices/', include([
                 url(r'^$', adm_views.offices_home, name='admin-offices'),

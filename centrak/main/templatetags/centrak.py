@@ -17,3 +17,21 @@ def split(s, sep=','):
     if s and sep in s:
         return s.split(sep)
     return s
+
+
+@register.filter
+def user_fullname(user):
+    value = user.last_name
+    if user.first_name:
+        if value:
+            value += ", "
+        value += user.first_name
+    return value
+
+
+@register.filter
+def user_roles(user):
+    value = ""
+    if user.groups.exists:
+        value = ", ".join([g.name for g in user.groups.all()])
+    return value

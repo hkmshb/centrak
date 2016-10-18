@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     # third-party
     'ezaddress',
@@ -115,5 +116,8 @@ LOGIN_REDIRECT_URL = '/'
 
 
 ##: ==+: Internal
-CENTRAK_KEDCO_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']
+CENTRAK_OFFICIAL_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']
 CENTRAK_ADMIN_PREFIX_URL = '/admin/'
+
+CENTRAK_DEFAULT_PAGE_SIZE = 50
+CENTRAK_CAPTURE_PAGE_SIZE = 200

@@ -1,0 +1,79 @@
+{% extends 'base_admin.html' %}
+{% load centrak %}
+{% block content-pane %}
+<div class="hook" data-v="AdminOrganisationForm">
+    <div class="panel panel-default panel-sq">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-user"></i> {{ form.mode }} User
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim done" href="{{ form|urlcancel:"{% url 'admin-user-list' %}" }}">
+                    <i class="fa fa-fw fa-close"></i> Cancel</a>
+                <button class="btn btn-default btn-sm btn-slim save">
+                    <i class="fa fa-fw fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form method="post">
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">{% if form.is_new or user.is_superuser %}
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}{% if form.username.errors %}
+                        <span class="text-danger" title="{{ form.username.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.username }}
+                    {% else %}
+                    <span> &nbsp;{{ form.username.label }}</span><label class="b">{{ form.username.value }}</label>
+                    <input type="hidden" name="{{ form.username.name }}" value="{{ form.username.value }}" /> {% endif %}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}{% if form.phone.errors %}
+                        <span class="text-danger" title="{{ form.phone.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.phone }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}{% if form.first_name.errors %}
+                        <span class="text-danger" title="{{ form.first_name.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}{% if form.last_name.errors %}
+                        <span class="text-danger" title="{{ form.last_name.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad checkbox">
+                    <label>
+                        {{ form.is_active.label }}<span style="margin-left: 30px;"> {{ form.is_active }}</span>                      
+                    </label>
+                </div>
+            </div>
+            <div class="sub-panel">
+                <div class="panel-body rd-l-pad">
+                    <div class="form-group">
+                        <div class="col-sm-6 rd-l-pad">
+                            <label for="{{ form.location.id_for_label }}">{{ form.location.label }}{% if form.location.errors %}
+                                <span class="text-danger" title="{{ form.location.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                            {% endif %}</label>
+                            {{ form.location }}
+                        </div>
+                        <div class="col-sm-6 rd-l-pad">
+                            <label for="{{ form.location1.id_for_label }}">{{ form.location1.label }}{% if form.location1.errors %}
+                                <span class="text-danger" title="{{ form.location1.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                            {% endif %}</label>
+                            {{ form.location1 }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% csrf_token %}
+            </form>
+        </body>
+    </div>
+</div>
+{% endblock %}

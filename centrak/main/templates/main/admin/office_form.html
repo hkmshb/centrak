@@ -4,7 +4,7 @@
 <div class="hook" data-v="AdminOrganisationForm">
     <div class="panel panel-default panel-sq">
         <div class="panel-heading">
-            {% if not is_spoint %}<i class="fa fa-fw fa-building"></i>{{ form.mode }} Region {{ form.is_new }}
+            {% if not is_spoint %}<i class="fa fa-fw fa-building"></i>{{ form.mode }} Region
             {% else %}<i class="fa fa-fw fa-home"></i>{{ form.mode }} Service Point {% endif %}
             <div class="buttons pull-right">
                 <a class="btn btn-default btn-sm btn-slim cancel" href="{{ form|urlcancel:"{% url 'admin-org-detail' %}" }}">
