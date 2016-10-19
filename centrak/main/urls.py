@@ -29,7 +29,7 @@ urlpatterns = [
             url(r'^users/(?P<user_id>[0-9]+)/', include([
                 url(r'^$', adm_views.user_detail, name='admin-user-info'),
                 url(r'^update$', adm_views.manage_user, name='admin-user-upd'),
-                url(r'^set-password$', adm_views.user_set_password, name='admin-passwd-set'),
+                url(r'^manage-passwd$', adm_views.user_manage_passwd, name='admin-passwd-set'),
             ])),
 
             url(r'^offices/', include([

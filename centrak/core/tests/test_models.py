@@ -2,8 +2,8 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 
-from .models import BusinessLevel, Organisation, BusinessOffice
-from .exceptions import InvalidOperationError
+from ..models import BusinessLevel, Organisation, BusinessOffice
+from ..exceptions import InvalidOperationError
 
 
 
@@ -11,11 +11,11 @@ from .exceptions import InvalidOperationError
 class TestBusinessLevel(object):
     
     def test_can_create_for_valid_code_with_name(self):
-        assert BusinessLevel.objects.count() == 0
-        obj = BusinessLevel(code='L1', name='Level 1')
-        obj.save()
-        
-        assert BusinessLevel.objects.count() == 1
+        if BusinessLevel.objects.count() == 0:
+            obj = BusinessLevel(code='L1', name='Level 1')
+            obj.save()
+            
+            assert BusinessLevel.objects.count() == 1
     
     def test_creation_fails_for_code_not_specified_in_choices(self):
         code = 'XY'
@@ -28,7 +28,7 @@ class TestBusinessLevel(object):
             obj.full_clean()
     
     def test_creation_fails_for_duplicate_code(self):
-        BusinessLevel.objects.create(code='L1', name='Level 1')
+        # BusinessLevel.objects.create(code='L1', name='Level 1')
         obj = BusinessLevel(code='L1', name='Level X')
         with pytest.raises(ValidationError):
             obj.full_clean()
@@ -63,8 +63,10 @@ class TestOrganisation(object):
 class TestBusinessOffice(object):
     
     def _create_business_levels(self):
-        self._level1 = BusinessLevel.objects.create(code='L1', name='Level 1')
-        self._level2 = BusinessLevel.objects.create(code='L2', name='Level 2')
+        # no need to create any more objects here as required objects are 
+        # created when applying a migration...
+        self._level1 = BusinessLevel.objects.get(code='L1')
+        self._level2 = BusinessLevel.objects.get(code='L2')
     
     def test_sublevel_office_can_have_null_parent(self):
         self._create_business_levels()

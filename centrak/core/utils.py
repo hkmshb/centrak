@@ -17,10 +17,11 @@ def is_valid_official_email_format(email, fname, lname):
     """
     Determines whether provided email is in desired official format.
     """
+    strip = lambda x: x.replace("'", '').replace('-', '').lower()
     if email and fname and lname:
         name_parts = [n for n in (email.split('@')[0]).split('.') if n]
         if len(name_parts) == 2:
             for name in name_parts:
-                if name == fname.lower() or name == lname.lower():
+                if name == strip(fname) or name == strip(lname):
                     return True
     return False

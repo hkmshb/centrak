@@ -32,8 +32,8 @@
                             <span>{{ u.username }}</span>
                         </div>
                         <div class="col-sm-6">
-                            <div><i class="fa fa-fw fa-map-marker"></i> {{ u.profile.full_location|default:"--" }}</div>
-                            <div><i class="fa fa-fw fa-sliders"></i> {{ u|user_roles|default:"--" }}</div>
+                            <div title="Location"><i class="fa fa-fw fa-map-marker"></i> {{ u.profile.full_location|default:"--" }}</div>
+                            <div title="Roles"><i class="fa fa-fw fa-sliders"></i> {{ u|user_roles|default:"--" }}</div>
                         </div></a>
                     </td>
                     <td class="text-right">{% if u.is_active %}

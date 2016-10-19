@@ -41,10 +41,15 @@
         </div>
         <div class="sub-panel">
             <div class="panel-body">
-                <div class="section col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad"> 
-                    &nbsp; Status: &nbsp;{% if user.is_active %}
-                    <i class="fa fa-fw fa-toggle-on text-success2"></i> ACTIVE {% else %}
-                    <i class="fa fa-fw fa-toggle-off"></i> INACTIVE {% endif %}
+                <div class="section data-card col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad"> 
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Status: &nbsp;{% if user.is_active %}</span>
+                        <i class="fa fa-fw fa-toggle-on text-success2"></i> ACTIVE {% else %}
+                        <i class="fa fa-fw fa-toggle-off"></i> INACTIVE {% endif %}
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Password: </span> {% if user.password %} ******** {% else %} - {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,7 +65,7 @@
             <div id="pwd-panel" class="panel-body collapse">{% with form=form_pwd %}
                 <form method="post" action="{% url 'admin-passwd-set' user.id %}">
                     <div class="form-group">{% if form.old_password.label %}
-                        <div class="col-sm-3 rd-l-pad rd-r-pad"><!--
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.old_password.errors %}has-error{% endif %}"><!--
                             <label for="{{ form.old_password.id_for_label }}">{{ form.old_password.label }}{% if form.old_password.errors %}
                                 <span class="text-danger" title="{{ form.old_password.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
                             {% endif %}</label> -->

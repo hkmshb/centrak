@@ -81,6 +81,11 @@ def has_object_permission(user, obj, add_perm, change_perm, pk='id'):
 
 #: ==+: admin view functions
 @admin_with_permission()
+def admin_home(request):
+    return render(request, 'main/admin/index.html')
+
+
+@admin_with_permission()
 def user_list(request):
     users = User.objects.all()
     return render(request, 'main/admin/user_list.html', {
@@ -116,10 +121,24 @@ def user_detail(request, user_id):
 
 
 @admin_with_permission()
-def user_set_password(request, user_id):
-    # todo: ...
+def user_manage_passwd(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    raise NotImplementedError()
+    is_same_user = request.user.id == user.id
+    form_class = auth_forms.SetPasswordForm
+    if is_same_user:
+        form_class = auth_forms.PasswordChangeForm
+    
+    form = form_class(user, data=request.POST)
+    if form.is_valid():
+        form.save()
+
+        msg_fmt = 'Password has been %s successfully'
+        messages.success(request, msg_fmt % ('changed' if is_same_user else 'set'), 
+                         extra_tags='success')
+    else:
+        messages.error(request, form.errors.as_text(), extra_tags='danger')
+
+    return redirect(reverse('admin-user-info', args=[user_id]))
 
 
 @admin_with_permission()
@@ -153,11 +172,6 @@ def manage_user(request, user_id=None):
     return render(request, 'main/admin/user_form.html', {
         'form': form
     })
-
-
-@admin_with_permission()
-def admin_home(request):
-    return render(request, 'main/admin/index.html')
 
 
 @admin_with_permission()
