@@ -2,7 +2,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 from django import forms
 
-from .models import UserProfile, Organisation, BusinessOffice, BusinessLevel
+from .models import UserProfile, Organisation, BusinessOffice, BusinessLevel, \
+        ApiServiceInfo
 from . import utils
 
 
@@ -127,6 +128,40 @@ class UserProfileForm(BaseModelForm):
             if is_new_user and profile.user.id:
                 profile.user.delete()
             raise ex
+
+class ApiServiceInfoForm(BaseModelForm):
+    class Meta:
+        model = ApiServiceInfo
+        exclude = ['api_token']
+        attrs_ = {'class': 'form-control input-sm'}
+        attrds = {'class': 'form-control input-sm', 'style': 'height: 139px'}
+        widgets = {
+            'key': forms.TextInput(attrs=attrs_),
+            'title': forms.TextInput(attrs=attrs_),
+            'description': forms.Textarea(attrs=attrds),
+            'api_root': forms.TextInput(attrs=attrs_),
+            'api_auth': forms.TextInput(attrs=attrs_),
+            'api_extra': forms.TextInput(attrs=attrs_),
+        }
+
+    @property
+    def is_new(self):
+        if self.instance:
+            return (self.instance['key'] in ('', None))
+        return False
+
+    @property
+    def mode(self):
+        if self.instance:
+            return ("Update" if self.instance['key'] else "New")
+        return ""
+    
+    def clean_key(self):
+        key = self.cleaned_data.get("key")
+        if not utils.is_valid_service_key(key):
+            message = "The key cannot contain any of these characters: %s"
+            raise ValidationError(message % utils.INVALID_SERVICE_KEY_CHAR)
+        return key
 
 
 class BusinessEntityForm(BaseModelForm):

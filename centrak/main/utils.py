@@ -11,7 +11,12 @@ MSG_FMT_SUCCESS_ADD = '%s added successfully.'
 MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
 
 
-##::
+##:: menu
+def is_admin_view(request):
+    target_prefix = settings.CENTRAK_ADMIN_PREFIX_URL.lower()
+    return (request.path.lower().startswith(target_prefix))
+
+
 class Menu(object):
     """Defines the application menu."""
     
@@ -56,7 +61,7 @@ class Menu(object):
             Menu.Item(self, _('System'), 'fa-gears', children=(
                 Menu.Item(self, _('Settings'), 'fa-gears'),
                 Menu.Item(self, _('Users'), 'fa-users', reverse('admin-user-list')),
-                Menu.Item(self, _('External API Services'), 'fa-cloud'))),
+                Menu.Item(self, _('External API Services'), 'fa-cloud', reverse('admin-apiservice-list')))),
             Menu.Item(self, _('DISCO Setup'), 'fa-institution', children=(
                 Menu.Item(self, _('Organisation'), 'fa-building-o', reverse('admin-org-detail')),
                 Menu.Item(self, _('Business Offices'), 'fa-home', reverse('admin-offices')),

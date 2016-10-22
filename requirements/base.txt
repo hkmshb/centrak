@@ -1,2 +1,4 @@
 django==1.8.15
 https://github.com/hkmshb/django-ezaddress/archive/v0.3.1.tar.gz
+django-filter==0.15.2
+djangorestframework==3.3.3

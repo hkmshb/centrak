@@ -18,6 +18,9 @@
         {% block content-pane %}{% endblock %}
     </div>
     {% endblock %}
+    <script id="config" type="text/json">
+        {"apiRoot": "{{ api_root }}"}
+    </script>
 {% endblock %}
 {% block script-extra %}{{ block.super }}
     <script src="{% static 'js/views.js' %}"></script>

@@ -1,5 +1,7 @@
+from django.core.urlresolvers import reverse
 from django import template
 register = template.Library()
+
 
 
 @register.filter
@@ -7,8 +9,11 @@ def urlcancel(form, default_url):
     if form.instance:
         if form.url_cancel:
             return form.url_cancel
-        elif form.instance.id:
-            return form.instance.get_absolute_url()            
+        elif form.instance._get_pk_val():
+            return form.instance.get_absolute_url()
+    
+    if (default_url.startswith('@')):
+        return reverse(default_url.replace('@',''))
     return default_url
 
 

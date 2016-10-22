@@ -1,0 +1,100 @@
+{% extends 'base_admin.html' %}
+{% load staticfiles %}
+{% block content-pane %}
+<div class="hook" data-v="ApiServiceView">
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-download"></I> External API Service
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-apiservice-upd' service.key %}">
+                    <i class="fa fa-fw fa-pencil"></i> Update
+                </a>
+                <a class="btn btn-danger btn-sm btn-slim clear-token">
+                    <i class="fa fa-fw fa-times"></i> Clear Token
+                </a>
+            </div>
+        </div>
+        <div class="panel-body"  style="padding-bottom:0;">
+            <div class="data-card col-sm-12 rd-l-pad rd-r-pad">
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Key</span><label class="key">{{ service.key }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Title</span><label>{{ service.title }} </label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Description</span><label>{{ service.description }}</label>
+                    </div>
+                    <div class="x-v-spread">
+                        <div class="col-sm-6 rd-l-pad">
+                            <span>API Root</span> <label class="api-root"> {{ service.api_root }}</label>
+                        </div>
+                        <div class="col-sm-6 rd-l-pad">
+                            <span>API Auth</span> <label class="api-auth">{{ service.api_auth }}</label>
+                        </div>
+                        <div class="col-sm-offset-6 col-sm-6 rd-l-pad">
+                            <span>API Extra</span> <label>{{ service.api_extra|default:"-" }}</label>
+                        </div>
+                        <div class="col-sm-offset-6 col-sm-6 rd-l-pad">
+                            <span>API Token</span> <label class="api_token">{{ service.api_token|default:"-" }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sub-panel">
+            <div class="panel-body">
+                <div class="section data-card rd-l-pad rd-r-pad"> 
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Status: &nbsp;{% if service.is_active %}</span>
+                        <i class="fa fa-fw fa-toggle-on text-success2"></i> ACTIVE {% else %}
+                        <i class="fa fa-fw fa-toggle-off"></i> INACTIVE {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sub-panel manage-token">
+            <a class="plain" href="#token-panel" data-toggle="collapse">
+                <div class="panel-heading">
+                    <i class="fa fa-fw fa-hashtag"></i> Manage API Token
+                    <div class="buttons pull-right" style="padding-top: 5px; color: #ddd;">
+                        <i class="fa fa-chevron-left"></i>
+                    </div>
+                </div>
+            </a>
+            <div id="token-panel" class="panel-body collapse">
+                <form method="post" class="auth-form">
+                    <div class="form-group">
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <input type="text" name="username" class="form-control input-sm username" required />
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <input type="password" name="password" class="form-control input-sm password" required />
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad">
+                            <button class="btn btn-default btn-sm btn-block get-token">&nbsp; Get Token &nbsp; </button>
+                        </div>
+                        <div class="col-sm-1 rd-l-pad processing hide">
+                            <img height="30px" width="30px" src="{% static 'imgs/progress.gif' %}" />
+                        </div>
+                    </div>
+                </form>
+                <form method="post" class="token-form hide" action="{% url 'admin-apiservice-token-set' service.key %}">
+                    <div class="form-group">
+                        <div class="col-sm-8 rd-l-pad rd-r-pad">
+                            <input type="text" name="token" class="form-control input-sm token" disabled="disabled" />
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad">
+                            <button class="btn btn-success btn-sm btn-block set-token">Apply Token</button>
+                        </div>
+                    </div>
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

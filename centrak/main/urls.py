@@ -22,7 +22,15 @@ urlpatterns = [
         include([
             url(r'^$', adm_views.admin_home, name='admin-home'),
             url(r'^org/$', adm_views.org_info, name='admin-org-detail'),
-            url(r'^org/update$', adm_views.manage_org, name='admin-org-upd'),
+            url(r'^org/update$', adm_views.manage_org, name='admin-org-upd'),        
+
+            url(r'^apiservices/$', adm_views.apiservice_list, name='admin-apiservice-list'),
+            url(r'^apiservices/create$', adm_views.manage_apiservice, name='admin-apiservice-add'),
+            url(r'^apiservices/(?P<key>\w+)/', include([
+                url(r'^$', adm_views.apiservice_detail, name='admin-apiservice-info'),
+                url(r'^update$', adm_views.manage_apiservice, name='admin-apiservice-upd'),
+                url(r'^set-token$', adm_views.apiservice_detail, name='admin-apiservice-token-set'),
+            ])),
             
             url(r'^users/$', adm_views.user_list, name='admin-user-list'),
             url(r'^users/new$', adm_views.manage_user, name='admin-user-add'),

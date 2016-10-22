@@ -38,3 +38,15 @@ class TestUserEmail(object):
         ('abdul-lahi', 'usman', 'abdullahi.usman@kedco.ng')])
     def test_passes_for_first_or_lastname_in_valid_domained_email(self, fname, lname, email):
         assert utils.is_valid_official_email_format(email, fname, lname) == True
+
+
+class TestUtilityFunctions(object):
+
+    @pytest.mark.parametrize("key", [
+        "sample key", "sample'key", "sample/key", "sample\\key", "sample~key", 
+        "sample@key", "sample#key", "sample$key", "sample%key", "sample^key", 
+        "sample&key", "sample*key", "sample(key", "sample)key", "sample+key", 
+        "sample=key", "sample,key", "sample?key"])
+    def test_cleanup_fails_for_key_with_defined_invalid_chars(self, key):
+        assert utils.INVALID_SERVICE_KEY_CHAR != None
+        assert utils.is_valid_service_key(key) == False

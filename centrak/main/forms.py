@@ -1,18 +1,20 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django import forms
 
-from core import models, utils, forms as core_forms
-
+from core import models, utils as core_utils, forms as core_forms
 
 User = get_user_model()
 
 
 
 class UserRegistrationForm(UserCreationForm):
-    """Form for registering/creating a new user for CENTrak."""
+    """
+    Form for registering/creating a new user for CENTrak.
+    """
     
     _error_messages = core_forms.UserProfileForm._error_messages.copy()
     
@@ -33,7 +35,7 @@ class UserRegistrationForm(UserCreationForm):
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if not utils.has_valid_email_domain(email):
+        if not core_utils.has_valid_email_domain(email):
             msg = self._error_messages['invalid-email-domain']
             raise forms.ValidationError(msg)
         
@@ -49,7 +51,7 @@ class UserRegistrationForm(UserCreationForm):
         lname = cleaned_data.get('last_name')
         email = cleaned_data.get('email')
         
-        if not utils.is_valid_official_email_format(email, fname, lname):
+        if not core_utils.is_valid_official_email_format(email, fname, lname):
             msg = self._error_messages['invalid-email-format']
             raise forms.ValidationError(msg)
         return cleaned_data
@@ -65,3 +67,4 @@ class UserRegistrationForm(UserCreationForm):
         profile = models.UserProfile(user_id=user.id)
         profile.save()
         return user
+

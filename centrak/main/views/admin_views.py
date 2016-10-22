@@ -1,6 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, \
-        user_passes_test
 from django.contrib.auth import get_user_model, forms as auth_forms
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -8,9 +6,11 @@ from django.db.models import Q, Count
 
 from ezaddress.models import State
 from core.models import UserProfile, BusinessLevel, BusinessOffice, \
-        Organisation, Voltage, Station, Powerline 
-from core.forms import OrganisationForm, OfficeForm, UserProfileForm
-from .. import utils
+        Organisation, Voltage, Station, Powerline, ApiServiceInfo
+from core.forms import OrganisationForm, OfficeForm, UserProfileForm, \
+        ApiServiceInfoForm
+from core.utils import admin_with_permission, has_object_permission
+from .. import utils, models, forms
 
 
 
@@ -33,57 +33,11 @@ def get_station_type_id(tab_key):
     return (Station.INJECTION if tab_key == 'injection' else Station.DISTRIBUTION)
 
 
-#: ==+ decorators
-def admin_with_permission(perm=None, login_url=None, raise_exception=False):
-    """
-    Decorator for views that checks whether a user 'is_staff' and has particular
-    permission enabled, redirecting to the log-in page if necessary. If the 
-    raise_exception parameter is given the PermissionDenied exception is raised.
-    """
-    def check_perms(user):
-        # ensure that user is a staff to access the ADMIN AREA
-        if not user.is_staff:
-            return False
-        if not perm:
-            return True
-        
-        # extracted from django.contrib.auth.decorators.permission_required
-        if not isinstance(perm, (list, tuple)):
-            perms = (perm,)
-        else:
-            perms = perm
-        
-        # first check if the user has the permission (even anonymous users)
-        if user.has_perms(perms):
-            return True
-        # in clase 403 handler should be called raise the Exception
-        if raise_exception:
-            raise PermissionDenied
-        # as last resort, show login form
-        return False
-    return user_passes_test(check_perms, login_url=login_url)
-
-
-def has_object_permission(user, obj, add_perm, change_perm, pk='id'):
-    """
-    Determines whether user has permission to create or change an object based
-    on the status (new, existing) of the object. 
-    """
-    assert add_perm not in ('', None) or change_perm not in ('', None)
-    if not getattr(obj, pk):
-        if add_perm and user.has_perm(add_perm):
-            return (True, None)
-    else:
-        if change_perm and user.has_perm(change_perm):
-            return (True, None)
-    return (False, redirect(reverse('login')))
-
 
 #: ==+: admin view functions
 @admin_with_permission()
 def admin_home(request):
     return render(request, 'main/admin/index.html')
-
 
 @admin_with_permission()
 def user_list(request):
@@ -171,6 +125,46 @@ def manage_user(request, user_id=None):
         form = UserProfileForm(**kwargs)
     return render(request, 'main/admin/user_form.html', {
         'form': form
+    })
+
+
+@admin_with_permission()
+def apiservice_list(request):
+    services = ApiServiceInfo.objects.all()
+    return render(request, 'main/admin/apiservice_list.html', {
+        'services': services
+    })
+
+
+@admin_with_permission()
+def manage_apiservice(request, key=None):
+    service = ApiServiceInfo()
+    if key:
+        service = get_object_or_404(ApiServiceInfo, key=key)
+    
+    if request.method == 'POST':
+        try:
+            form = ApiServiceInfoForm(data=request.POST, instance=service)
+            if form.is_valid():
+                service = form.save()
+                
+                message = utils.MSG_FMT_SUCCESS_UPD if key else utils.MSG_FMT_SUCCESS_ADD
+                messages.success(request, message % 'External API Service', extra_tags='success')
+                return redirect(reverse('admin-apiservice-info', args=[service.key]))
+        except Exception as ex:
+            messages.error(request, str(ex), extra_tags='danger')
+    else:
+        form = ApiServiceInfoForm(instance=service)
+    return render(request, 'main/admin/apiservice_form.html', {
+        'form': form
+    })
+
+
+@admin_with_permission()
+def apiservice_detail(request, key):
+    service = get_object_or_404(ApiServiceInfo, key=key)
+    return render(request, 'main/admin/apiservice_detail.html', {
+        'service': service
     })
 
 

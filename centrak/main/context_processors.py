@@ -11,3 +11,12 @@ def current_date(request):
 def menu(request):
     """Adds the application menu to the context."""
     return {'menu': lambda: utils.Menu(request)}
+
+
+def jsconf(request):
+    """Provides some JavaScript configuration."""
+    context = {'api_root': settings.CENTRAK_API_ROOT}
+    if utils.is_admin_view(request):
+        context.update({
+        })
+    return context

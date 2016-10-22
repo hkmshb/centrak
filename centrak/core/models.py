@@ -12,6 +12,21 @@ from .exceptions import InvalidOperationError
 
 
 #*----------------------------------------------------------------------------+
+#| Abstract Core Models
+#+----------------------------------------------------------------------------+
+class TimeStampedModel(models.Model):
+    """
+    Abstract base model with fields for tracking object creation and last
+    update dates.
+    """
+    date_created = models.DateField(auto_now_add=True)
+    last_updated = models.DateField(auto_now=True, null=True)
+
+    class Meta:
+        abstract = True
+
+
+#*----------------------------------------------------------------------------+
 #| UserProfile and other User related models.
 #+----------------------------------------------------------------------------+
 class UserProfile(models.Model):
@@ -50,20 +65,30 @@ class UserSettings(models.Model):
     capture_page_size = models.PositiveIntegerField(_('Capture Page Size'),
                     default=settings.CENTRAK_CAPTURE_PAGE_SIZE)
 
-
 #*----------------------------------------------------------------------------+
-#| Abstract Core Models
+#| ApiServiceInfo
 #+----------------------------------------------------------------------------+
-class TimeStampedModel(models.Model):
+class ApiServiceInfo(TimeStampedModel):
     """
-    Abstract base model with fields for tracking object creation and last
-    update dates.
+    Maintains a list of accessible API Services.
     """
-    date_created = models.DateField(auto_now_add=True)
-    last_updated = models.DateField(auto_now=True, null=True)
+    key = models.CharField(_('Service Key'), max_length=20, primary_key=True)
+    title = models.CharField(_('Service Title'), max_length=50, unique=True)
+    description = models.TextField(_('Service Description'), blank=True)
+    api_root  = models.URLField(_('API Root'), max_length=100, unique=True)
+    api_auth  = models.URLField(_('API Auth'), max_length=100, blank=True)
+    api_extra = models.URLField(_('API Extra'), max_length=100, blank=True)
+    api_token = models.CharField(_('API Token'), max_length=100, blank=True)
+    is_active = models.BooleanField(_('Is Active'), default=False)
 
+    def __str__(self):
+        return "Service: [{}], {}".format(self.key, self.title)
+    
     class Meta:
-        abstract = True
+        db_table = 'apiservice_info'
+    
+    def get_absolute_url(self):
+        return reverse('admin-apiservice-info', args=[self.key])
 
 
 #*----------------------------------------------------------------------------+

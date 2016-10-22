@@ -1,0 +1,74 @@
+{% extends 'base_admin.html' %}
+{% load centrak %}
+{% block content-pane %}
+<div class="hook" data-v="FormView">
+    <div class="panel panel-default panel-sq">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-cloud"></i> {{ form.mode }} External API Service
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim done" href="{{ form|urlcancel:"@admin-apiservice-list" }}">
+                    <i class="fa fa-fw fa-close"></i> Cancel</a>
+                <button class="btn btn-default btn-sm btn-slim save">
+                    <i class="fa fa-fw fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form method="post">
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.key.id_for_label }}">{{ form.key.label }}{% if form.key.errors %}
+                        <span class="text-danger" title="{{ form.key.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.key }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.title.id_for_label }}">{{ form.title.label }}{% if form.title.errors %}
+                        <span class="text-danger" title="{{ form.title.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.title }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.description.id_for_label }}">{{ form.description.label }}{% if form.description.errors %}
+                        <span class="text-danger" title="{{ form.description.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.description }}
+                </div>
+                <div class="col-sm-6 rd-l-pad">
+                    <label for="{{ form.api_root.id_for_label }}">{{ form.api_root.label }}{% if form.api_root.errors %}
+                        <span class="text-danger" title="{{ form.api_root.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                    {% endif %}</label>
+                    {{ form.api_root }}
+                </div>
+                <div class="v-spread">
+                    <div class="col-sm-6 rd-l-pad">
+                        <label for="{{ form.api_auth.id_for_label }}">{{ form.api_auth.label }}{% if form.api_auth.errors %}
+                            <span class="text-danger" title="{{ form.api_auth.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                        {% endif %}</label>
+                        {{ form.api_auth }}
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <label for="{{ form.api_extra.id_for_label }}">{{ form.api_extra.label }}{% if form.api_extra.errors %}
+                            <span class="text-danger" title="{{ form.api_extra.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
+                        {% endif %}</label>
+                        {{ form.api_extra }}
+                    </div>
+                </div>
+            </div>
+            <div class="sub-panel" style="margin: 20px 0 0 0; padding:0;">
+                <div class="panel-body rd-l-pad" style="padding:0;">
+                    <div class="form-group col-sm-6 rd-l-pad checkbox">
+                        <label>
+                            {{ form.is_active.label }}<span style="margin-left: 30px;"> {{ form.is_active }}</span>                      
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {% csrf_token %}
+            </form>
+        </body>
+    </div>
+</div>
+{% endblock %}

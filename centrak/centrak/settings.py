@@ -39,6 +39,8 @@ INSTALLED_APPS = (
 
     # third-party
     'ezaddress',
+    'django_filters',
+    'rest_framework',
     
     # internal
     'main',
@@ -72,6 +74,7 @@ TEMPLATES = [
 
                 # internal
                 'main.context_processors.menu',
+                'main.context_processors.jsconf',
                 'main.context_processors.current_date',
             ],
         },
@@ -118,6 +121,7 @@ LOGIN_REDIRECT_URL = '/'
 ##: ==+: Internal
 CENTRAK_OFFICIAL_DOMAINS = ['kedco.ng', 'kedco.net', 'tmp.kedco.ng']
 CENTRAK_ADMIN_PREFIX_URL = '/admin/'
+CENTRAK_API_ROOT         = '/api/v1/'
 
 CENTRAK_DEFAULT_PAGE_SIZE = 50
 CENTRAK_CAPTURE_PAGE_SIZE = 200

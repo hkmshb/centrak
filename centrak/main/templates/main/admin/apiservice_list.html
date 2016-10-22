@@ -1,0 +1,45 @@
+{% extends 'base_admin.html' %}
+{% load centrak %}
+{% block content-pane %}
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-cloud"></i> External API Services
+            {% if services.exists %}
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-apiservice-add' %}">
+                    <i class="fa fa-fw fa-plus"></i> Add
+                </a>
+            </div>
+            {% endif %}            
+        </div>
+        <div class="panel-body">
+        {% if not services.exists %}
+            <div class="action-notice">
+                No External API Service found <br/>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-apiservice-add' %}">Add an External API Service</a>
+            </div>
+        {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Title</th><th>API Root</th><th></th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for s in services %}
+                    <tr><td><a href="{% url 'admin-apiservice-info' s.key %}">{{ s.title }}</a></td>
+                        <td>{{ s.api_root }}</td>
+                        <td>{% if s.api_token %}
+                            <i title="Has API Token" class="fa fa-fw fa-key text-success2"></i>{% else %}
+                            <i tltle="No API Token" class="fa fa-fw fa-key"></i>{% endif %}{% if s.api_auth %}
+                            <i title="Has Auth Url" class="fa fa-fw fa-sign-in text-success2"></i>{% else %}
+                            <i title="No Auth Url" class="fa fa-fw fa-sign-in"></i>{% endif %}{% if s.is_active %}
+                            <i title="Is Active" class="fa fa-fw fa-toggle-on text-success2"></i>{% else %}
+                            <i title="Inactive" class="fa fa-fw fa-toggle-off"></i> {% endif %}
+                            </td>
+                        <td><i class="fa fa-fw fa-trash"></i></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}
