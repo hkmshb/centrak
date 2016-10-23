@@ -19,9 +19,11 @@
     </div>
     {% endblock %}
     <script id="config" type="text/json">
-        {"apiRoot": "{{ api_root }}"}
+        {"apiRoot": "{{ api_root }}"{% block config-extra %}{% endblock %}}
     </script>
 {% endblock %}
 {% block script-extra %}{{ block.super }}
+    <script src="{% static 'js/models.js' %}"></script>
+    <script src="{% static 'js/collections.js' %}"></script>
     <script src="{% static 'js/views.js' %}"></script>
 {% endblock %}

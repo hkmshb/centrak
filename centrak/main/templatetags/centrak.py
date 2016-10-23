@@ -40,3 +40,10 @@ def user_roles(user):
     if user.groups.exists:
         value = ", ".join([g.name for g in user.groups.all()])
     return value
+
+
+@register.filter
+def fa_synced_by(synced_by, default):
+    if synced_by not in ('', None):
+        return ('fa-laptop' if synced_by == 'auto' else 'fa-user')
+    return 'fa-question'

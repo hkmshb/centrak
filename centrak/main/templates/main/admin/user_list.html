@@ -1,9 +1,6 @@
 {% extends 'base_admin.html' %}
 {% load humanize centrak %}
 {% block content-pane %}
-<style type="text/css">
-    tr:first-child td { border-top: none !important; }
-</style>
 <div class="panel panel-default panel-sqi">
     <div class="panel-heading">
         <i class="fa fa-fw fa-users"></i> Users
@@ -21,7 +18,7 @@
             application much less this page!
         </div>
     {% else %}
-        <table class="table table-stripped table-condensed">
+        <table class="table table-stripped table-condensed no-thead">
             <tbody>
                 {% for u in users %}
                 <tr><td colspan="4">

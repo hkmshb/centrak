@@ -1,8 +1,10 @@
 from rest_framework import authentication, permissions, filters
 from rest_framework import viewsets
+from rest_framework_mongoengine import viewsets as mviewsets
 
 from core.models import ApiServiceInfo
-from .serializers import ApiServiceInfoSerializer
+from enumeration.models import XForm
+from .serializers import ApiServiceInfoSerializer, XFormSerializer
 
 
 
@@ -33,3 +35,12 @@ class ApiServiceInfoViewSet(DefaultMixin, viewsets.ModelViewSet):
     """
     queryset = ApiServiceInfo.objects.order_by('date_created')
     serializer_class = ApiServiceInfoSerializer
+
+
+class XFormViewSet(DefaultMixin, mviewsets.ModelViewSet):
+    """
+    API endpoint for listing and creating XForms.
+    """
+    queryset = XForm.objects.order_by('object_id')
+    serializer_class = XFormSerializer
+

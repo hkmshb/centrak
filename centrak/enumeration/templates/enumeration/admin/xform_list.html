@@ -1,0 +1,83 @@
+{% extends 'base_admin.html' %}
+{% load staticfiles humanize centrak %}
+{% block content-pane %}
+{{ xforms_obj_ids }}
+<div class="hook" data-v="{% if tab == 'external' %}SurveyXFormView{% endif %}">
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading tabbed">
+            <ul class="nav nav-tabs nav-flattabs">
+                <li{% if tab != 'external' %} class="active"{% endif %}><a href="{% url 'admin-xform-list' %}"><i class="fa fa-fw fa-wpforms"></i> Imported XForms</a></li>
+                <li{% if tab == 'external' %} class="active"{% endif %}><a href="{% url 'admin-xform-list' %}external/"><i class="fa fa-fw fa-cloud"></i> Survey XForms</a></li>
+            </ul>
+            {% if tab == 'external' %}
+            <div class="buttons pull-right">
+                <button class="btn btn-default btn-sm btn-slim import">
+                    <i class="fa fa-fw fa-download"></i> Import
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        <div class="panel-body xform-list">
+        {% if not tab or tab == 'imported' %}
+            {% if not xforms %}
+            <div class="action-notice">{% with label=tab|default:"33"|title %}
+                No Import XForm found <br/>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-xform-list' %}external/">Import Survey XForm</a>{% endwith %}
+            </div>
+            {% else %}
+            <table class="table table-stripped table-condensed">
+                <thead>
+                    <tr><th>Title</th><th>Capture Count</th><th>Last Synced</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for f in xforms %}
+                    <tr><td><a href="{# url 'admin-xform-info' f.id_string #}">{{ f.title }}</a></td>
+                        <td>-</td>
+                        <td><i class="fa fa-fw fa-clock-o"></i> {{ f.last_synced }}</td>
+                        <td><i class="fa fa-fw {{ f.synced_by|fa_synced_by:'Unknown' }}" title="Synced by: {{ f.synced_by|default:'Unknown' }}"></i>
+                            {% if f.is_active %}<i class="fa fa-fw fa-toggle-on text-success2" title="Status: ACTIVE"></i>{% else %}
+                            <i class="fa fa-fw fa-toggle-off" title="Status: INACTIVE"></i>{% endif %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        {% else %}
+            <div class="loading text-center" style="height: 100px">
+                <br/>
+                <img height="40px" weight="40px" src="{% static 'imgs/progress.gif' %}" />
+            </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+<script type="application/json" id="bootstrap">
+    {"object_ids": {{ object_ids }}}
+</script>
+<script type="text/template" id="list-template">
+<% if (xforms === null || xforms.length === 0) { %>
+    <div class="action-notice">
+    <% if (_.isEmpty(_error)) { %>
+        No data found <br/>
+        <a class="btn btn-default btn-sm" href="{% url 'admin-xform-list' %}external/">Refresh</a>
+    <% } else { %>
+        <i class="fa fa-warning text-danger fa-lg"></i><br/>
+        Error occured connecting to an External API Service. <br/>
+        Please check your External API Services settings.
+    <% } %>
+    </div>
+<% } else { %> 
+    <table class="table table-stripped table-condensed">
+        <thead>
+            <tr><th>XForms</th><th><input type="checkbox" class="toggler" /></th></tr>
+        </thead>
+        <tbody><% _.each(xforms.models, function(m) {  var id = m.get('id'); %>
+            <tr><td><%- m.get('title') %></td><% if (_(object_ids).contains(id)) { %>
+                <td><i class="fa fa-fw fa-check"></i></td><% } else { %>
+                <td id="c<%- id %>"><input type="checkbox" name="item" class="icheckbox" value="<%- id %>" /></td><% } %></tr> 
+        <% }) %>
+        </tbody>
+    </table>
+<% } %>
+</script>
+{% endblock %}
+{% block config-extra %}, "xformsEndpoint": "{{ xforms_endpoint}}", "survey": {"apiRoot": "{{ survey_api_root }}"}{% endblock %}

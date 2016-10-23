@@ -9,7 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 import os
-
+import mongoengine
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
@@ -39,12 +39,16 @@ INSTALLED_APPS = (
 
     # third-party
     'ezaddress',
+    'mongoengine',
     'django_filters',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_mongoengine',
     
     # internal
     'main',
     'core',
+    'enumeration',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -113,6 +117,15 @@ STATICFILES_DIRS = [
 ]
 
 
+##: ==+: mongo-engine settings
+_MONGODB_NAME = 'centrak'
+_MONGODB_HOST = ''
+_MONGODB_USER = ''
+_MONGODB_PWD  = ''
+
+#mongoengine.connect(_MONGODB_NAME)
+
+
 ##: ==+: Auth:
 LOGIN_URL = '/account/login'
 LOGIN_REDIRECT_URL = '/'
@@ -125,3 +138,6 @@ CENTRAK_API_ROOT         = '/api/v1/'
 
 CENTRAK_DEFAULT_PAGE_SIZE = 50
 CENTRAK_CAPTURE_PAGE_SIZE = 200
+
+
+from . import local_settings

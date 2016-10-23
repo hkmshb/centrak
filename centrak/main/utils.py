@@ -57,7 +57,7 @@ class Menu(object):
         return (
             Menu.Item(self, _('Dashboard'), 'fa-dashboard', reverse('admin-home')),
             Menu.Item(self, _('Projects'), 'fa-cubes'),
-            Menu.Item(self, _('Survey Forms'), 'fa-wpforms'),
+            Menu.Item(self, _('Survey XForms'), 'fa-wpforms', reverse('admin-xform-list')),
             Menu.Item(self, _('System'), 'fa-gears', children=(
                 Menu.Item(self, _('Settings'), 'fa-gears'),
                 Menu.Item(self, _('Users'), 'fa-users', reverse('admin-user-list')),

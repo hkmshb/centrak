@@ -40,6 +40,7 @@ module.exports = function(grunt) {
                     {dest:destJS, src:['fbower_comps/bootstrap/dist/js/bootstrap.min.js'], expand:true, flatten:true},
                     {dest:destJS, src:['fbower_comps/underscore/underscore-min.js'], expand:true, flatten:true},
                     {dest:destJS, src:['fbower_comps/backbone/backbone-min.js'], expand:true, flatten:true},
+                    {dest:destJS, src:['fbower_comps/moment/min/moment.min.js'], expand:true, flatten:true},
                 ],
             }
         }

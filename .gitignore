@@ -11,4 +11,5 @@ instance
 *.log
 .*
 
+local_settings.py
 static/css/*.css

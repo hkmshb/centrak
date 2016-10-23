@@ -4,22 +4,113 @@
     'use strict';
 
     // ::: views :::
-    var FormView = Backbone.View.extend({
+    var TemplateView = Backbone.View.extend({
+        innerEl: '',
+        templateName: '',
         el: '.content-pane',
-        events: {
-            'click button.save': 'submit'
+        initialize: function() {
+            this.$alert = $('.js.alert', this.$el);
         },
-        submit: function() {
-            $('form', this.$el).submit();
+        getCanvas: function() {
+            if (!_.isEmpty(this.innerEl)) {
+                if (_.isEmpty(this.$innerEl))
+                    this.$innerEl = $(this.innerEl, this.$el);
+                return this.$innerEl;
+            } else {
+                this.$innerEl = null;
+                return this.$el;
+            }
+        },
+        getContext: function() {
+            return null;
+        },
+        render: function() {
+            var context = this.getContext();
+            if (_.isEmpty(context)) return;
+
+            var _template = _.template($(this.templateName).html())
+              , html = _template(context)
+              , canvas = this.getCanvas();
+            
+            canvas.html(html);
+            this.showMessage(null);
+            $('.loading').addClass('hide');
+            this.postRender();
         },
         serializeForm: function(form) {
             return _.object(_.map(form.serializeArray(), function(item) {
                 return [item.name, item.value];
             }));
+        },
+        handleError: function(xhr, status, error) {
+            $('.handleError-ind', this.$el).addClass('hide');
+            this.showMessage(error || status);
+        },
+        showMessage: function(message, alert_tag) {
+            if (_.isEmpty(message)) {
+                this.$alert.addClass('hide');
+            } else {
+                this.$alert
+                    .removeClass('hide alert-danger alert-success')
+                    .addClass('alert-' + (alert_tag || 'danger'))
+                    .find('.alert-board').text(message);
+            }
+        },
+        postRender: function() {
+            // do nothing...
+        }
+    }), 
+    
+    FormView = TemplateView.extend({
+        events: {
+            'click button.save': 'submit'
+        },
+        initialize: function() {
+            TemplateView.prototype.initialize.apply(this, arguments);
+        },
+        submit: function() {
+            $('form', this.$el).submit();
         }
     }),
 
-    ApiServiceView = Backbone.View.extend({
+    ToggledListView = TemplateView.extend({
+        events: {
+            'click input.toggler': 'togglerChanged',
+            'click input.icheckbox': 'childChanged',
+        },
+        initialize: function() {
+            TemplateView.prototype.initialize.apply(this, arguments);
+        },
+        postRender: function() {
+            this.$toggler = $('input.toggler', this.$innerEl);
+            this.$children = $('input.icheckbox', this.$innerEl);
+        },
+        togglerChanged: function(e) {
+            var status = this.$toggler.is(':checked');
+            this.$children.each(function() {
+                $(this).prop('checked', status);
+            });
+        },
+        childChanged: function(e) {
+            var totalCount = this.$children.length
+              , checkCount = $('input.icheckbox:checked', this.$innerEl).length;
+            
+            if (totalCount == checkCount) {
+                if (!this.$toggler.is(':checked')) {
+                    this.$toggler.prop('checked', true)
+                                 .prop('indeterminate', false);
+                }
+            } else if (totalCount > checkCount && checkCount > 0) {
+                this.$toggler.prop('checked', false)
+                             .prop('indeterminate', true);
+            } else {
+                this.$toggler.prop('checked', false)
+                             .prop('indeterminate', false);
+            }
+        }
+    }),
+
+    ApiServiceView = TemplateView.extend({
         el: '.content-pane',
         apiPoint: 'apiservices/',
         events: {
@@ -28,7 +119,7 @@
             'click a.clear-token': 'clearToken'
         },
         initialize: function() {
-            Backbone.View.prototype.initialize.apply(this, arguments);
+            TemplateView.prototype.initialize.apply(this, arguments);
             this.serviceKey = $('label.key', this.$el).text();
         },
         applyToken: function() {
@@ -58,7 +149,7 @@
             if (!_.isEmpty(urlAuth)) {
                 $usr.attr('disabled', '');
                 $pwd.attr('disabled', '');
-                $('.progress-col', this.$el).removeClass('hide');
+                $('.processing', this.$el).removeClass('hide');
                 $.ajax({
                     // hack: prevents browser from using cached credentials from a
                     // successful authentication thus api_url is caused to change.
@@ -67,7 +158,7 @@
                         xhr.setRequestHeader("Authorization", "Basic " + cred);
                     }
                 }).success($.proxy(this.displayToken, this))
-                  .fail($.proxy(this.displayError, this));
+                  .fail($.proxy(this.handleError, this));
               }
         },
         setToken: function(token) {
@@ -80,14 +171,14 @@
                             ? "API Token has been unset successfully."
                             : "API Token has been set successfully.";
 
-                self.displayMessage(message, 'success');
+                self.showMessage(message, 'success');
                 $('label.api_token', this.$el).text(token !== null? token: "-");
             }).fail(function(xhr, status, error) {
-                self.displayMessage(error, 'danger');
+                self.showMessage(error, 'danger');
             });
         },
         displayToken: function(data) {
-            var $p = $('.progress-col', this.$el)
+            var $p = $('.processing', this.$el)
               , $f = $('.token-form', this.$el)
               , $t = $('.token', $f);
 
@@ -95,26 +186,93 @@
             $f.removeClass('hide');
             $t.val(data.api_token);
         },
-        displayError: function(xhr, status, error) {
-            $('.progress-col', this.$el).addClass('hide');
-            this.displayMessage(status + ": " + error, 'danger');
+        handleError: function(xhr, status, error) {
+            $('.processing', this.$el).addClass('hide');
+            $('input.username', this.$el).removeAttr('disabled');
+            $('input.password', this.$el).removeAttr('disabled');
+            TemplateView.prototype.handleError.apply(this, arguments);
+        }
+    }),
+    
+    SurveyXFormView = ToggledListView.extend({
+        innerEl: '.xform-list',
+        templateName: '#list-template',
+        events: function() {
+            return _.extend({}, ToggledListView.prototype.events, {
+                'click button.import': 'importForms'
+            });
         },
-        displayMessage: function(message, alert_tag) {
-            var $alert = $('.js.alert');
-            $alert.removeClass('alert-danger').removeClass('alert-success');
-            if (!_.isEmpty(message)) {
-                $alert.removeClass('hide')
-                      .addClass('alert-' + alert_tag)
-                      .find('.alert-board')
-                      .text(message);
-            } else {
-                $alert.addClass('hide');
+        initialize: function() {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            this.bs_data = JSON.parse($('#bootstrap').text());
+
+            var self = this;
+            app.externalXForms.fetch({
+                cache: false,
+                beforeSend: self.setAuth,
+                success: $.proxy(self.render, self),
+                error: $.proxy(self.handleError, self)
+            });
+        },
+        importForms: function() {
+            var self = this, today = moment().format() 
+              , selected = this._getSelectedXForms()
+              , dispatch = function(m, resp, opts) {
+                    var $td = $('#c' + m.get('object_id'), self.$innerEl);
+                    $td.html('<i class="fa fa-fw fa-check"></i>');
+                };
+            
+            _(selected).each(function(m) {
+                m.set('date_imported', today);
+                m.set('object_id', m.get('id'));
+                if (_.isEmpty(m.get('description')))
+                    m.unset('description');
+                
+                m.unset('id');
+                app.xforms.create(m, {
+                    wait: true,
+                    success: dispatch,
+                });
+            });
+        },
+        setAuth: function(xhr) {
+            xhr.setRequestHeader(
+                'Authorization',
+                'Token ' + app.$ck.getCookie('survey_auth_token'));
+        },
+        getContext: function() {
+            var context = {'xforms': null};
+            if (app.externalXForms.length == 0) {
+                if (!_.isEmpty(this._error)) {
+                    context['_error'] = this._error;
+                    return context;
+                }
+                return null;
             }
+            context['xforms'] = app.externalXForms;
+            context['object_ids'] = this.bs_data.object_ids;
+            return context;
+        },
+        handleError: function(coll, resp, options) {
+            this._error = resp;
+            this.render();
+        },
+        _getSelectedXForms: function() {
+            var entry = null, selected = [];
+            _($('input.icheckbox:checked')).each(function(e) {
+                entry = app.externalXForms.findWhere({id: Number($(e).val())});
+                if (!_.isEmpty(entry)) {
+                    selected.push(entry.clone());
+                }
+            });
+            return selected;
         }
     });
 
     // ::: registery
     app.views.FormView = FormView;
+    app.views.ToggledListView = ToggledListView;
     app.views.ApiServiceView = ApiServiceView;
+    app.views.SurveyXFormView = SurveyXFormView;
 
 })(jQuery, Backbone, _, app);
