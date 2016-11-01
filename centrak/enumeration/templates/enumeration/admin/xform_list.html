@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                     {% for f in xforms %}
-                    <tr><td><a href="{# url 'admin-xform-info' f.id_string #}">{{ f.title }}</a></td>
+                    <tr><td><a href="{% url 'admin-xform-info' f.object_id %}">{{ f.title }}</a></td>
                         <td>-</td>
                         <td><i class="fa fa-fw fa-clock-o"></i> {{ f.last_synced }}</td>
                         <td><i class="fa fa-fw {{ f.synced_by|fa_synced_by:'Unknown' }}" title="Synced by: {{ f.synced_by|default:'Unknown' }}"></i>

@@ -2,6 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls import include, url
 from .views import default_views as def_views
 from .views import admin_views as adm_views
+from .views import enum_views as enu_views
 
 
 urlpatterns = [
@@ -68,4 +69,7 @@ urlpatterns = [
 
     #: ==+: main urls
     url(r'^$', def_views.index, name='home-page'),
+    url(r'^captures/d/((?P<tab>new)/)?', include([
+        url(r'^$', enu_views.capture_index, name='captures' ),
+    ]))
 ]

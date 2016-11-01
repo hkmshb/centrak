@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block header-title %}{% endblock %}
+{% block content %}
+<br/>
+<div class="row">
+    <div class="col-sm-3 rd-l-pad">
+        <div class="panel panel-default">
+            <div class="panel-body rd-tm-pad rd-bm-pad">
+                &nbsp;...
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="datetimepicker"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-9 rd-r-pad">
+        <div class="clearfix">
+            <ul class="nav nav-tabs nav-flattabs">
+                <li{% if not tab %} class="active"{% endif %}><a href="{% url 'captures' %}"><i class="fa fa-fw fa-check-circle text-success2"></i> Valiated</a></li>
+                <li{% if tab == 'new' %} class="active"{% endif %}><a href="{% url 'captures' %}new/"><i class="fa fa-fw fa-star text-warning"></i> New</a></li>
+
+                <li class="pull-right">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <input type="text" class="form-control input-sm" name="q" 
+                                placeholder="Search" />
+                        </div>
+                        <button type="submit" class="btn btn-default btn-sm">
+                            <i class="fa fa-search"></i> Search
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        <br/>
+
+        <div class="panel panel-default panel-sqi">
+            <div class="panel-body">
+            {% if not records %}
+                <div class="action-notice">
+                {% if not tab %}
+                    <form class="col-xs-8 col-xs-offset-2">
+                        <div class="notice-message" style="padding-bottom:10px">
+                            No Validated Record Added Today.
+                            <span class="text-primary">Now Perform a Quick Validation!</span>
+                        </div>
+                        <div class="form-group col-xs-9 rd-r-pad rd-l-pad">
+                            <input type="text" class="form-control input-sm"
+                                   placeholder="Enter Account Number to Validate" />
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm" style="margin-top:0;">
+                            <i class="fa fa-fw fa-check"></i> Validate #
+                        </button>
+                    </form>
+                    <br/><br/><br/><br/>
+                {% else %}
+                    No New Record Added Today. <br/>
+                    <a class="btn btn-primary btn-sm" href="">Add a "New Customer" Record</a>
+                {% endif %}
+                </div>
+            {% else %}
+                <table class="table table-striped">
+                    <tbody>
+                        <tr><td>32/10/03/0017-01</td><td>A3</td>
+                            <td>Federal Coll. of Educ.</td>
+                            <td>Challawa Road</td>
+                            <td>04219961</td></tr>
+                        <tr><td>32/10/03/0017-01</td><td>A3</td>
+                            <td>Federal Coll. of Educ.</td>
+                            <td>Challawa Road</td>
+                            <td>04219961</td></tr>
+                        <tr><td>32/10/03/0017-01</td><td>A3</td>
+                            <td>Federal Coll. of Educ.</td>
+                            <td>Challawa Road</td>
+                            <td>04219961</td></tr>
+                        <tr><td>32/10/03/0017-01</td><td>A3</td>
+                            <td>Federal Coll. of Educ.</td>
+                            <td>Challawa Road</td>
+                            <td>04219961</td></tr>
+                        <tr><td>32/10/03/0017-01</td><td>A3</td>
+                            <td>Federal Coll. of Educ.</td>
+                            <td>Challawa Road</td>
+                            <td>04219961</td></tr>
+                    </tbody>
+                </table>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script-extra %}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.datetimepicker').datetimepicker({
+            inline: true
+        });
+    })
+</script>
+{% endblock %}

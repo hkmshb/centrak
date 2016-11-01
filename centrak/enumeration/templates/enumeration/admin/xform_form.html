@@ -1,0 +1,67 @@
+{% extends 'base_admin.html' %}
+{% load centrak %}
+{% block content-pane %}
+<div class="hook">
+    <div class="panel panel-default panel-sqi">
+        <div class="panel-heading">
+            <i class="fa fa-fw fa-wpforms"></i> Imported XForm
+            <div class="buttons pull-right">
+                <a class="btn btn-default btn-sm btn-slim" href="">
+                    <i class="fa fa-fw fa-pencil"></i> Update
+                </a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="data-card col-sm-12 rd-l-pad rd-r-pad">
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>ID String</span><label class="key">{{ xform.id_string }}</label>
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Title</span><label>{{ xform.title }} </label>
+                    </div>
+                </div>
+                <div class="data-row">
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Description</span><label>{{ xform.description|default:"-" }}</label>
+                    </div>
+                    <div class="x-v-spread">
+                        <div class="col-sm-6 rd-l-pad">
+                            <span>Url</span> <label class="api-root"> {{ xform.url }}</label>
+                        </div>
+                        <div class="col-sm-offset-6 col-sm-6 rd-l-pad">
+                            <span>Type</span> <label class="api-auth">{{ xform.get_type_display|default:"-" }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sub-panel">
+            <div class="panel-body">
+                <div class="section data-card rd-l-pad rd-r-pad"> 
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Status: &nbsp;{% if xform.is_active %}</span>
+                        <i class="fa fa-fw fa-toggle-on text-success2"></i> ACTIVE {% else %}
+                        <i class="fa fa-fw fa-toggle-off"></i> INACTIVE {% endif %}
+                    </div>
+                    <div class="col-sm-6 rd-l-pad">
+                        <span>Date Imported: </span> {{ xform.date_imported }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sub-panel">
+            <div class="panel-body">
+                <div class="section data-card rd-l-pad rd-r-pad"> 
+                    <div class="col-sm-6 rd-l-pad">Last Synced on
+                        <i class="fa fa-fw fa-clock-o"></i>
+                        <span>{{ xform.last_synced|default:"Unknown" }}</span> by
+                        <i class="fa fa-fw {{ xform.synced_by|fa_synced_by:'Unknown' }}"></i>
+                        <span>{{ xform.synced_by|default:"Unknown" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

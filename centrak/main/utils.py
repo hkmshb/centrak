@@ -49,8 +49,7 @@ class Menu(object):
     def _get_main_items(self):
         return (
             Menu.Item(self, _('Dashboard'), 'fa-dashboard', reverse('home-page')),
-            Menu.Item(self, _('Projects'), 'fa-cubes'),
-            Menu.Item(self, _('Captures'), 'fa-tags')
+            Menu.Item(self, _('Captures'), 'fa-database', reverse('captures')),
         )
     
     def _get_admin_items(self):

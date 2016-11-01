@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 
 from core.utils import admin_with_permission, has_object_permission
 from core.models import ApiServiceInfo
+from .forms import XFormForm
 from .models import XForm
 
 
@@ -27,14 +29,43 @@ def xform_list(request, tab=None):
 
 
 @admin_with_permission()
-def xform_detail(request, xform_id):
-    xform = get_object_or_404(XForm, pk=xform_id)
+def xform_detail(request, object_id):
+    xform = XForm.objects.get(object_id=object_id)
     return render(request, 'enumeration/admin/xform_detail.html', {
         'xform': xform
     })
 
+
 @admin_with_permission()
-def manage_xform(request, xform_id=None):
-    pass
+def manage_xform(request, object_id):
+    xform = XForm.objects.get(object_id=object_id)
+    if request.method == 'POST':
+        form = XFormForm(data=request.POST)
+        if form.is_valid():
+            pass
+    return render(request, 'enumeration/admin/xform_form.html', {
+        'instance': xform
+    })
+
+
+@admin_with_permission()
+def xmanage_xform(request, object_id):
+    xform = XForm.objects.get(object_id=object_id)
+    if request.method == 'POST':
+        try:
+            form = XFormForm(data=request.POST, instance=xform)
+            if form.is_valid():
+                form.save()
+
+                message = "XForm updated successfully"
+                messages.success(request, message, extra_tags='success')
+                return redirect(reverse('admin-xform-info', args=[form.object_id]))
+        except Exception as ex:
+            messages.error(request, str(ex), extra_tags='danger')
+    else:
+        form = XFormForm(instance=xform)
+    return render(request, 'enumeration/admin/xform_form.html', {
+        'form': form
+    })
 
 
