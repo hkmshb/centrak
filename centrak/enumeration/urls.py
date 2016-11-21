@@ -10,5 +10,6 @@ urlpatterns = [
             url(r'^(?P<object_id>[0-9]+)/$', views.xform_detail, name='admin-xform-info'),
             url(r'^(?P<object_id>[0-9]+)/update$', views.manage_xform, name='admin-xform-upd'),
         ])),
+        url(r'^accounts/$', views.accounts_list, name='admin-acct-list'),
     ])),
 ]

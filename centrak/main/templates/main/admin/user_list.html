@@ -4,11 +4,11 @@
 <div class="panel panel-default panel-sqi">
     <div class="panel-heading">
         <i class="fa fa-fw fa-users"></i> Users
-            <div class="buttons pull-right">
-                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-user-add' %}">
-                    <i class="fa fa-fw fa-user-plus"></i> Create
-                </a>
-            </div>
+        <div class="buttons pull-right">
+            <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-user-add' %}">
+                <i class="fa fa-fw fa-user-plus"></i> Create
+            </a>
+        </div>
     </div>
     <div class="panel-body">
     {% if not users.exists %}

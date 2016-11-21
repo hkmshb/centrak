@@ -13,6 +13,7 @@ import mongoengine
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
+PUBL_DIR = os.path.join(ROOT_DIR, '..', 'public')
 INST_DIR = os.path.join(ROOT_DIR, 'instance')
 
 
@@ -116,6 +117,9 @@ STATICFILES_DIRS = [
     os.path.join(ROOT_DIR, 'static')
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PUBL_DIR, 'media')
+
 
 ##: ==+: mongo-engine settings
 _MONGODB_NAME = 'centrak'
@@ -123,7 +127,7 @@ _MONGODB_HOST = ''
 _MONGODB_USER = ''
 _MONGODB_PWD  = ''
 
-#mongoengine.connect(_MONGODB_NAME)
+# mongoengine.connect(_MONGODB_NAME)
 
 
 ##: ==+: Auth:
@@ -140,4 +144,4 @@ CENTRAK_DEFAULT_PAGE_SIZE = 50
 CENTRAK_CAPTURE_PAGE_SIZE = 200
 
 
-from . import local_settings
+from .local_settings import *

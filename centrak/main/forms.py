@@ -43,7 +43,9 @@ class UserRegistrationForm(UserCreationForm):
             User.objects.get(email=email)
         except User.DoesNotExist:
             return email
-        raise forms.ValidationError(_("'%s' is already in use.") % email)
+        raise forms.ValidationError(
+            _("'%(email)s' is already in use."), 
+            params={'email': email})
     
     def clean(self):
         cleaned_data = super(UserRegistrationForm, self).clean()
@@ -68,3 +70,7 @@ class UserRegistrationForm(UserCreationForm):
         profile.save()
         return user
 
+
+class UploadFileForm(forms.Form):
+    tag  = forms.CharField(max_length=50, required=False)
+    file = forms.FileField(required=True)

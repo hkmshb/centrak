@@ -267,6 +267,26 @@
             });
             return selected;
         }
+    }),
+    
+    ImportView = TemplateView.extend({
+        el: '.content-pane',
+        events: {
+            'click button.import': 'submit'
+        },
+        submit: function(e) {
+            e.preventDefault();
+            var tmpl = $('#progress', this.$el)
+              , form = $('form', this.$el)
+              , file = $('input[name=file]', form);
+            
+            if (file.val() == "") {
+                $('.form-group.file-wrap', form).addClass('has-error');
+            } else {
+                form.submit();
+                $('.import-pane').html(tmpl.html());
+            }
+        }
     });
 
     // ::: registery
@@ -274,5 +294,7 @@
     app.views.ToggledListView = ToggledListView;
     app.views.ApiServiceView = ApiServiceView;
     app.views.SurveyXFormView = SurveyXFormView;
+    app.views.ImportView = ImportView;
+
 
 })(jQuery, Backbone, _, app);

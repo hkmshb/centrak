@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, forms as auth_forms
+from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
-from django.contrib import messages
 from django.db.models import Q, Count
+from django.contrib import messages
+
 
 from ezaddress.models import State
 from core.models import UserProfile, BusinessLevel, BusinessOffice, \
@@ -11,6 +13,7 @@ from core.forms import OrganisationForm, OfficeForm, UserProfileForm, \
         ApiServiceInfoForm
 from core.utils import admin_with_permission, has_object_permission
 from .. import utils, models, forms
+from .. import handlers
 
 
 
@@ -320,4 +323,35 @@ def powerline_list(request, tab=None):
                           .order_by('code')
     return render(request, 'main/admin/powerline_list.html', {
         'powerlines': powerlines, 'tab': tab
+    })
+
+
+@admin_with_permission()
+def manage_imports(request, type):
+    form = forms.UploadFileForm()
+    if request.method == 'POST':
+        form = forms.UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            upl_obj = request.FILES['file']
+            filepath = handlers.handle_uploaded_files(upl_obj)
+            if not filepath:
+                message = "Upload failed: %s" % upl_obj.name
+                messages.error(request, message, extra_tags='danger')
+                return redirect(reverse('admin-import', args=[type]))
+            
+            try:
+                ixhandler = handlers.AccountIXHandler(filepath)
+                ixhandler.load_from_excel()
+
+                message = "Upload and import successful."
+                messages.success(request, message, extra_tags='success')
+            except Exception as ex:
+                message = "Unable to process file: %s<br/>%s" % (upl_obj.name, str(ex))
+                messages.error(request, mark_safe(message), extra_tags='danger')
+                return redirect(reverse('admin-import', args=[type]))
+        else:
+            pass
+
+    return render(request, 'main/admin/import_form.html', {
+        'form': form, 'type': type
     })

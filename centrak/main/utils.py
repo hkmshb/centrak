@@ -49,7 +49,7 @@ class Menu(object):
     def _get_main_items(self):
         return (
             Menu.Item(self, _('Dashboard'), 'fa-dashboard', reverse('home-page')),
-            Menu.Item(self, _('Captures'), 'fa-database', reverse('captures')),
+            Menu.Item(self, _('Captures'), 'fa-database', reverse('capture-list')),
         )
     
     def _get_admin_items(self):
@@ -57,6 +57,9 @@ class Menu(object):
             Menu.Item(self, _('Dashboard'), 'fa-dashboard', reverse('admin-home')),
             Menu.Item(self, _('Projects'), 'fa-cubes'),
             Menu.Item(self, _('Survey XForms'), 'fa-wpforms', reverse('admin-xform-list')),
+            Menu.Item(self, _('Customers'), 'fa-users', children=(
+                Menu.Item(self, _('Accounts'), 'fa-book', reverse('admin-acct-list')),
+                Menu.Item(self, _('Payments'), 'fa-money'))),
             Menu.Item(self, _('System'), 'fa-gears', children=(
                 Menu.Item(self, _('Settings'), 'fa-gears'),
                 Menu.Item(self, _('Users'), 'fa-users', reverse('admin-user-list')),
