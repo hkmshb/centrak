@@ -1,0 +1,36 @@
+server {
+    # port
+    listen 80;
+    listen [::]:80;
+
+    # server vhost name
+    server_name <host>;
+    client_max_body_size 50m;
+
+    location / {
+        ## local
+        #proxy_pass http://localhost:<port>;
+
+        # uwsgi
+        uwsgi_pass unix:///opt/webapps/<site>/instance/var/centrak.sock;
+        include uwsgi_params;
+
+        proxy_read_timeout  300s;
+
+        # no redirects
+        proxy_redirect      off;
+
+        proxy_set_header    Host $host;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Host $server_name;
+
+        # timeouts on unavailable backend(s)
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+    }
+
+    # static files
+    location /static {
+        alias /opt/webapps/<site>/public/static;
+    }
+}

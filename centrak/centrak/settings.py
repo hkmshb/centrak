@@ -14,7 +14,7 @@ import mongoengine
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
 PUBL_DIR = os.path.join(ROOT_DIR, '..', 'public')
-INST_DIR = os.path.join(ROOT_DIR, 'instance')
+INST_DIR = os.path.join(ROOT_DIR, '..', 'instance')
 
 
 # Quick-start development settings - unsuitable for production
