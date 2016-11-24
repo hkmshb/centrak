@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.utils.safestring import mark_safe
 from django import forms
 
 from .models import UserProfile, Organisation, BusinessOffice, BusinessLevel, \
@@ -49,20 +50,23 @@ class UserProfileForm(BaseModelForm):
     last_name = forms.CharField(label=_('Last Name'), max_length=30)
     phone = forms.CharField(label=_('Phone'), max_length=50, required=False)
     is_active = forms.BooleanField(label=_('Status: Is Active'), required=False)
-    location = forms.ModelChoiceField(label=_("Region"), empty_label="<Select One>",
-                    queryset=BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1),
-                    required=False)
+    location = forms.ModelChoiceField(label=_("Region"), required=False, 
+                    empty_label=mark_safe("&laquo; select &raquo;"),
+                    queryset=BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1))
     location1 = forms.ModelChoiceField(label=_("Service Point"), required=False,
-                    empty_label="<Select One>", queryset=BusinessOffice.objects.filter(level='L2'))
+                    empty_label=mark_safe("&laquo; select &raquo;"), 
+                    queryset=BusinessOffice.objects.filter(level='L2'))
     
     def __init__(self, user, *args, **kwargs):
         instance = kwargs.get('instance', None)
-        if instance and instance.location:
-            if instance.location.level.code == BusinessLevel.LEVEL2:
-                kwargs['initial'].update({
-                    'location':  instance.location.parent.id,
-                    'location1': instance.location.id
-                })
+        if instance:
+            kwargs['initial'].update({'is_active': user.is_active})
+            if instance.location:
+                if instance.location.level.code == BusinessLevel.LEVEL2:
+                    kwargs['initial'].update({
+                        'location':  instance.location.parent.id,
+                        'location1': instance.location.id
+                    })
 
         super(UserProfileForm, self).__init__(*args, **kwargs)
         self._current_user = user

@@ -6,6 +6,7 @@ from mongoengine.queryset import Q
 
 from enumeration.forms import PaperCaptureForm
 from enumeration.models import Account, Capture
+from .. import utils
 
 
 
@@ -33,6 +34,11 @@ def capture_index(request, tab=None):
 def validate_capture(request):    
     acct_no = request.POST.get('acct_no', None)
     if not acct_no or not request.method == 'POST':
+        return redirect(reverse('capture-list'))
+
+    acct_no = acct_no.replace('/', '').replace('-', '_')
+    if not acct_no.endswith('_01') or len(acct_no) != 13:
+        messages.error(request, 'Invalid account number.', extra_tags='danger')
         return redirect(reverse('capture-list'))
 
     # TODO: validate acct_no format before bringing up form
@@ -86,6 +92,13 @@ def _manage_capture_exist(request, ident):
     ident = 'f@k3#!' if not ident else ident.replace('_', '-')
     form, instance, acct, initial = (None, None, None, dict())
 
+    # check if account has been validated before
+    if ident.endswith('-01'):
+        instance = Capture.objects.filter(acct_no=utils.expand_acct_no(ident))
+        if instance:
+            obj_id = str(instance.first().id)
+            return redirect(reverse('capture-upd', args=[obj_id]))
+
     if ident.endswith('-01'):
         acct = Account.objects.get(acct_no=ident)
         if not acct:
@@ -98,7 +111,7 @@ def _manage_capture_exist(request, ident):
         
         # normalize entries: acct_no & acct_status
         initial['acct_status'] = Capture.EXISTING
-        initial['acct_no'] = "%s/%s/%s/%s" % (ident[:2], ident[2:4], ident[4:6], ident[6:])
+        initial['acct_no'] = utils.expand_acct_no(ident)
         form = PaperCaptureForm(request.user, Capture.EXISTING, initial=initial)
     else:
         instance = Capture.objects.get(id=ident)

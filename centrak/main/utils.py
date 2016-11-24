@@ -11,6 +11,14 @@ MSG_FMT_SUCCESS_ADD = '%s added successfully.'
 MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
 
 
+
+def expand_acct_no(acct_no):
+    if len(acct_no) == 13 and acct_no.endswith('-01') and '/' not in acct_no:
+        chunks = (acct_no[:2], acct_no[2:4], acct_no[4:6], acct_no[6:])
+        return "%s/%s/%s/%s" % chunks
+    return acct_no
+
+
 ##:: menu
 def is_admin_view(request):
     target_prefix = settings.CENTRAK_ADMIN_PREFIX_URL.lower()
