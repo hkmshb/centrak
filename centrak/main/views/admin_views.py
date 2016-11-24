@@ -318,7 +318,6 @@ def powerstation_list(request, tab=None):
 def powerline_list(request, tab=None):
     powerline_type = Powerline.FEEDER
     voltage = Voltage.MVOLTL if tab == '11' else Voltage.MVOLTH
-    print([powerline_type, voltage])
     powerlines = Powerline.objects.filter(type=powerline_type, voltage=voltage)\
                           .order_by('code')
     return render(request, 'main/admin/powerline_list.html', {

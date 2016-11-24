@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles compress %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +9,11 @@
     <meta name="keywords" content="{% block meta-keywords %}{% endblock %}">
     <meta name="description" content="{% block meta-description %}{% endblock %}">
     {% block meta-extra %}{% endblock %}
+    {% compress css %}
     <link rel="stylesheet" href="{% static 'css/libs/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/libs/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/libs/bootstrap-datepicker3.min.css' %}"></script>
+    {% endcompress %}
     {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}
     {% block head-extra %}{% endblock %}
 </head>
@@ -46,6 +48,7 @@
     </div>
     
     <!-- ===+: le scripts  -->
+    {% compress js %}
     <script src="{% static 'js/libs/jquery.min.js' %}"></script>
     <script src="{% static 'js/libs/jquery.validate.min.js' %}"></script>
     <script src="{% static 'js/libs/bootstrap.min.js' %}"></script>
@@ -53,6 +56,7 @@
     <script src="{% static 'js/libs/backbone-min.js' %}"></script>
     <script src="{% static 'js/libs/moment.min.js' %}"></script>
     <script src="{% static 'js/libs/bootstrap-datepicker.min.js' %}"></script>
+    {% endcompress %}
     {% block script-extra %}{% endblock %}
 </body>
 </html>

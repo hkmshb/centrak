@@ -21,11 +21,11 @@ INST_DIR = os.path.join(ROOT_DIR, 'instance')
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-g!@ij9zw4vfk+nso%+blz@9@-=)lwe-+(kt+x=ojlpg6ph(8p'
+# SECRET_KEY = None
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'on') == 'on'
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = (
 
     # third-party
     'ezaddress',
+    'compressor',
     'mongoengine',
     'widget_tweaks',
     'django_filters',
@@ -113,10 +114,18 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
+STATIC_ROOT = os.path.join(PUBL_DIR, 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(ROOT_DIR, 'static')
 ]
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # other finders ...
+    'compressor.finders.CompressorFinder',
+)
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PUBL_DIR, 'media')
