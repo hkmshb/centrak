@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load staticfiles widget_tweaks centrak %}
+{% block header-title %}{% endblock %}
+{% block content %}
+<br/>
+<div class="row">
+    {% include 'snippets/capture_side_pane.html' with form=form %}
+    <div class="col-sm-9 rd-r-pad">
+        <div class="panel panel-default panel-sqi" style="margin-bottom:5px;">
+            <div class="panel-heading">{% if not form.instance or not form.instance.id %}
+                Add New Capture{% else %}Update Capture{% endif %}
+            </div>
+        </div>
+        <br/>
+        <form method="post" class="form-compact hook" data-v="PaperCaptureView">
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.date_captured.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_date_captured" tabIndex="-1" {% if form.fx_date_captured.value %}checked{% endif %} /></span>
+                                <div class="input-group ig2 date">
+                                    <input type="text" class="form-control input-sm" name="date_captured" placeholder="Capture Date" data-ti="1"
+                                           value="{{ form.date_captured.value|default:"" }}" tabIndex="1" title="Date Captured" readonly />
+                                    <span class="input-group-addon date"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">{% if request.user|can_change_region %}
+                            <div class="input-group ig2 {% if form.region_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_region_name"  tabIndex="-1" {% if form.fx_region_name.value %}checked{% endif %} /></span>
+                                {{ form.region_name|append_attr:"tabIndex:2"|set_data:"ti:2" }}
+                            </div>{% else %}
+                            <input type="text" class="form-control input-sm" name="region_name" placeholder="Region" tabIndex="2" title="Region"
+                                    value="{{ form.region_name.value|default:"" }}" readonly />
+                            {% endif %}
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.csp_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_csp_name"  tabIndex="-1" {% if form.fx_csp_name.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm body" name="csp_name" placeholder="CSP" data-ti="3"
+                                       value="{{ form.csp_name.value|default:"" }}" tabIndex="3" title="CSP" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.sales_repr_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_sales_repr_name" tabIndex="-1" {% if form.fx_sales_repr_name.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="sales_repr_name" placeholder="Sales Representative" data-ti="4" 
+                                       value="{{ form.sales_repr_name.value|default:"" }}" tabIndex="4" title="Sales Representative" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.csp_supr_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_csp_supr_name" tabIndex="-1" {% if form.fx_csp_supr_name.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="csp_supr_name" placeholder="CSP Supervisor" data-ti="5"
+                                       value="{{ form.csp_supr_name.value|default:"" }}" tabIndex="5" title="CSP Supervisor" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.tsp_engr_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_tsp_engr_name" tabIndex="-1" {% if form.fx_tsp_engr_name.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="tsp_engr_name" placeholder="TSP Engineer" data-ti="6"
+                                       value="{{ form.tsp_engr_name.value|default:"" }}" tabIndex="6" title="TSP Engineer" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group sub-panel">
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.feeder_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_feeder_name" tabIndex="-1" {% if form.fx_feeder_name.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="feeder_name" placeholder="Feeder" data-ti="7"
+                                       value="{{ form.feeder_name.value|default:"" }}" tabIndex="7" title="Feeder" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.station_name.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_station_name" tabIndex="-1" {% if form.fx_station_name.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="station_name" placeholder="Station/Transformer" data-ti="8" 
+                                       value="{{ form.station_name.value|default:"" }}" tabIndex="8" title="Station/Transformer" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.upriser_no.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_upriser_no" tabIndex="-1" {% if form.fx_upriser_no.value %}checked{% endif %} /></span>
+                                <input type="number" class="form-control input-sm" name="upriser_no" placeholder="Upriser" min="1" max="6" data-ti="9"
+                                       value="{{ form.upriser_no.value|default:"" }}" tabIndex="9" title="Upriser" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.pole_no.errors %}has-error{% endif %}">
+                            <input type="number" class="form-control input-sm" name="pole_no" placeholder="Pole #" min="0" max="999" data-ti="10"
+                                    value="{{ form.pole_no.value|default:"" }}" tabIndex="10" title="Pole No" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.acct_no.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="Account No" title="Account No" tabIndex="11"
+                                   name="acct_no" value="{{ form.acct_no.value|default:"" }}" />
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.title.errors %}has-error{% endif %}">
+                            {{ form.title|append_attr:"tabIndex:12" }}
+                        </div>
+                        <div class="col-sm-6 rd-l-pad rd-r-pad {% if form.cust_name.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="Customer Name" title="Customer Name" tabIndex="13"
+                                   name="cust_name" value="{{ form.cust_name.value|default:"" }}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.cust_mobile.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="Mobile No" title="Mobile No" tabIndex="14"
+                                   name="cust_mobile" value="{{ form.cust_mobile.value|default:"" }}" />
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.cust_email.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="E-mail" title="E-mail" tabIndex="15"
+                                   name="cust_email" value="{{ form.cust_email.value|default:"" }}" />
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.addr_landmark.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_landmark" tabIndex="-1" {% if form.fx_addr_landmark.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" placeholder="Closest Landmark" title="Closest Landmark" data-ti="16"  
+                                        name="addr_landmark" value="{{ form.addr_landmark.value|default:'' }}" tabIndex="16" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.addr_no.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="House No" title="House No" tabIndex="17"
+                                   name="addr_no" value="{{ form.addr_no.value|default:'' }}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-6 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.addr_street.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_street" tabIndex="-1" {% if form.fx_addr_street.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="addr_street" title="Street/Area" data-ti="18"
+                                       placeholder="Street/Area" tabIndex="18"  value="{{ form.addr_street.value|default:'' }}" />
+                            </div>
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.addr_town.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_town" tabIndex="-1" {% if form.fx_addr_town.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="addr_town" title="City/Town/Village" data-ti="19"
+                                       placeholder="City/Town/Village" tabIndex="19"  value="{{ form.addr_town.value|default:'' }}" />
+                            </div>
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.addr_state.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_state" tabIndex="-1" {% if form.fx_addr_state.value %}checked{% endif %}  /></span>
+                                {{ form.addr_state|append_attr:"tabIndex:20"|set_data:"ti:20" }}
+                            </div>
+                        </div>
+                    </div>{% if form.acct_status.value == 'existing' %}
+                    <div class="form-group">
+                        <div class="col-sm-12 rd-l-pad rd-r-pad">
+                            <input type="text" class="form-control input-sm" title="Service Address" readonly
+                                   value="Service Address: {{ acct.service_addr|default:'-'}}" />
+                        </div>
+                    </div>{% endif %}
+                    <div class="form-group sub-panel">
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.tariff.errors %}has-error{% endif %}">
+                            {{ form.tariff|append_attr:"tabIndex:21" }}
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.meter_no.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" name="meter_no" tabIndex="22" 
+                                placeholder="Meter No" value="{{ form.meter_no.value|default:'' }}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                &nbsp; <input type="checkbox" id=""  value=""> Remark 1
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                &nbsp; <input type="checkbox" id=""  value=""> Remark 2
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                &nbsp; <input type="checkbox" id=""  value=""> Remark 3
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                &nbsp; <input type="checkbox" id=""  value=""> Remark 1
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                &nbsp; <input type="checkbox" id=""  value=""> Remark 2
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="checkbox-inline">
+                                &nbsp; <input type="checkbox" id=""  value=""> Remark 3
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+            {% with is_new_acct=form.acct_status.value|equal:'new' %}
+            <div class="form-group" style="padding-top:5px">{% if is_new_acct %}{% if not form.instance or not form.instance.id %}
+                <button name="save_new" class="btn btn-default btn-sm">
+                    <i class="fa fa-fw fa-save"></i> Save and New
+                </button>&nbsp;{% endif %}{% endif %}
+                <button name="save_close" class="btn btn-default btn-sm">
+                    <i class="fa fa-fw fa-save"></i> Save and Close
+                </button>&nbsp;
+                <a class="btn btn-default btn-sm" href={% if is_new_acct %}"{% url 'capture-list' 'new/' %}"{% else %}"{% url 'capture-list' %}"{% endif %}>
+                    <i class="fa fa-fw fa-close"></i> Close
+                </a>
+                <input type="hidden" name="date_digitized" value="{{ form.date_digitized.value }}" />
+                <input type="hidden" name="acct_status" value="{{ form.acct_status.value }}" />
+                <input type="hidden" name="id" value="{{ form.instance.id }}" />
+                {% csrf_token %}
+            </div>{% endwith %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block script-extra %}
+    {{ block.super }}
+    <script src="{% static 'js/models.js' %}"></script>
+    <script src="{% static 'js/collections.js' %}"></script>
+    <script src="{% static 'js/views.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.datepicker-inline').datepicker({    
+                format: 'dd/mm/yyyy', todayHighlight: true,
+            });
+            $('.input-group.date').datepicker({
+                format: 'dd/mm/yyyy', todayHighlight: true,
+                autoclose: true
+            });
+        })
+    </script>
+{% endblock %}

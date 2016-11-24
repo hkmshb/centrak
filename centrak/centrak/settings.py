@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     # third-party
     'ezaddress',
     'mongoengine',
+    'widget_tweaks',
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',

@@ -38,6 +38,12 @@ class Account(TimeStampedModel):
 
     class Meta:
         db_table = 'enum_account'
+    
+    def __str__(self):
+        return ("%(acct_info)s; %(cust_name)s; %(tariff)s; %(acct_status)s" % {
+            'acct_info': self.acct_no or self.book_code, 'tariff': self.tariff,
+            'cust_name': self.cust_name, 'acct_status': self.acct_status             
+        })
 
 
 #+============================================================================+
@@ -149,7 +155,7 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     csp_name     = fields.StringField(max_length=50, blank=False)
 
     # staff names
-    username        = fields.StringField(max_length=50)
+    user_email      = fields.EmailField(max_length=50, required=True)
     csp_supr_name   = fields.StringField(max_length=50)
     tsp_engr_name   = fields.StringField(max_length=50)
     sales_repr_name = fields.StringField(max_length=50)
@@ -176,8 +182,8 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     }
     
     def __str__(self):
-        return "%s %s %s" % (
-            self.region_name,
-            self.acct_no or self.book_code,
-            self.cust_name
-        )
+        return ("%(region_name)s %(acct_info)s %(cust_name)s" % {
+            'region_name': self.region_name,
+            'acct_info': self.acct_no or self.book_code,
+            'cust_name': self.cust_name
+        })

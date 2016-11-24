@@ -5,6 +5,11 @@ register = template.Library()
 
 
 @register.filter
+def equal(value, expected):
+    return value == expected
+
+
+@register.filter
 def urlcancel(form, default_url):
     if form.instance:
         if form.url_cancel:
@@ -40,6 +45,13 @@ def user_roles(user):
     if user.groups.exists:
         value = ", ".join([g.name for g in user.groups.all()])
     return value
+
+
+@register.filter
+def can_change_region(user):
+    if user.is_superuser:
+        return True
+    return False
 
 
 @register.filter

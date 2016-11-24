@@ -34,7 +34,7 @@ urlpatterns = [
             ])),
             
             url(r'^users/$', adm_views.user_list, name='admin-user-list'),
-            url(r'^users/new$', adm_views.manage_user, name='admin-user-add'),
+            url(r'^users/create$', adm_views.manage_user, name='admin-user-add'),
             url(r'^users/(?P<user_id>[0-9]+)/', include([
                 url(r'^$', adm_views.user_detail, name='admin-user-info'),
                 url(r'^update$', adm_views.manage_user, name='admin-user-upd'),
@@ -63,13 +63,18 @@ urlpatterns = [
                 adm_views.powerstation_list, name='admin-station-list'),
             url(r'^powerlines/((?P<tab>(33|11))/)?$', adm_views.powerline_list,
                 name='admin-powerline-list'),
+            
+            url(r'^import/(?P<type>\w+)$', adm_views.manage_imports, name='admin-import'),
         ])
     ),
 
 
     #: ==+: main urls
     url(r'^$', def_views.index, name='home-page'),
-    url(r'^captures/d/((?P<tab>new)/)?', include([
-        url(r'^$', enu_views.capture_index, name='captures' ),
-    ]))
+    url(r'^captures/p/', include([
+        url(r'^form/$', enu_views.manage_capture, name='capture-add'),
+        url(r'^validate$', enu_views.validate_capture, name='capture-val'),
+        url(r'^((?P<tab>new)/)?(?P<ident>\w+)/update$', enu_views.manage_capture, name='capture-upd'),
+        url(r'^((?P<tab>new)/)?$', enu_views.capture_index, name='capture-list'),
+    ])),
 ]

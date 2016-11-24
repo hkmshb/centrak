@@ -103,7 +103,7 @@ h1, h2, h3, h4, h5, h6,
 
 // ===+: content section
 #content-wrapper {
-    margin-top: 100px;
+    padding-top: 100px;
 }
 
 // ===+: footer section
@@ -204,6 +204,7 @@ footer {
 
 .adm {
     #content-wrapper {
+        padding-top: 0;
         margin-top: 70px;
     }
     .side-pane {
@@ -256,9 +257,13 @@ footer {
 
 /* ==============================+
  |  styling...
- + =====================================================================*/
-// panel
+ + =====================================================================*/  
+// datepicker
+.datepicker {
+    font: normal @b-font-size/20px @b-font-stack;
+}
 
+// panel
 .panel a.plain {
     color: @text-color;
     &:hover, &:focus {
@@ -317,6 +322,10 @@ footer {
     }
 }
 
+.form-group.has-error {
+    border-color: @brand-danger;
+}
+
 .adm .content-pane .form-group {
     width: 100%;
     display: table;
@@ -366,4 +375,42 @@ a.dourow {
     .modal-footer { padding: 5px 15px; }
 }
 
+// input-group
+.input-group.ig2 {
+    .input-group-addon.date {
+        padding: 4px 6px;
+        border-right: solid 1px @panel-default-border;
+        background-color: @panel-default-heading-bg;
+    }
+    .input-group-addon {
+        padding: 8px 4px 4px;
+        border-right: none;
+        background-color: transparent;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    }
+    select,
+    input[type=text], input[type=number] {
+        border-left: none;
+    }
+}
 
+
+.form-compact {
+    .panel {
+        margin-bottom: 5px;
+    }
+    .form-group {
+        width: 100%;
+        margin-bottom: 1px;
+        display: inline-block;
+    }
+    .sub-panel {
+        padding-top: 8px;
+        margin-top: 2px;
+    }
+}
+
+form .search-panel {
+    padding-bottom: 9px;
+    border-bottom: solid 1px @panel-default-border;
+}

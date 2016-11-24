@@ -3,34 +3,27 @@
 {% block content %}
 <br/>
 <div class="row">
-    <div class="col-sm-3 rd-l-pad">
-        <div class="panel panel-default">
-            <div class="panel-body rd-tm-pad rd-bm-pad">
-                &nbsp;...
-            </div>
-        </div>
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="datetimepicker"></div>
-            </div>
-        </div>
-    </div>
-
+    {% include 'snippets/capture_side_pane.html' with form=form %}
     <div class="col-sm-9 rd-r-pad">
         <div class="clearfix">
             <ul class="nav nav-tabs nav-flattabs">
-                <li{% if not tab %} class="active"{% endif %}><a href="{% url 'captures' %}"><i class="fa fa-fw fa-check-circle text-success2"></i> Valiated</a></li>
-                <li{% if tab == 'new' %} class="active"{% endif %}><a href="{% url 'captures' %}new/"><i class="fa fa-fw fa-star text-warning"></i> New</a></li>
+                <li{% if not tab %} class="active"{% endif %}><a href="{% url 'capture-list' %}"><i class="fa fa-fw fa-check-circle text-success2"></i> Valiated</a></li>
+                <li{% if tab == 'new' %} class="active"{% endif %}><a href="{% url 'capture-list' %}new/"><i class="fa fa-fw fa-star text-warning"></i> New</a></li>
 
                 <li class="pull-right">
-                    <form class="form-inline">
+                    <form method="post" action="{% url 'capture-val' %}" class="form-inline">{% if captures %}{% if not tab %}
                         <div class="form-group">
-                            <input type="text" class="form-control input-sm" name="q" 
-                                placeholder="Search" />
+                            <input type="text" class="form-control input-sm" name="acct_no" autocomplete="off"
+                                placeholder="Account Number" />
                         </div>
-                        <button type="submit" class="btn btn-default btn-sm">
-                            <i class="fa fa-search"></i> Search
-                        </button>
+                        <button type="submit" name="validate" class="btn btn-default btn-sm">
+                            <i class="fa fa-fw fa-check"></i> Validate
+                        </button>{% else %}
+                        <a href="{% url 'capture-add' %}" class="btn btn-default btn-sm">
+                            <i class="fa fa-fw fa-plus-square"></i> Make Entry
+                        </a>{% endif %}
+                        {% endif %}
+                        {% csrf_token %}
                     </form>
                 </li>
             </ul>
@@ -39,51 +32,46 @@
 
         <div class="panel panel-default panel-sqi">
             <div class="panel-body">
-            {% if not records %}
+            {% if not captures %}
                 <div class="action-notice">
                 {% if not tab %}
-                    <form class="col-xs-8 col-xs-offset-2">
+                    <form method="post" action="{% url 'capture-val' %}" class="col-xs-8 col-xs-offset-2">
                         <div class="notice-message" style="padding-bottom:10px">
                             No Validated Record Added Today.
                             <span class="text-primary">Now Perform a Quick Validation!</span>
                         </div>
                         <div class="form-group col-xs-9 rd-r-pad rd-l-pad">
-                            <input type="text" class="form-control input-sm"
+                            <input type="text" name="acct_no" class="form-control input-sm" autocomplete="off"
                                    placeholder="Enter Account Number to Validate" />
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm" style="margin-top:0;">
                             <i class="fa fa-fw fa-check"></i> Validate #
                         </button>
+                        {% csrf_token %}
                     </form>
                     <br/><br/><br/><br/>
                 {% else %}
                     No New Record Added Today. <br/>
-                    <a class="btn btn-primary btn-sm" href="">Add a "New Customer" Record</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'capture-add' %}">
+                        Add a "New Customer" Record
+                    </a>
                 {% endif %}
                 </div>
             {% else %}
                 <table class="table table-striped">
-                    <tbody>
-                        <tr><td>32/10/03/0017-01</td><td>A3</td>
-                            <td>Federal Coll. of Educ.</td>
-                            <td>Challawa Road</td>
-                            <td>04219961</td></tr>
-                        <tr><td>32/10/03/0017-01</td><td>A3</td>
-                            <td>Federal Coll. of Educ.</td>
-                            <td>Challawa Road</td>
-                            <td>04219961</td></tr>
-                        <tr><td>32/10/03/0017-01</td><td>A3</td>
-                            <td>Federal Coll. of Educ.</td>
-                            <td>Challawa Road</td>
-                            <td>04219961</td></tr>
-                        <tr><td>32/10/03/0017-01</td><td>A3</td>
-                            <td>Federal Coll. of Educ.</td>
-                            <td>Challawa Road</td>
-                            <td>04219961</td></tr>
-                        <tr><td>32/10/03/0017-01</td><td>A3</td>
-                            <td>Federal Coll. of Educ.</td>
-                            <td>Challawa Road</td>
-                            <td>04219961</td></tr>
+                    <thead>
+                        <tr><th>Account #</th><th>Tariff</th><th>Customer Name</th>
+                            <th>Feeder</th><th>Station</th><th>LT Routh</th>
+                            <th>Meter #</th><th></th></tr>
+                    <tbody>{% for c in captures %}{% with t=tab|add:"/" %}
+                        <tr><td><a href="{% url 'capture-upd' t c.id %}">{{ c.acct_no }}</a></td>
+                            <td>{{ c.tariff }}</td>
+                            <td>{{ c.cust_name }}</td>
+                            <td>{{ c.feeder_name }}</td>
+                            <td>{{ c.station_name }}</td>
+                            <td>{{ c.upriser_no }}/{{ c.pole_no }}</td>
+                            <td>{{ c.meter_no|default:'-' }}</td>
+                            <td></td></tr>{% endwith %}{% endfor %}
                     </tbody>
                 </table>
             {% endif %}
@@ -95,8 +83,8 @@
 {% block script-extra %}
 <script type="text/javascript">
     $(document).ready(function(){
-        $('.datetimepicker').datetimepicker({
-            inline: true
+        $('.datepicker-inline').datepicker({
+            format: 'dd/mm/yyyy', todayHighlight: true,    
         });
     })
 </script>

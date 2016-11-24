@@ -287,6 +287,46 @@
                 $('.import-pane').html(tmpl.html());
             }
         }
+    }),
+
+    PaperCaptureView = TemplateView.extend({
+        el: '.form-compact',
+        events: {
+            'click input.fx': 'toggleInputFreeze',
+            'change select': 'handleSelectChange',
+        },
+        initialize: function() {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            var self = this;
+            $(document).ready(function() {
+                _($('input.fx:checked')).each(function(e) {
+                    self.toggleInputFreeze({target: e});
+                });
+            });
+        },
+        handleSelectChange: function(e) {
+            // var fx = 'input[name=fx_' + e.target.name + ']';
+            // if ($(fx, this.$el).is(':checked')) {
+            // }
+        },
+        toggleInputFreeze: function(e) {
+            var checked = $(e.target).is(':checked')
+              , name = e.target.name.replace('fx_', '')
+              , ctrl = $('input[name=' + name + ']')
+              , attr = 'readonly';
+            
+            if (ctrl.length == 0) {
+                ctrl = $('select[name=' + name + ']');
+            }
+            if (checked) {
+                ctrl.attr(attr, attr);
+                ctrl.attr('tabIndex', '-1');
+            } else if (name !== 'date_captured') {
+                ctrl.removeAttr(attr);
+                ctrl.attr('tabIndex', ctrl.data('ti'));
+                ctrl.focus();
+            }
+        }
     });
 
     // ::: registery
@@ -295,6 +335,6 @@
     app.views.ApiServiceView = ApiServiceView;
     app.views.SurveyXFormView = SurveyXFormView;
     app.views.ImportView = ImportView;
-
+    app.views.PaperCaptureView = PaperCaptureView;
 
 })(jQuery, Backbone, _, app);
