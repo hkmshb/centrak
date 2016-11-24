@@ -30,7 +30,7 @@ module.exports = function(grunt) {
                     // style-sheets
                     {dest:destCSS, src:['fbower_comps/bootstrap/dist/css/bootstrap.min.css'], expand:true, flatten:true},
                     // {dest:destCSS, src:['fbower_comps/font-awesome/css/font-awesome.min.css'], expand:true, flatten:true},
-                    {dest:destCSS, src:['fbower_comps/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css'], expand:true, flatten:true},
+                    {dest:destCSS, src:['fbower_comps/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css'], expand:true, flatten:true},
 
                     // fonts
                     {dest:destCssFONT, src:['fbower_comps/bootstrap/dist/fonts/*.*'], expand:true, flatten:true},
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
                     {dest:destJS, src:['fbower_comps/underscore/underscore-min.js'], expand:true, flatten:true},
                     {dest:destJS, src:['fbower_comps/backbone/backbone-min.js'], expand:true, flatten:true},
                     {dest:destJS, src:['fbower_comps/moment/min/moment.min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js'], expand:true, flatten:true}
+                    {dest:destJS, src:['fbower_comps/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'], expand:true, flatten:true},
                 ],
             }
         }
