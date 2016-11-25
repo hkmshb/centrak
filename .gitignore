@@ -12,4 +12,3 @@ instance
 .*
 
 local_settings.py
-static/css/*.css
