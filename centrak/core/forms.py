@@ -60,6 +60,7 @@ class UserProfileForm(BaseModelForm):
     def __init__(self, user, *args, **kwargs):
         instance = kwargs.get('instance', None)
         if instance:
+            kwargs['initial'] = kwargs.get('initial', dict())
             kwargs['initial'].update({'is_active': user.is_active})
             if instance.location:
                 if instance.location.level.code == BusinessLevel.LEVEL2:

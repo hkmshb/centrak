@@ -25,9 +25,9 @@ class Account(TimeStampedModel):
     )
 
     # standard fields
-    acct_no = models.CharField(_("Account No."), max_length=13, blank=False, 
+    acct_no = models.CharField(_("Account No."), max_length=16, blank=False, 
                     unique=True)
-    book_code   = models.CharField(_("Book Code"), max_length=6, blank=False)
+    book_code   = models.CharField(_("Book Code"), max_length=8, blank=False)
     cust_name   = models.CharField(_("Customer Name"), max_length=100, blank=False)
     cust_mobile = models.CharField(_("Mobile"), max_length=20, blank=True, null=True)
     acct_status = models.CharField(_("Status"), max_length=3, blank=True, 
