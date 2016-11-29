@@ -50,7 +50,8 @@ class PaperCaptureForm(forms.Form):
     upriser_no      = forms.IntegerField(required=True, label="Upriser #")
     pole_no         = forms.IntegerField(required=True, label="Pole #")
 
-    acct_no         = forms.CharField(required=True, label="Account No")
+    acct_no         = forms.CharField(required=False, label="Account No")
+    book_code       = forms.CharField(required=False, label="Book Code")
     acct_status     = forms.CharField(required=True, label="Account Status")
     meter_no        = forms.CharField(required=False, label="Meter No")
     title           = forms.ChoiceField(required=True, label="Title", choices=Title.CHOICES)
@@ -119,16 +120,22 @@ class PaperCaptureForm(forms.Form):
             f.widget.attrs['title'] = f.label
             f.widget.choices = choice + f.widget.choices
 
-    
+    def clean_book_code(self):
+        value = self.cleaned_data.get('book_code', '').strip()
+        if self.status == Capture.NEW:
+            if not value or len(value) != 8 or len(value.split('/')) != 3:
+                raise forms.ValidationError(_('Invalid value'))
+        return value
+
     def clean_acct_no(self):
         value = self.cleaned_data.get('acct_no', '').strip()
-        if not value or len(value) not in (8, 16):
-            raise forms.ValidationError(_('Invalid value'))
-        
-        expected_split_len = 4 if value.endswith('-01') else 3
-        if len(value.split('/')) != expected_split_len:
-            raise forms.ValidationError(_('Invalid value'))
-        return value.strip() 
+        if self.status == Capture.EXISTING:
+            if not value or len(value) != 16:
+                raise forms.ValidationError(_('Invalid value'))
+            
+            if not value.endswith('-01') or len(value.split('/')) != 4:
+                raise forms.ValidationError(_('Invalid value'))
+        return value
 
     def clean_sales_repr_name(self):
         return self._clean_human_name('sales_repr_name')

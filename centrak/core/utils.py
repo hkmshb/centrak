@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
 
@@ -50,6 +51,23 @@ def has_object_permission(user, obj, add_perm, change_perm, pk='id'):
         if change_perm and user.has_perm(change_perm):
             return (True, None)
     return (False, redirect(reverse('login')))
+
+
+##:: ==+ pagination
+def paginate(request, queryset, 
+             param_page=settings.CENTRAK_QS_PARAM_PAGE, 
+             param_page_size=settings.CENTRAK_QS_PARAM_PAGE_SIZE):
+    page_size = request.GET.get(param_page_size, 50)
+    page = request.GET.get(param_page, 1)
+
+    paginator = Paginator(queryset, page_size)
+    try:
+        page = paginator.page(page)
+    except PageNotAnInteger:
+        page = paginator.page(1)
+    except EmptyPage:
+        page = paginator.page(paginator.num_pages)
+    return page
 
 
 ##:: ==+ general utility funcs

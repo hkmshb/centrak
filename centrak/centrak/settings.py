@@ -153,5 +153,8 @@ CENTRAK_API_ROOT         = '/api/v1/'
 CENTRAK_DEFAULT_PAGE_SIZE = 50
 CENTRAK_CAPTURE_PAGE_SIZE = 200
 
+CENTRAK_QS_PARAM_PAGE      = 'page'
+CENTRAK_QS_PARAM_PAGE_SIZE = 'pageSize'
+
 
 from .local_settings import *

@@ -97,11 +97,15 @@
             </div>
             <div class="panel panel-default panel-sqi">
                 <div class="panel-body">
-                    <div class="form-group">
+                    <div class="form-group">{% if tab and tab == 'existing' %}
                         <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.acct_no.errors %}has-error{% endif %}">
                             <input type="text" class="form-control input-sm" placeholder="Account No" title="Account No" tabIndex="11"
                                    name="acct_no" value="{{ form.acct_no.value|default:"" }}" />
-                        </div>
+                        </div>{% else %}
+                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.book_code.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="Book Code" title="Book Code" tabIndex="11"
+                                   name="book_code" value="{{ form.book_code.value|default:"" }}" />
+                        </div>{% endif %}
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.title.errors %}has-error{% endif %}">
                             {{ form.title|append_attr:"tabIndex:12" }}
                         </div>

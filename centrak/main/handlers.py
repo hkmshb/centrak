@@ -39,7 +39,7 @@ class IXHandlerBase:
 
     def validate_column_headings(self):
         headers = (self.headers or ('fake-@#$%^',))
-        xlsheet = XlSheet(self._file_path, 'accts')
+        xlsheet = XlSheet(self._file_path, 'accounts')
         if not XlSheet.find_headers(xlsheet, headers):
             raise ValidationError("Expected columns not found.")
 
@@ -51,7 +51,7 @@ class AccountIXHandler(IXHandlerBase):
         self.validate_column_headings()
 
         # read data into DataFrame
-        df = pd.read_excel(self._file_path, 'accts')
+        df = pd.read_excel(self._file_path, 'accounts')
         df.rename(columns={'mobile':'phone'}, inplace=True)
         df['date_created'] = datetime.today().strftime("%Y-%m-%d")
         del df['sn']

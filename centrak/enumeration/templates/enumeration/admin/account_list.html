@@ -1,27 +1,26 @@
 {% extends 'base_admin.html' %}
 {% load staticfiles humanize centrak %}
 {% block content-pane %}
-{{ xforms_obj_ids }}
 <div class="hook" data-v="">
-    <div class="panel panel-default panel-sqi">
+    <div class="panel panel-default panel-sqi block">
         <div class="panel-heading">
             <i class="fa fa-fw fa-book"></i> Accounts
             {% if accounts.exists %}
             <div class="buttons pull-right">
                 <button class="btn btn-default btn-sm btn-slim import">
-                    <i class="fa fa-fw fa-download"></i> Import
+                    <i class="fa fa-fw fa-download"></i> Importy
                 </button>
             </div>
             {% endif %}
         </div>
-        <div class="panel-body xform-list">
+        <div class="panel-body xform-list scroll-horz">
             {% if not accts %}
             <div class="action-notice">
                 No Existing Accounts found <br/>
                 <a class="btn btn-default btn-sm" href="{% url 'admin-import' "accounts" %}">Import Existing Accounts</a>
             </div>
             {% else %}
-            <table class="table table-striped table-condensed">
+            <table class="table table-striped table-condensed scroll-body">
                 <thead>
                     <tr><th>Account #</th><th>Tariff</th><th>Fullname</th>
                         <th>Service Address</th><th>Mobile #</th><th></th></tr>
@@ -39,6 +38,7 @@
             </table>
             {% endif %}
         </div>
+        {% include 'snippets/panel_pager.html' with page=accts %}
     </div>
 </div>
 {% endblock %}

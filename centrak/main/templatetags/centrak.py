@@ -1,5 +1,10 @@
+from urllib.parse import urlencode
+
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django import template
+
+
 register = template.Library()
 
 
@@ -7,6 +12,13 @@ register = template.Library()
 @register.filter
 def equal(value, expected):
     return value == expected
+
+
+@register.filter
+def update_qs(request, page):
+    qs = request.GET.copy()
+    qs.update({ settings.CENTRAK_QS_PARAM_PAGE: page })
+    return urlencode(qs)
 
 
 @register.filter

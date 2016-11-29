@@ -270,6 +270,23 @@ footer {
         text-decoration: none;
     }
 }
+
+.panel .pager {
+    margin: 0px;
+    padding: 5px 15px 5px 15px;
+    a { margin: 0; margin-top: -3px; padding: 4px 6px; }
+    .stats { margin-top: 4px; }
+    .page {
+        margin: 0;
+        padding: 0;
+        padding-right: 2px;   
+        width: 50px;
+        height: 27px;
+        display: inline;
+        text-align: center; 
+    }
+}
+
 .sub-panel a.plain {
     &:hover, &:focus {
         .fa { color: @link-color; }
@@ -414,3 +431,8 @@ form .search-panel {
     padding-bottom: 9px;
     border-bottom: solid 1px @panel-default-border;
 }
+
+.block { display:block !important; }
+.scroll-horz { overflow-x: scroll; width: 100%; display: block !important; }
+.scroll-body { margin-bottom:0; width: 900px; }
+ 

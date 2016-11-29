@@ -6,6 +6,7 @@ from mongoengine.queryset import Q
 
 from enumeration.forms import PaperCaptureForm
 from enumeration.models import Account, Capture
+from core.utils import paginate
 from .. import utils
 
 
@@ -25,8 +26,10 @@ def capture_index(request, tab=None):
               & Q(user_email=request.user.username)
     
     captures = Capture.objects(query).order_by('-date_digitized')
+    page = paginate(request, captures)
+    
     return render(request, 'enumeration/capture_index.html', {
-        'tab': tab, 'captures': captures
+        'tab': tab, 'captures': page
     })
 
 
@@ -84,7 +87,7 @@ def _manage_capture_new(request, id=None):
             form = PaperCaptureForm(request.user, Capture.NEW, instance=capture, initial=fixed_entries)
 
     return render(request, 'enumeration/capture_form.html', {
-        'form': form
+        'form': form, 'tab': 'new'
     })
 
 
@@ -132,6 +135,6 @@ def _manage_capture_exist(request, ident):
             messages.error(request, str(ex), extra_tags='danger')
 
     return render(request, 'enumeration/capture_form.html', {
-        'form': form, 'acct': acct
+        'form': form, 'acct': acct, 'tab': 'existing'
     })
     

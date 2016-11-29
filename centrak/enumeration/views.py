@@ -2,7 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from core.utils import admin_with_permission, has_object_permission
+from core.utils import admin_with_permission, has_object_permission, \
+        paginate
 from core.models import ApiServiceInfo
 from .forms import XFormForm
 from .models import XForm, Account
@@ -71,7 +72,7 @@ def xmanage_xform(request, object_id):
 
 @admin_with_permission()
 def accounts_list(request):
-    accts = Account.objects.all()[:20]
+    page = paginate(request, Account.objects.all())
     return render(request, 'enumeration/admin/account_list.html', {
-        'accts': accts
+        'accts': page
     })

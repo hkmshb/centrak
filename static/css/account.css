@@ -416,6 +416,27 @@ ul.dropdown-menu.wide-menu li > a {
 .panel a.plain:focus {
   text-decoration: none;
 }
+.panel .pager {
+  margin: 0px;
+  padding: 5px 15px 5px 15px;
+}
+.panel .pager a {
+  margin: 0;
+  margin-top: -3px;
+  padding: 4px 6px;
+}
+.panel .pager .stats {
+  margin-top: 4px;
+}
+.panel .pager .page {
+  margin: 0;
+  padding: 0;
+  padding-right: 2px;
+  width: 50px;
+  height: 27px;
+  display: inline;
+  text-align: center;
+}
 .sub-panel a.plain:hover .fa,
 .sub-panel a.plain:focus .fa {
   color: #337ab7;
@@ -549,6 +570,18 @@ a.dourow:hover {
 form .search-panel {
   padding-bottom: 9px;
   border-bottom: solid 1px #ddd;
+}
+.block {
+  display: block !important;
+}
+.scroll-horz {
+  overflow-x: scroll;
+  width: 100%;
+  display: block !important;
+}
+.scroll-body {
+  margin-bottom: 0;
+  width: 900px;
 }
 a,
 label {

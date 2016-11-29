@@ -1,0 +1,21 @@
+{% load humanize centrak %}
+<div class="panel-footer pager">{% with p=page %}
+    <div class="pull-left stats">
+        {{ p.start_index|default:0|intcomma }} - {{ p.end_index|default:0|intcomma }} of {{ p.paginator.count|default:0|intcomma }}
+    </div> &nbsp;
+    <div class="pull-right btns">
+        <a class="btn btn-default btn-sm" {% if p.number > 1 %}href="?{{ request|update_qs:"1" }}"{% else %}disabled{% endif %} >
+            <i class="fa fa-fw fa-angle-double-left"></i>
+        </a>
+        <a class="btn btn-default btn-sm" {% if p.has_previous %}href="?{{ request|update_qs:p.previous_page_number }}"{% else %}disabled{% endif %}>
+            <i class="fa fa-fw fa-angle-left"></i>
+        </a>
+        <input type="number" class="form-control input-sm page" name="page_no" value="{{ p.number }}" />
+        <a class="btn btn-default btn-sm" {% if p.has_next %}href="?{{ request|update_qs:p.next_page_number }}"{% else %}disabled{% endif %}>
+            <i class="fa fa-fw fa-angle-right"></i>
+        </a>
+        <a class="btn btn-default btn-sm" {% if p.number < p.paginator.num_pages %}href="?{{ request|update_qs:p.paginator.num_pages }}"{% else %}disabled{% endif %}>
+            <i class="fa fa-fw fa-angle-double-right"></i>
+        </a>
+    </div>
+</div>{% endwith %}
