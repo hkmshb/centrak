@@ -166,7 +166,9 @@ class PaperCaptureForm(forms.Form):
                 continue
             
             if f == 'date_captured':
-                f = 'date_created'
+                key = 'date_created'
+                kwargs[key] = data.get(f)
+                continue
             kwargs[f] = data.get(f)
         
         kwargs['medium'] = Capture.MEDIUM_PAPER

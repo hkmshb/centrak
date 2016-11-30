@@ -7,7 +7,6 @@
     });
 
     app.models.PaperCapture = Backbone.Model.extend({
-
     });
 
 })(jQuery, Backbone, _, app);

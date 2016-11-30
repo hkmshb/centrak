@@ -158,3 +158,8 @@ CENTRAK_QS_PARAM_PAGE_SIZE = 'pageSize'
 
 
 from .local_settings import *
+
+##: debug toolbar inclusion
+if DEBUG:
+    INSTALLED_APPS = list(INSTALLED_APPS) + ['debug_toolbar']
+    MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + list(MIDDLEWARE_CLASSES)

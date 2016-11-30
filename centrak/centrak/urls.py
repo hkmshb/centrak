@@ -14,6 +14,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
 
 from rest_framework.authtoken.views import obtain_auth_token
 from api.urls import api_urls
@@ -27,3 +28,10 @@ urlpatterns = [
     url(r'', include('enumeration.urls')),
     url(r'', include('main.urls')),
 ]
+
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls))
+    ]

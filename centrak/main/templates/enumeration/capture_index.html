@@ -2,8 +2,8 @@
 {% block header-title %}{% endblock %}
 {% block content %}
 <br/>
-<div class="row">
-    {% include 'snippets/capture_side_pane.html' with form=form %}
+<div class="row hook" data-v="PaperCaptureListView">
+    {% include 'snippets/capture_side_pane.html' with form=form filter=filter %}
     <div class="col-sm-9 rd-r-pad">
         <div class="clearfix">
             <ul class="nav nav-tabs nav-flattabs">
@@ -14,7 +14,7 @@
                     <form method="post" action="{% url 'capture-val' %}" class="form-inline">{% if captures %}{% if not tab %}
                         <div class="form-group">
                             <input type="text" class="form-control input-sm" name="acct_no" autocomplete="off"
-                                placeholder="Account Number" />
+                                   placeholder="Account Number" />
                         </div>
                         <button type="submit" name="validate" class="btn btn-default btn-sm">
                             <i class="fa fa-fw fa-check"></i> Validate
@@ -81,13 +81,7 @@
         </div>
     </div>
 </div>
-{% endblock %}
-{% block script-extra %}
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('.datepicker-inline').datepicker({
-            format: 'dd/mm/yyyy', todayHighlight: true,    
-        });
-    })
+<script id="config" type="text/json">
+    {"urlRoot": "{{ request.path }}"{% block config-extra %}{% endblock %}}
 </script>
 {% endblock %}

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
@@ -7,6 +9,8 @@ from mongoengine.queryset import Q
 from enumeration.forms import PaperCaptureForm
 from enumeration.models import Account, Capture
 from core.utils import paginate
+
+from ..filters import CaptureFilter
 from .. import utils
 
 
@@ -15,21 +19,29 @@ from .. import utils
 def capture_index(request, tab=None):
     # clear fixed entry session
     request.session['paper_capture_fixed_entries'] = None
+    
+    # filter by current date if no date filter exists
+    qs_GET = request.GET.copy()
+    date_digitized = qs_GET.get('date_digitized', None)
+    if not date_digitized:
+        qs_GET['date_digitized'] = datetime.today().strftime('%Y-%m-%d')
 
     # retrieve paper captures
     status = Capture.EXISTING if not tab else Capture.NEW
     query = Q(medium=Capture.MEDIUM_PAPER) & Q(acct_status=status)
+    
     if not request.user.is_superuser:
         p = request.user.profile
         region_name = p.location.name if p and p.location else ""
-        query = query & Q(region_name=region_name)\
+        query = query & Q(region_name=region_name) \
               & Q(user_email=request.user.username)
     
     captures = Capture.objects(query).order_by('-date_digitized')
-    page = paginate(request, captures)
-    
+    filter = CaptureFilter(qs_GET, queryset=captures)
+    page = paginate(request, filter)
+
     return render(request, 'enumeration/capture_index.html', {
-        'tab': tab, 'captures': page
+        'tab': tab, 'captures': page, 'filter': filter
     })
 
 

@@ -327,6 +327,26 @@
                 ctrl.focus();
             }
         }
+    }),
+
+    // ::: NON ADMIN VIEWS
+    
+    PaperCaptureListView = TemplateView.extend({
+        el: 'content-pane',
+        initialize: function() {
+            TemplateView.prototype.initialize.apply(this, arguments);
+            var self = this;
+            $(document).ready(function() {
+                $('.datepicker-inline').datepicker({
+                    format: 'yyyy-mm-dd', todayHighlight: true,
+                }).on('changeDate', self.dateChanged);
+            });
+        },
+        dateChanged: function(e) {
+            var dt = e.format('yyyy-mm-dd') 
+              , url = app.conf.urlRoot + "?date_digitized=" + dt;
+            window.location.href = url;
+        }
     });
 
     // ::: registery
@@ -336,5 +356,8 @@
     app.views.SurveyXFormView = SurveyXFormView;
     app.views.ImportView = ImportView;
     app.views.PaperCaptureView = PaperCaptureView;
+
+    // ::: NON ADMIN
+    app.views.PaperCaptureListView = PaperCaptureListView;
 
 })(jQuery, Backbone, _, app);
