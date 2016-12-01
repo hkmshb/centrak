@@ -6,7 +6,7 @@
         <div class="panel-heading">
             <i class="fa fa-fw fa-user"></i> {{ form.mode }} User
             <div class="buttons pull-right">
-                <a class="btn btn-default btn-sm btn-slim done" href="{{ form|urlcancel:"{% url 'admin-user-list' %}" }}">
+                <a class="btn btn-default btn-sm btn-slim done" href="{{ form|urlcancel:"@admin-user-list" }}">
                     <i class="fa fa-fw fa-close"></i> Cancel</a>
                 <button class="btn btn-default btn-sm btn-slim save">
                     <i class="fa fa-fw fa-save"></i> Save

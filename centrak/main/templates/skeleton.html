@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="{% static 'css/libs/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/libs/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/libs/bootstrap-datepicker3.min.css' %}"></script>
-    {% endcompress %}
-    {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}
+    {% endcompress %}{% compress css %}
+    {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}{% endcompress %}
     {% block head-extra %}{% endblock %}
 </head>
 <body id="{% block body-id %}{% endblock %}" class="{% block body-class %}{% endblock %}">
@@ -56,7 +56,7 @@
     <script src="{% static 'js/libs/backbone-min.js' %}"></script>
     <script src="{% static 'js/libs/moment.min.js' %}"></script>
     <script src="{% static 'js/libs/bootstrap-datepicker.min.js' %}"></script>
-    {% endcompress %}
-    {% block script-extra %}{% endblock %}
+    {% endcompress %}{% compress js %}
+    {% block script-extra %}{% endblock %}{% endcompress %}
 </body>
 </html>

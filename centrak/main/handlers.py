@@ -47,6 +47,14 @@ class IXHandlerBase:
 class AccountIXHandler(IXHandlerBase):
     headers = ('sn', 'acct_no', 'book_code', 'cust_name', 'service_addr', 'cust_mobile', 'meter_no', 'tariff')
 
+    def _get_pg_connstr(self):
+        db_settings = settings.DATABASES['default']
+        if 'postgresql' not in db_settings['ENGINE']:
+            raise Exception("Backend database should be 'PostgreSQL'.")
+        
+        conn_str = "postgresql://%(USER)s:%(PASSWORD)s@%(HOST)s/%(NAME)s"
+        return conn_str % db_settings
+
     def load_from_excel(self):
         self.validate_column_headings()
 
@@ -56,6 +64,6 @@ class AccountIXHandler(IXHandlerBase):
         df['date_created'] = datetime.today().strftime("%Y-%m-%d")
         del df['sn']
         
-        # TODO: compose this using settings entries ...
-        engine = create_engine("postgresql://abdulhakeem:gai@localhost/CENTrak2") 
+        conn_str = self._get_pg_connstr()
+        engine = create_engine(conn_str)
         df.to_sql('enum_account', engine, if_exists='append', index=False)

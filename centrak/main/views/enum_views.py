@@ -109,18 +109,20 @@ def _manage_capture_exist(request, ident):
 
     # check if account has been validated before
     if ident.endswith('-01'):
-        instance = Capture.objects.filter(acct_no=utils.expand_acct_no(ident))
+        ident = utils.expand_acct_no(ident)
+        instance = Capture.objects.filter(acct_no=ident)
         if instance:
             obj_id = str(instance.first().id)
             return redirect(reverse('capture-upd', args=[obj_id]))
 
     if ident.endswith('-01'):
-        acct = Account.objects.get(acct_no=ident)
-        if not acct:
-            message = "Account does not exists for '%s'." % acct_no
+        match = Account.objects.filter(acct_no=ident)
+        if not match:
+            message = "Account does not exists for '%s'." % ident
             messages.error(request, message, extra_tags='danger')
             return redirect(reverse('capture-list'))
         
+        acct = match.first()
         for f in acct._meta.fields:
             initial[f.name] = getattr(acct, f.name)
         
