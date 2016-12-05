@@ -65,22 +65,13 @@
             <div id="pwd-panel" class="panel-body collapse">{% with form=form_pwd %}
                 <form method="post" action="{% url 'admin-passwd-set' user.id %}">
                     <div class="form-group">{% if form.old_password.label %}
-                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.old_password.errors %}has-error{% endif %}"><!--
-                            <label for="{{ form.old_password.id_for_label }}">{{ form.old_password.label }}{% if form.old_password.errors %}
-                                <span class="text-danger" title="{{ form.old_password.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
-                            {% endif %}</label> -->
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.old_password.errors %}has-error{% endif %}">
                             {{ form.old_password }}
                         </div>{% endif %}
-                        <div class="col-sm-3 rd-l-pad rd-r-pad"><!--
-                            <label for="{{ form.new_password1.id_for_label }}">{{ form.new_password1.label }}{% if form.new_password1.errors %}
-                                <span class="text-danger" title="{{ form.new_password1.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
-                            {% endif %}</label>-->
+                        <div class="col-sm-3 rd-l-pad rd-r-pad">
                             {{ form.new_password1 }}
                         </div>
-                        <div class="col-sm-3 rd-l-pad rd-r-pad"><!--
-                            <label for="{{ form.new_password2.id_for_label }}">{{ form.new_password2.label }}{% if form.new_password2.errors %}
-                                <span class="text-danger" title="{{ form.new_password2.errors|first }}"><i class="fa fa-exclamation-circle"></i></span>
-                            {% endif %}</label>-->
+                        <div class="col-sm-3 rd-l-pad rd-r-pad">
                             {{ form.new_password2 }}
                         </div>
                         <div class="cols-sm-1 rd-l-pad rd-r-pad">

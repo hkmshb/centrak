@@ -1,5 +1,10 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import forms as auth_forms
+from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.contrib import messages
+
 from main.forms import UserRegistrationForm
 
 
@@ -49,3 +54,32 @@ def handle_server_error(request):
 #: ==+: main view functions
 def index(request):
     return render(request, 'main/index.html', {})
+
+
+@login_required
+def profile_manage_passwd(request):
+    def _style_form(form):
+        attrs_ = {'class': 'form-control input-sm'}
+        for fn in ['old_password', 'new_password1', 'new_password2']:
+            field = form.fields.get(fn)
+            if field:
+                label = 'Confirm password' if '2' in fn else field.label
+                attrs_['placeholder'] = label
+                field.widget.attrs = attrs_.copy()
+
+    form = auth_forms.PasswordChangeForm(request.user)
+    if request.method == 'POST':
+        form = auth_forms.PasswordChangeForm(request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+
+            message = "Password has been changed successfully"
+            messages.success(request, message, extra_tags='success')
+            return auth_views.logout(request, next_page='profile-upd')
+        else:
+            messages.error(request, form.errors.as_text(), extra_tags='danger')
+    
+    _style_form(form)
+    return render(request, 'main/profile_detail.html', {
+        'user': request.user, 'form_pwd': form
+    })

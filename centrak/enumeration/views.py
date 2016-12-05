@@ -50,7 +50,7 @@ def manage_xform(request, object_id):
 
 
 @admin_with_permission()
-def xmanage_xform(request, object_id):
+def x__manage_xform(request, object_id):
     xform = XForm.objects.get(object_id=object_id)
     if request.method == 'POST':
         try:

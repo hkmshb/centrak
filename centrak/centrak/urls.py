@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^su:admin/', include(admin.site.urls)),
     url(r'^api/token/', obtain_auth_token, name='api-token'),
     url(r'api/v1/', include(api_urls)),
+    url(r'session_security', include('session_security.urls')),
     url(r'', include('enumeration.urls')),
     url(r'', include('main.urls')),
 ]

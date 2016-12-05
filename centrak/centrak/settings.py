@@ -47,6 +47,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_mongoengine',
+    'session_security',
     
     # internal
     'main',
@@ -63,6 +64,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+
+    # third-party
+    'session_security.middleware.SessionSecurityMiddleware',
 )
 
 ROOT_URLCONF = 'centrak.urls'
@@ -185,6 +189,12 @@ _MONGODB_USER = ''
 _MONGODB_PWD  = ''
 
 # mongoengine.connect(_MONGODB_NAME)
+
+
+##: Session Security
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SECURITY_WARN_AFTER   = 240     # 4min
+SESSION_SECURITY_EXPIRE_AFTER = 300     # 5min
 
 
 ##: ==+: Auth:

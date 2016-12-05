@@ -113,6 +113,8 @@ def _manage_capture_exist(request, ident):
         instance = Capture.objects.filter(acct_no=ident)
         if instance:
             obj_id = str(instance.first().id)
+            message = "The Account with number '%s' has been validated before."
+            messages.warning(request, message % ident, extra_tags='warning')
             return redirect(reverse('capture-upd', args=[obj_id]))
 
     if ident.endswith('-01'):

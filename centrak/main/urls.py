@@ -16,7 +16,7 @@ urlpatterns = [
         {'template_name':'account/login.html'}, name='login'),
     url(r'^account/logout$', auth_views.logout, kwargs={'next_page':'home-page'},
         name='logout'),
-
+    
     
     #: ==+: admin urls
     url(r'^admin/',
@@ -71,6 +71,7 @@ urlpatterns = [
 
     #: ==+: main urls
     url(r'^$', def_views.index, name='home-page'),
+    url(r'^profile/$', def_views.profile_manage_passwd, name='profile-upd'),
     url(r'^captures/p/', include([
         url(r'^form/$', enu_views.manage_capture, name='capture-add'),
         url(r'^validate$', enu_views.validate_capture, name='capture-val'),
