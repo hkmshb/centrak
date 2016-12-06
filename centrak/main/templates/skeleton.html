@@ -45,7 +45,6 @@
                 </div>
             </div>
         </div>
-        {% include 'session_security/all.html' %}
     </div>
     
     <!-- ===+: le scripts  -->
@@ -59,5 +58,6 @@
     <script src="{% static 'js/libs/bootstrap-datepicker.min.js' %}"></script>
     {% endcompress %}{% compress js %}
     {% block script-extra %}{% endblock %}{% endcompress %}
+    {% include 'session_security/all.html' %}
 </body>
 </html>

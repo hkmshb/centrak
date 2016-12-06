@@ -71,7 +71,7 @@ def user_detail(request, user_id):
             label = 'Confirm password' if '2' in fn else field.label
             attrs_['placeholder'] = label
             field.widget.attrs = attrs_.copy()
-
+    
     return render(request, 'main/admin/user_detail.html', {
         'user': user, 'form_pwd': form_pwd
     })
@@ -104,12 +104,13 @@ def manage_user(request, user_id=None):
     if user_id:
         profile = get_object_or_404(UserProfile, user_id=user_id)
     
-    kwargs = dict(user=request.user, instance=profile)
+    kwargs = dict(instance=profile)
     if user_id:
         kwargs['initial'] = {
             'username': profile.user.username,
             'first_name': profile.user.first_name,
             'last_name': profile.user.last_name,
+            'is_active': profile.user.is_active
         }
 
     if request.method == 'POST':

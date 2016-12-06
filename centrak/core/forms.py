@@ -57,11 +57,11 @@ class UserProfileForm(BaseModelForm):
                     empty_label=mark_safe("&laquo; select &raquo;"), 
                     queryset=BusinessOffice.objects.filter(level='L2'))
     
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
         if instance:
             kwargs['initial'] = kwargs.get('initial', dict())
-            kwargs['initial'].update({'is_active': user.is_active})
+            kwargs['initial'].update({'is_active': instance.user.is_active})
             if instance.location:
                 if instance.location.level.code == BusinessLevel.LEVEL2:
                     kwargs['initial'].update({
@@ -70,8 +70,6 @@ class UserProfileForm(BaseModelForm):
                     })
 
         super(UserProfileForm, self).__init__(*args, **kwargs)
-        self._current_user = user
-
         attrs_ = {'class': 'form-control input-sm'}
         for fn, field in self.fields.items():
             if fn != 'is_active':
@@ -84,7 +82,7 @@ class UserProfileForm(BaseModelForm):
     
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        if not self._current_user.is_superuser:
+        if self.instance and not self.instance.user.is_superuser:
             if not utils.has_valid_email_domain(username):
                 msg = self._error_messages['invalid-email-domain']
                 raise forms.ValidationError(msg)
@@ -100,10 +98,10 @@ class UserProfileForm(BaseModelForm):
     
     def clean(self):
         cleaned_data = super(UserProfileForm, self).clean()
-        if not self._current_user.is_superuser:
+        if not self.instance.user.is_superuser:
             fname = cleaned_data.get('first_name')
             lname = cleaned_data.get('last_name')
-            email = cleaned_data.get('email')
+            email = cleaned_data.get('username')
 
             if not utils.is_valid_official_email_format(email, fname, lname):
                 msg = self._error_messages['invalid-email-format']
