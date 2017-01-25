@@ -1,12 +1,46 @@
+'use strict';
+
 module.exports = function(grunt) {
-    var destJS = 'static/js/libs'
-      , destCSS = 'static/css/libs'
-      , destFONT = 'static/fonts'
-      , destCssFONT = 'static/css/fonts';
-    
+    require('time-grunt')(grunt);
+    require('jit-grunt')(grunt);
+
+    // configuration paths for resx
+    var conf = {
+        bowr: 'fbower_comps',
+        node: 'node_modules',
+        font: 'static/libs/fonts',
+        css: 'static/libs/css',
+        js: 'static/libs/js',
+    };
+
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
-        
+        // settings
+        p: conf,
+
+        // copy third-party resources to appropriate dir
+        copy: {
+            main: {
+                files: [{
+                    // styles
+                    expand:true, flatten:true, dest:'<%= p.css %>', src:'<%= p.bowr %>/bootstrap/dist/css/bootstrap.min.css' }, {
+                    expand:true, flatten:true, dest:'<%= p.css %>', src:'<%= p.bowr %>/font-awesome/css/font-awesome.min.css' }, {
+                    expand:true, flatten:true, dest:'<%= p.css %>', src:'<%= p.bowr %>/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css' }, {
+                    
+                    // fonts:
+                    expand:true, flatten:true, dest:'<%= p.font %>', src:'<%= p.bowr %>/bootstrap/dist/fonts/*.*' }, {
+                    expand:true, flatten:true, dest:'<%= p.font %>', src:'<%= p.bowr %>/font-awesome/fonts/*.*' }, {
+                    
+                    // scripts:
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/jquery/dist/jquery.min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/jquery-validation/dist/jquery.validate.min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/bootstrap/dist/js/bootstrap.min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/underscore/underscore-min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/backbone/backbone-min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/moment/min/moment.min.js'
+                }]
+            }
+        },
         less: {
             dist: {
                 files: {
@@ -17,41 +51,12 @@ module.exports = function(grunt) {
         },
         watch: {
             css: {
+                options: { spawn: false },
                 files: ['static/less/*.less'],
-                tasks: ['less'],
-                options: {
-                    spawn: false,
-                }
-            }
-        },
-        copy: {
-            main: {
-                files: [
-                    // style-sheets
-                    {dest:destCSS, src:['fbower_comps/bootstrap/dist/css/bootstrap.min.css'], expand:true, flatten:true},
-                    // {dest:destCSS, src:['fbower_comps/font-awesome/css/font-awesome.min.css'], expand:true, flatten:true},
-                    {dest:destCSS, src:['fbower_comps/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css'], expand:true, flatten:true},
-
-                    // fonts
-                    {dest:destCssFONT, src:['fbower_comps/bootstrap/dist/fonts/*.*'], expand:true, flatten:true},
-                    {dest:destFONT, src:['fbower_comps/font-awesome/fonts/*.*'], expand:true, flatten:true},
-
-                    // scripts
-                    {dest:destJS, src:['fbower_comps/jquery/dist/jquery.min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/jquery-validation/dist/jquery.validate.min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/bootstrap/dist/js/bootstrap.min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/underscore/underscore-min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/backbone/backbone-min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/moment/min/moment.min.js'], expand:true, flatten:true},
-                    {dest:destJS, src:['fbower_comps/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'], expand:true, flatten:true},
-                ],
+                tasks: ['less']
             }
         }
     });
-
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-contrib-less');
-    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('default', ['less', 'watch']);
 };

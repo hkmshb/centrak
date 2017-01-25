@@ -10,9 +10,9 @@
     <meta name="description" content="{% block meta-description %}{% endblock %}">
     {% block meta-extra %}{% endblock %}
     {% compress css %}
-    <link rel="stylesheet" href="{% static 'css/libs/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/libs/font-awesome.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/libs/bootstrap-datepicker3.min.css' %}"></script>
+    <link rel="stylesheet" href="{% static 'libs/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'libs/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'libs/css/bootstrap-datepicker3.min.css' %}"></script>
     {% endcompress %}{% compress css %}
     {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}{% endcompress %}
     {% block head-extra %}{% endblock %}
@@ -49,13 +49,13 @@
     
     <!-- ===+: le scripts  -->
     {% compress js %}
-    <script src="{% static 'js/libs/jquery.min.js' %}"></script>
-    <script src="{% static 'js/libs/jquery.validate.min.js' %}"></script>
-    <script src="{% static 'js/libs/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/libs/underscore-min.js' %}"></script>
-    <script src="{% static 'js/libs/backbone-min.js' %}"></script>
-    <script src="{% static 'js/libs/moment.min.js' %}"></script>
-    <script src="{% static 'js/libs/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'libs/js/jquery.min.js' %}"></script>
+    <script src="{% static 'libs/js/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'libs/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'libs/js/underscore-min.js' %}"></script>
+    <script src="{% static 'libs/js/backbone-min.js' %}"></script>
+    <script src="{% static 'libs/js/moment.min.js' %}"></script>
+    <script src="{% static 'libs/js/bootstrap-datepicker.min.js' %}"></script>
     {% endcompress %}{% compress js %}
     {% block script-extra %}{% endblock %}{% endcompress %}
     {% include 'session_security/all.html' %}

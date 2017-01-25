@@ -1,31 +1,16 @@
 {
   "name": "centrak",
-  "version": "0.5.0",
-  "description": "Customer Enumeration Activity Tracking Portal",
-  "main": "gruntfile.js",
-  "keywords": [
-    "centrak",
-    "enumeration",
-    "customer-enumeration"
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "hkmshb <hkmshb@gmail.com>",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@gitlab.com/hkmshb/centrak.git"
-  },
-  "bugs": {
-    "url": "https://gitlab.com/hkmshb/centrak/issues"
-  },
-  "homepage": "https://gitlab.com/hkmshb/centrak#README",
+  "private": true,
   "dependencies": {},
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-less": "^1.4.0",
-    "grunt-contrib-watch": "^1.0.0"
+    "grunt-contrib-watch": "^1.0.0",
+    "jit-grunt": "^0.10.0",
+    "time-grunt": "^1.4.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
