@@ -147,3 +147,85 @@ form, .data-card {
     background-color: @coin-bg-b;
     border: solid 2px @coin-border-color;
 } 
+
+
+
+/* ==============================+
+ |  WIDGET STATS
+ + =====================================================================*/
+.b { font-weight: bold; }
+.blue { color: rgb(52, 143, 260) !important; }
+.bg-blue { background-color: rgba(103, 168, 206, 0.6) !important; }
+.bg-green { background-color: rgba(0, 172, 172, 0.6) !important; }
+.bg-purple { background-color: rgba(114, 124, 182, 0.6) !important; }
+.bg-orange { background-color: rgba(243, 156, 18, 0.6) !important; }
+.bg-red { background-color: rgba(221, 75, 57, 0.6) !important; }
+.bg-white { background-color: #fff; border: solid 1px #ddd; }
+
+.bg-black-dark { background-color: rgba(45, 53, 60, 0.7) !important; }
+.bg-black { background-color: rgba(45, 53, 60, 0.5) !important; }
+.bg-black-lite { background-color: rgba(45, 53, 60, 0.3) !important;  }
+
+
+.widget {
+    color: #fff;
+    margin-bottom: 10px; padding: 10px;
+    border-radius: 3px; overflow: hidden;
+}
+
+.widget.widget-stats {
+    position: relative;
+    .stats-icon {
+        height: 48px; width: 48px; 
+        font-size: 48px; line-height: 48px;
+        position: absolute; top: 8px; right: 14px;
+        text-align: center; color: #fff; opacity: 0.2;
+    }
+    .stats-title { 
+        position: relative; font-size: 9pt; margin: 0 0 5px;
+        color: rgba(255, 255, 255, 0.6); text-transform: uppercase; 
+    }
+    .stats-number {
+        font-size: 20pt; font-weight: bold; margin-bottom: 10px;
+    }
+    .stats-progress {
+        background: rgba(0, 0, 0, 0.2); 
+        height: 2px; margin: 0 -15px 5px;
+
+        .progress-bar { background: #fff; }
+    }
+    .stats-desc { color: rgba(255, 255, 255, 0.6); }
+    .scale { font-size:8pt; float:right; }
+}
+
+.widget-chart {
+    position: relative; overflow: hidden;
+    border-radius: 4px; margin-bottom: 20px;
+
+    .widget-chart-content { padding: 10px; }
+    .widget-chart-content.with-sidebar { padding: 10px; margin-right: 200px; }
+    .chart-title { 
+        margin: 0 5px 5px; 
+        font-size: 14pt !important; text-transform: uppercase;
+        small {
+            display: block; margin-top: 5px; 
+            font-family: Roboto; font-size: 8pt; 
+            text-transform: none;
+        }
+    }
+
+    .widget-chart-sidebar {
+        position: absolute; 
+        right: 0; top: 0; bottom: 0;
+        padding: 10px; width: 200px; 
+    }
+}
+
+.widget.widget-stats-strip { color: #333; margin-bottom: 0; padding: 10px 10px 0; }
+.widget.widget-stats-strip {
+    .strip-title { font-size: 9pt; color: #999; text-transform: uppercase; }
+    .strip-numbers.bottom { border-top: dotted 1px #ddd; }
+    .strip-text.lg { font-size: 16pt; }
+    .strip-text.sm { font-size: 12pt; }
+    .strip-text.xs { font-size: 9pt; }
+}

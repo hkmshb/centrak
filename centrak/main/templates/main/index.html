@@ -1,8 +1,26 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% block header-title %}{% endblock %}
+
 {% block content %}
+{% if not request.user.is_authenticated %}
     <h1>Welcome to CENTrak</h1>
     <p>
         Kano Electricity Distribution Company's Customer Enumeration Activity Tracking Portal.
     </p>
+{% else %}
+    <div class="dashboard hook" data-v="DashboardView">
+        {% include 'snippets/dashboard.html' %}
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block script-extra %}
+{% if request.user.is_authenticated %}
+    <script src="{% static 'libs/js/Chart.min.js' %}"></script>
+    {{ block.super }}
+    <script type="text/javascript">
+        var analytics = [{{ stats.analytics.ever|safe }}, {{ stats.analytics.today|safe }}];
+    </script>
+{% endif %}
 {% endblock %}

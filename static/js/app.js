@@ -1,5 +1,5 @@
 /* jshint laxcomma:true */
-var app = (function($){
+var app = (function($) {
     var config = $('#config')
       , app = {
             "views": {},
@@ -29,5 +29,11 @@ var app = (function($){
         }
     });
 
+    /* chart colours */
+    app.colours = {
+        green: {norm:'rgb(0,172,127)', lite:'rgba(0,172,172,.2)', dark:'rgba(0,172,172,.9)'},
+        orange: {norm:'rgb(243,156,18)', lite:'rgba(243,156,18,.2)', dark:'rgba(243,156,18,.9)'},
+        red: {norm:'rgb(221,75,57)', lite:'rgba(221,75,57,.2)', dark:'rgba(221,75,57,.9)'}
+    };
     return app;
 })(jQuery);

@@ -280,12 +280,68 @@
               , form = $('form', this.$el)
               , file = $('input[name=file]', form);
             
-            if (file.val() == "") {
+            if (file.val() === "") {
                 $('.form-group.file-wrap', form).addClass('has-error');
             } else {
                 form.submit();
                 $('.import-pane').html(tmpl.html());
             }
+        }
+    }),
+
+    // ::: NON ADMIN VIEWS
+    
+    DashboardView = TemplateView.extend({
+        el: '.dashboard',
+        colours: [
+            [app.colours.green.norm, app.colours.green.lite],
+            [app.colours.orange.norm, app.colours.orange.lite],
+            [app.colours.red.norm, app.colours.red.lite]],
+        initialize: function() {
+            var self = this;
+            $(document).ready(function() {
+                Chart.defaults.global.legend.labels.boxWidth = 10;
+                var ever = analytics[0]
+                  , today = analytics[1]
+                  , ctx1 = $('#captures-ever')
+                  , ctx2 = $('#captures-today');
+                
+                var chart1 = new Chart.Line(ctx1, {
+                    data: { labels: ever[0], 
+                        datasets: self.getLineDataset(ever[1])
+                    }
+                }),
+                chart2 = new Chart(ctx2, {
+                    type: 'horizontalBar',
+                    data: { labels: today[0],
+                        datasets: self.getBarDataset(today[1]),
+                    },
+                    options: { 
+                        responsive: true, maintainAspectRatio: true,
+                        scales: { yAxes: [{ stacked: true}] }
+                    }
+                });
+            });
+        },
+        getLineDataset: function(source) {
+            var self = this;
+            return _(source).map(function(e, idx) {
+                var colours = self.colours[idx];
+                return { label: e[0].replace(/_/g, ''), data: e[1],
+                    borderWidth:1, borderColor: colours[0],
+                    backgroundColor: colours[1]
+                };
+            });
+        },
+        getBarDataset: function(source) {
+            var self = this, t_colours = self.colours.slice().reverse();
+            return _(source.reverse()).map(function(e, idx) {
+                var colours = t_colours[idx];
+                return { label: e[0].replace(/_/g, ''), data: e[1],
+                    borderWidth:1, borderColor: colours[0],
+                    backgroundColor: colours[1]
+                };
+            });
         }
     }),
 
@@ -315,7 +371,7 @@
               , ctrl = $('input[name=' + name + ']')
               , attr = 'readonly';
             
-            if (ctrl.length == 0) {
+            if (ctrl.length === 0) {
                 ctrl = $('select[name=' + name + ']');
             }
             if (checked) {
@@ -329,8 +385,6 @@
         }
     }),
 
-    // ::: NON ADMIN VIEWS
-    
     PaperCaptureListView = TemplateView.extend({
         el: 'content-pane',
         initialize: function() {
@@ -358,6 +412,7 @@
     app.views.PaperCaptureView = PaperCaptureView;
 
     // ::: NON ADMIN
+    app.views.DashboardView = DashboardView;
     app.views.PaperCaptureListView = PaperCaptureListView;
 
 })(jQuery, Backbone, _, app);

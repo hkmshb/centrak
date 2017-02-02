@@ -5,12 +5,12 @@
 
     app.collections.ExternalXForms = Backbone.Collection.extend({
         model: app.models.XForm,
-        url: (_.isEmpty(app.conf.survey)? "": app.conf.survey.apiRoot)
+        url: (app.conf && app.conf.survey && app.conf.survey.apiRoot || "")
     });
 
     app.collections.XForms = Backbone.Collection.extend({
         model: app.models.XForm,
-        url: (_.isEmpty(app.conf.xformsEndpoint)? "": app.conf.xformsEndpoint)
+        url: (app.conf && app.conf.xformsEndpoint || "")
     });
 
     // create collection instances

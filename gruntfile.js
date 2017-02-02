@@ -37,7 +37,8 @@ module.exports = function(grunt) {
                     expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' }, {
                     expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/underscore/underscore-min.js' }, {
                     expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/backbone/backbone-min.js' }, {
-                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/moment/min/moment.min.js'
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/moment/min/moment.min.js' }, {
+                    expand:true, flatten:true, dest:'<%= p.js %>', src:'<%= p.bowr %>/chart.js/dist/Chart.min.js'
                 }]
             }
         },

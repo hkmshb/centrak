@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'main',
     'core',
     'enumeration',
+    'stats',
 )
 
 MIDDLEWARE_CLASSES = (
