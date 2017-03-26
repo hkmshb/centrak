@@ -108,3 +108,31 @@ def stats_dash_capture_analytics(source, date_crnt=None):
     counts = stats_count_group_items(df, *grouping)
     result.today = Storage(counts)
     return result
+
+
+def stats_pane_capture_summary(source, region_name, date_crnt):
+    if not isinstance(source, pd.DataFrame):
+        source = queryset_to_dataframe(source)
+    
+    result = Storage({'all':Storage(), 'region':Storage()})
+    if source.empty:
+        return result
+    
+    # calculate stats for all
+    counts = stats_count_group_items(df, ['acct_status'])
+    result.all.update(counts)
+
+    ## calculate stats for region
+    # total
+    df2 = df[df['region_name'] == region_name]
+    counts = stats_count_group_items(df2, ['acct_status'])
+    result.region.total = counts
+
+    # month
+    if not date_crnt: date_crnt = date.today()
+    date_first = date_crnt.replace(day=1)
+    date_last = date_crnt.replace(day=31)
+
+
+def stats_pane_capture_history(source, region_name):
+    pass

@@ -3,16 +3,22 @@ from dolfin_deploy import *
 
 
 
-def pre_deploy(repo_url, site_name=None, proj_name=None, db_username=None, db_password=None):
-    env.site_dir  = '/opt/webapps/%s' % env.site_name
+def pre_deploy(site_name=None, proj_name=None, repo_url=None, db_username=None, db_password=None):
     env.site_name = site_name or 'centrak'
     env.proj_name = proj_name or 'centrak'
+    env.site_dir  = '/opt/webapps/%s' % env.site_name
     env.repo_url  = repo_url
+    if not repo_url:
+        raise Exception("repo_url not provided.")
 
 
 def post_deploy():
     fn.update_django_settings()
     fn.update_django_settings_ext()
+
+
+def service(name, action):
+    sudo('service %(name)s %(action)s' % {'name':name, 'action':action})
 
 
 #+============================================================================+

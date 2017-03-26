@@ -63,7 +63,6 @@ def index(request):
     
     ### authenticated user
     ## stats: computation for stats on dashboard
-    # stats; org wide
     fields = ['region_name', 'acct_status', 'date_created']
     captures_qs = Capture.objects.only(*fields)
     df = stcore.queryset_to_dataframe(captures_qs)

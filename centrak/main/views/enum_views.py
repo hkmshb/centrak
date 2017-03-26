@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.template.response import TemplateResponse
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
@@ -20,6 +21,7 @@ def capture_index(request, tab=None):
     # clear fixed entry session
     request.session['paper_capture_fixed_entries'] = None
     
+    ## step 1: data filtering
     # filter by current date if no date filter exists
     qs_GET = request.GET.copy()
     date_digitized = qs_GET.get('date_digitized', None)
@@ -40,8 +42,10 @@ def capture_index(request, tab=None):
     filter = CaptureFilter(qs_GET, queryset=captures)
     page = paginate(request, filter)
 
-    return render(request, 'enumeration/capture_index.html', {
-        'tab': tab, 'captures': page, 'filter': filter
+    ## step 2: stats composition
+    stats = {'summary':[], 'history':[]}
+    return TemplateResponse(request, 'enumeration/capture_index.html', {
+        'tab': tab, 'captures': page, 'filter': filter, 'stats': stats
     })
 
 

@@ -157,9 +157,10 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     date_digitized = fields.DateTimeField(verbose_name='Date Digitized')
 
     # organization
-    region_name  = fields.StringField(max_length=20, blank=False, verbose_name='Region Name')
-    csp_code     = fields.StringField(max_length=20, blank=True, verbose_name='CSP Code')
-    csp_name     = fields.StringField(max_length=50, blank=False, verbose_name='CSP Name')
+    region_name = fields.StringField(max_length=20, blank=False, verbose_name='Region Name')
+    region_code = fields.StringField(max_length=12, blank=False, verbose_name='Region Code')
+    csp_code    = fields.StringField(max_length=20, blank=True, verbose_name='CSP Code')
+    csp_name    = fields.StringField(max_length=50, blank=False, verbose_name='CSP Name')
 
     # staff names
     user_email      = fields.EmailField(max_length=50, required=True, verbose_name='User Email')
@@ -189,7 +190,8 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     }
     
     def __str__(self):
-        return ("%(region_name)s %(acct_info)s %(cust_name)s" % {
+        return ("%(region_code)s %(region_name)s %(acct_info)s %(cust_name)s" % {
+            'region_code': self.region_code, 
             'region_name': self.region_name,
             'acct_info': self.acct_no or self.book_code,
             'cust_name': self.cust_name

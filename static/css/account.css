@@ -274,6 +274,147 @@ form .data-row,
   border: solid 2px #ccc;
 }
 /* ==============================+
+ |  WIDGET STATS
+ + =====================================================================*/
+.b {
+  font-weight: bold;
+}
+.blue {
+  color: #348fff !important;
+}
+.bg-blue {
+  background-color: rgba(103, 168, 206, 0.6) !important;
+}
+.bg-green {
+  background-color: rgba(0, 172, 172, 0.6) !important;
+}
+.bg-purple {
+  background-color: rgba(114, 124, 182, 0.6) !important;
+}
+.bg-orange {
+  background-color: rgba(243, 156, 18, 0.6) !important;
+}
+.bg-red {
+  background-color: rgba(221, 75, 57, 0.6) !important;
+}
+.bg-white {
+  background-color: #fff;
+  border: solid 1px #ddd;
+}
+.bg-black-dark {
+  background-color: rgba(45, 53, 60, 0.7) !important;
+}
+.bg-black {
+  background-color: rgba(45, 53, 60, 0.5) !important;
+}
+.bg-black-lite {
+  background-color: rgba(45, 53, 60, 0.3) !important;
+}
+.widget {
+  color: #fff;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.widget.widget-stats {
+  position: relative;
+}
+.widget.widget-stats .stats-icon {
+  height: 48px;
+  width: 48px;
+  font-size: 48px;
+  line-height: 48px;
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  text-align: center;
+  color: #fff;
+  opacity: 0.2;
+}
+.widget.widget-stats .stats-title {
+  position: relative;
+  font-size: 9pt;
+  margin: 0 0 5px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+.widget.widget-stats .stats-number {
+  font-size: 20pt;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.widget.widget-stats .stats-progress {
+  background: rgba(0, 0, 0, 0.2);
+  height: 2px;
+  margin: 0 -15px 5px;
+}
+.widget.widget-stats .stats-progress .progress-bar {
+  background: #fff;
+}
+.widget.widget-stats .stats-desc {
+  color: rgba(255, 255, 255, 0.6);
+}
+.widget.widget-stats .scale {
+  font-size: 8pt;
+  float: right;
+}
+.widget-chart {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.widget-chart .widget-chart-content {
+  padding: 10px;
+}
+.widget-chart .widget-chart-content.with-sidebar {
+  padding: 10px;
+  margin-right: 200px;
+}
+.widget-chart .chart-title {
+  margin: 0 5px 5px;
+  font-size: 14pt !important;
+  text-transform: uppercase;
+}
+.widget-chart .chart-title small {
+  display: block;
+  margin-top: 5px;
+  font-family: Roboto;
+  font-size: 8pt;
+  text-transform: none;
+}
+.widget-chart .widget-chart-sidebar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 10px;
+  width: 200px;
+}
+.widget.widget-stats-strip {
+  color: #333;
+  margin-bottom: 0;
+  padding: 10px 10px 0;
+}
+.widget.widget-stats-strip .strip-title {
+  font-size: 9pt;
+  color: #999;
+  text-transform: uppercase;
+}
+.widget.widget-stats-strip .strip-numbers.bottom {
+  border-top: dotted 1px #ddd;
+}
+.widget.widget-stats-strip .strip-text.lg {
+  font-size: 16pt;
+}
+.widget.widget-stats-strip .strip-text.sm {
+  font-size: 12pt;
+}
+.widget.widget-stats-strip .strip-text.xs {
+  font-size: 9pt;
+}
+/* ==============================+
  |  bootstrap overrides
  + =====================================================================*/
 @media (min-width: 768px) {
@@ -432,10 +573,10 @@ ul.dropdown-menu.wide-menu li > a {
   margin: 0;
   padding: 0;
   padding-right: 2px;
-  width: 50px;
-  height: 27px;
   display: inline;
   text-align: center;
+  width: 50px;
+  height: 27px;
 }
 .sub-panel a.plain:hover .fa,
 .sub-panel a.plain:focus .fa {
@@ -582,6 +723,39 @@ form .search-panel {
 .scroll-body {
   margin-bottom: 0;
   width: 900px;
+}
+.row.row-condensed {
+  margin: 10px -10px 0;
+}
+.row.row-condensed .col-sm-3,
+.row.row-condensed .col-sm-4,
+.row.row-condensed .col-sm-5,
+.row.row-condensed .col-sm-6,
+.row.row-condensed .col-sm-7,
+.row.row-condensed .col-sm-8,
+.row.row-condensed .col-sm-9,
+.row.row-condensed .col-sm-10,
+.row.row-condensed .col-sm-11,
+.row.row-condensed .col-sm-12,
+.row.row-condensed .col-md-3,
+.row.row-condensed .col-md-4,
+.row.row-condensed .col-md-5,
+.row.row-condensed .col-md-6,
+.row.row-condensed .col-md-7,
+.row.row-condensed .col-md-8,
+.row.row-condensed .col-md-9,
+.row.row-condensed .col-md-10,
+.row.row-condensed .col-md-11,
+.row.row-condensed .col-md-12 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.tab-history .table td {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.tab-summary > div:last-child {
+  padding-bottom: 10px;
 }
 a,
 label {
