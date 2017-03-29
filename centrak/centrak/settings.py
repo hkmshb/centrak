@@ -184,11 +184,7 @@ LOGGING = {
 
 
 ##: ==+: mongo-engine settings
-_MONGODB_NAME = 'centrak'
-_MONGODB_HOST = ''
-_MONGODB_USER = ''
-_MONGODB_PWD  = ''
-
+#_MONGODB_NAME = 'centrak'
 # mongoengine.connect(_MONGODB_NAME)
 
 

@@ -3,10 +3,10 @@ from dolfin_deploy import *
 
 
 
-def pre_deploy(site_name=None, proj_name=None, repo_url=None, db_username=None, db_password=None):
+def pre_deploy(site_name=None, proj_name=None, repo_url=None):
     env.site_name = site_name or 'centrak'
     env.proj_name = proj_name or 'centrak'
-    env.site_dir  = '/opt/webapps/%s' % env.site_name
+    env.site_dir  = "/opt/webapps/%s" % env.site_name
     env.repo_url  = repo_url
     if not repo_url:
         raise Exception("repo_url not provided.")
@@ -36,14 +36,14 @@ def create_site_directories(**dirnames):
     
     for d in directories:
         env.d_ = d
-        fullpath = '%(site_dir)s/%(d_)s' % env
-        run('mkdir -p %s' % fullpath)
-        env['%s_dir' % d] = fullpath
+        fullpath = "%(site_dir)s/%(d_)s" % env
+        run("mkdir -p %s" % fullpath)
+        env["%s_dir" % d] = fullpath
 
 
 def update_virtualenv():
     run(("if [ ! -f %(venv_dir)s/bin/pip ]; then"
-         "  virtualenv --python=python3.4 %(venv_dir)s; "
+         "  virtualenv --python=python3.5 %(venv_dir)s; "
          "fi; "
          "%(venv_dir)s/bin/pip install -r %(source_dir)s/requirements/base.txt") % env)
 

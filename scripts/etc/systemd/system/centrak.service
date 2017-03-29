@@ -1,0 +1,12 @@
+[Unit]
+Description=Customer Enumeration Tracking Portal: CENTrak
+After=network.target
+
+[Service]
+User=<usr>
+ExecStart=/opt/webapps/<site>/venv/bin/uwsgi \
+          -- ini /opt/webapps/<site>/source/scripts/uwsgi.ini \
+          --env DJANGO_SETTINGS_MODULE=centrak.settings
+
+[Install]
+WantedBy=multi-user.target

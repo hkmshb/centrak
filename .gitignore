@@ -3,13 +3,16 @@ fbower_comps
 __pycache__
 instance
 
+
 .settings
 .*project
+*.notes.md
 *.sqlite3
 *.py[co]
 *.todo
 *.log
 .*
+
 
 local_settings.py
 tags
