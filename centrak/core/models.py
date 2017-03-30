@@ -66,7 +66,7 @@ class UserSettings(models.Model):
                     default=settings.CENTRAK_CAPTURE_PAGE_SIZE)
 
 #*----------------------------------------------------------------------------+
-#| ApiServiceInfo
+#| ApiServiceInfo + Notifications
 #+----------------------------------------------------------------------------+
 class ApiServiceInfo(TimeStampedModel):
     """
@@ -89,6 +89,26 @@ class ApiServiceInfo(TimeStampedModel):
     
     def get_absolute_url(self):
         return reverse('admin-apiservice-info', args=[self.key])
+
+
+class Notification(TimeStampedModel):
+    """Maintains a list of long lived notification messages.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=False, null=False)
+    message = models.TextField(_('Message'))
+    read = models.BooleanField(_('Read'), default=False)
+    task_id = models.CharField(_('Task Id'), max_length=100, blank=True)
+    task_status = models.CharField(_('Task Status'), max_length=32, blank=True)
+
+    @property
+    def is_task(self):
+        return self.task_id and self.task_id.strip() != ''
+
+    def __str__(self):
+        return "Notification: [task={}, read={}] {}".format(
+            'Y' if self.is_task else 'N', 'Y' if self.read else 'N',
+            self.message[:70] + ('...' if len(self.message) > 20 else '')
+        )
 
 
 #*----------------------------------------------------------------------------+

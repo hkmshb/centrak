@@ -10,6 +10,8 @@ from dolfin.core import Storage
 
 from main.forms import UserRegistrationForm
 from enumeration.models import Capture
+from core.models import Notification
+from core.utils import paginate
 from stats import core as stcore
 
 
@@ -127,4 +129,23 @@ def profile_manage_passwd(request):
     _style_form(form)
     return render(request, 'main/profile_detail.html', {
         'user': request.user, 'form_pwd': form
+    })
+
+
+@login_required
+def notification_list(request):
+    q = Notification.objects.filter(user_id=request.user.id).order_by('-id')
+    p = paginate(request, q)
+    return render(request, 'main/notification_list.html', {
+        'notifications': p
+    })
+    
+
+@login_required
+def notification_detail(request, id):
+    notification = Notification.objects.get(user_id=request.user.id, id=id)
+    notification.read = True
+    notification.save()
+    return render(request, 'main/notification_detail.html', {
+        'notification': notification
     })

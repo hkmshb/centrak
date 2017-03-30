@@ -4,16 +4,17 @@ from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
 from django.contrib import messages
-
+from celery import uuid
 
 from ezaddress.models import State
 from core.models import UserProfile, BusinessLevel, BusinessOffice, \
-        Organisation, Voltage, Station, Powerline, ApiServiceInfo
+        Organisation, Voltage, Station, Powerline, ApiServiceInfo, \
+        Notification
 from core.forms import OrganisationForm, OfficeForm, UserProfileForm, \
         ApiServiceInfoForm
 from core.utils import admin_with_permission, has_object_permission
 from .. import utils, models, forms
-from .. import handlers
+from .. import handlers, tasks
 
 
 
@@ -339,16 +340,10 @@ def manage_imports(request, type):
                 messages.error(request, message, extra_tags='danger')
                 return redirect(reverse('admin-import', args=[type]))
             
-            try:
-                ixhandler = handlers.AccountIXHandler(filepath)
-                ixhandler.load_from_excel()
-
-                message = "Upload and import successful."
-                messages.success(request, message, extra_tags='success')
-            except Exception as ex:
-                message = "Unable to process file: %s<br/>%s" % (upl_obj.name, str(ex))
-                messages.error(request, mark_safe(message), extra_tags='danger')
-                return redirect(reverse('admin-import', args=[type]))
+            tasks.import_accounts.delay(request.user.id, filepath)
+            message = "Upload complete and import in progress. Check " \
+                    + "notifications for resulting task status."
+            messages.success(request, message, extra_tags='success')
         else:
             pass
 

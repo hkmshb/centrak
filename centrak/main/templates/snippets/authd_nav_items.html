@@ -9,9 +9,11 @@
 <li class="sep">|</li>
 {% endif %}
 <li class="strip-notification">
-    <a href="#">
+    <a href="{% url 'notification-list' %}">
         <i class="fa fa-fw fa-lg fa-bell-o"></i> 
-        <span class="badge text-sm bg-danger">0</span>
+        {% if notification_count %}
+        <span class="badge text-sm bg-danger">{{ notification_count }}</span>
+        {% endif %}
         <span class="text">Messages & Notifications</span>
     </a>
 </li>

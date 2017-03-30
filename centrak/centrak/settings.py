@@ -88,6 +88,7 @@ TEMPLATES = [
                 'main.context_processors.menu',
                 'main.context_processors.jsconf',
                 'main.context_processors.current_date',
+                'main.context_processors.notification_count',
             ],
         },
     },
@@ -186,6 +187,15 @@ LOGGING = {
 ##: ==+: mongo-engine settings
 #_MONGODB_NAME = 'centrak'
 # mongoengine.connect(_MONGODB_NAME)
+
+
+##: ==+: Celery
+## version 4.0 uses lower case names for config entries
+BROKER_URL               = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND    = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT    = ['application/json']
+CELERY_TASK_SERIALIZER   = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 
 ##: Session Security

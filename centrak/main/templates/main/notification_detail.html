@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load centrak %}
+{% block header-title %}{% endblock %}
+{% block content %}
+    <br/>
+    <div class="side-pane col-sm-3">
+        &nbsp;
+    </div>
+    <div class="content-pane col-sm-9">
+        <div class="hook">
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-heading">
+                    <i class="fa fa-fw fa-envelope-open-o"></i> Notification
+                </div>
+                <div class="panel-body rd-l-pad rd-r-pad">
+                    <div class="data-card">
+                        <div class="data-row">
+                            <div class="col-sm-6">
+                                <span><b>Date Created</b></span><label>{{ notification.date_created }}</label>
+                            </div>
+                            {% if notification.is_task %}
+                            <div class="col-sm-6">
+                                <span><b>Task Status</b></span><label>{{ notification.task_status|title }}</label>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="data-row">
+                            <div class="col-sm-12">
+                                <span><b>Message</b></span><label style="font-weight: normal">{{ notification.message }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

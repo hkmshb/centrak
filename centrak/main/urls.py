@@ -72,6 +72,9 @@ urlpatterns = [
     #: ==+: main urls
     url(r'^$', def_views.index, name='home-page'),
     url(r'^profile/$', def_views.profile_manage_passwd, name='profile-upd'),
+    url(r'^notifications/$', def_views.notification_list, name='notification-list'),
+    url(r'^notifications/(?P<id>[0-9]+)/$', def_views.notification_detail,
+        name='notification-info'),
     url(r'^captures/p/', include([
         url(r'^form/$', enu_views.manage_capture, name='capture-add'),
         url(r'^validate$', enu_views.validate_capture, name='capture-val'),

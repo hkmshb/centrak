@@ -71,3 +71,8 @@ def fa_synced_by(synced_by, default):
     if synced_by not in ('', None):
         return ('fa-laptop' if synced_by == 'auto' else 'fa-user')
     return 'fa-question'
+
+
+@register.filter
+def fa_notification_read(read):
+    return 'fa-envelope-open-o' if read else 'fa-envelope'

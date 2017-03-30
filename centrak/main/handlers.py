@@ -45,7 +45,8 @@ class IXHandlerBase:
 
 
 class AccountIXHandler(IXHandlerBase):
-    headers = ('sn', 'acct_no', 'book_code', 'cust_name', 'service_addr', 'cust_mobile', 'meter_no', 'tariff')
+    headers = ('sn', 'acct_no', 'book_code', 'cust_name', 'service_addr', 
+               'cust_mobile', 'meter_no', 'tariff')
 
     def _get_pg_connstr(self):
         db_settings = settings.DATABASES['default']

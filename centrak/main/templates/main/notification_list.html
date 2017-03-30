@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load centrak %}
+{% block header-title %}{% endblock %}
+{% block content %}
+    <br/>
+    <div class="side-pane col-sm-3">
+        &nbsp;
+    </div>
+    <div class="content-pane col-sm-9">
+        <div class="hook">
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-heading">
+                    <i class="fa fa-fw fa-envelope"></i> Notifications
+                </div>
+                <div class="panel-body">
+                {% if not notifications %}
+                    <div class="action-notice">
+                        No Notifications found!
+                    </div>
+                {% else %}
+                    <table class="table no-thead table-condensed table-striped table-hover">
+                        <tbody>
+                        {% for n in notifications %}
+                            <tr>{% if not n.read %}
+                                <td><a href="{% url 'notification-info' n.id %}"><i class="fa fa-fw fa-envelope"></i></a></td>
+                                <td><a href="{% url 'notification-info' n.id %}"><b>{{ n.message|truncatechars:70 }}</b></a></td>
+                                <td><a href="{% url 'notification-info' n.id %}"><b>{{ n.task_status|default:'-'|title }}</b></a></td>{% else %}
+                                <td><a href="{% url 'notification-info' n.id %}"><i class="fa fa-fw fa-envelope-open-o"></i></a></td>
+                                <td><a href="{% url 'notification-info' n.id %}" style="color:#333;">{{ n.message|truncatechars:70 }}</a></td>
+                                <td><a href="{% url 'notification-info' n.id %}" style="color:#333;">{{ n.task_status|default:'-'|title }}</a></td>{% endif %}
+                                <td></td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                </div>
+                {% include 'snippets/panel_pager.html' with page=notifications %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

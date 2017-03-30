@@ -2,7 +2,7 @@
 {% load staticfiles humanize centrak %}
 {% block content-pane %}
 <div class="hook" data-v="">
-    <div class="panel panel-default panel-sqi block">
+    <div class="panel panel-default panel-sqi{% if accts %} block{% endif %}">
         <div class="panel-heading">
             <i class="fa fa-fw fa-book"></i> Accounts
             {% if accounts.exists %}
