@@ -7,11 +7,13 @@
     {% include 'snippets/capture_side_pane.html' with form=form %}
     <div class="col-sm-9 rd-r-pad">
         <div class="panel panel-default panel-sqi" style="margin-bottom:5px;">
-            <div class="panel-heading">{% if not form.instance or not form.instance.id %}
-                Add New Capture{% else %}Update Capture{% endif %}
+            <div class="panel-heading">{% if form.acct_status.value == 'existing' %}Validate and {% endif %}
+                {% if not form.instance or not form.instance.id %}Add New Capture{% else %}Update Capture{% endif %}
             </div>
         </div>
-        <br/>
+        <i style="font-size:8pt; margin-top:13px; display:block;"> 
+            All dropdown fields are required, other required fields are marked with an asterix (*)
+        </i>
         <form method="post" class="form-compact hook" data-v="PaperCaptureView">
             <div class="panel panel-default panel-sqi">
                 <div class="panel-body">
@@ -20,7 +22,7 @@
                             <div class="input-group ig2 {% if form.date_captured.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_date_captured" tabIndex="-1" {% if form.fx_date_captured.value %}checked{% endif %} /></span>
                                 <div class="input-group ig2 date">
-                                    <input type="text" class="form-control input-sm" name="date_captured" placeholder="Capture Date" data-ti="1"
+                                    <input type="text" class="form-control input-sm" name="date_captured" placeholder="* Capture Date" data-ti="1"
                                            value="{{ form.date_captured.value|default:"" }}" tabIndex="1" title="Date Captured" readonly />
                                     <span class="input-group-addon date"><i class="fa fa-calendar"></i></span>
                                 </div>
@@ -31,14 +33,14 @@
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_region_name"  tabIndex="-1" {% if form.fx_region_name.value %}checked{% endif %} /></span>
                                 {{ form.region_name|append_attr:"tabIndex:2"|set_data:"ti:2" }}
                             </div>{% else %}
-                            <input type="text" class="form-control input-sm" name="region_name" placeholder="Region" tabIndex="2" title="Region"
+                            <input type="text" class="form-control input-sm" name="region_name" placeholder="* Region" tabIndex="2" title="Region"
                                     value="{{ form.region_name.value|default:"" }}" readonly />
                             {% endif %}
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.csp_name.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_csp_name"  tabIndex="-1" {% if form.fx_csp_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm body" name="csp_name" placeholder="CSP" data-ti="3" autocomplete="off"
+                                <input type="text" class="form-control input-sm body" name="csp_name" placeholder="* CSP" data-ti="3" autocomplete="off"
                                        value="{{ form.csp_name.value|default:"" }}" tabIndex="3" title="CSP" />
                             </div>
                         </div>
@@ -47,21 +49,21 @@
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.sales_repr_name.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_sales_repr_name" tabIndex="-1" {% if form.fx_sales_repr_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="sales_repr_name" placeholder="Sales Representative" data-ti="4" autocomplete="off"
+                                <input type="text" class="form-control input-sm" name="sales_repr_name" placeholder="* Sales Representative" data-ti="4" autocomplete="off"
                                        value="{{ form.sales_repr_name.value|default:"" }}" tabIndex="4" title="Sales Representative" />
                             </div>
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.csp_supr_name.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_csp_supr_name" tabIndex="-1" {% if form.fx_csp_supr_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="csp_supr_name" placeholder="CSP Supervisor" data-ti="5" autocomplete="off"
+                                <input type="text" class="form-control input-sm" name="csp_supr_name" placeholder="* CSP Supervisor" data-ti="5" autocomplete="off"
                                        value="{{ form.csp_supr_name.value|default:"" }}" tabIndex="5" title="CSP Supervisor" />
                             </div>
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.tsp_engr_name.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_tsp_engr_name" tabIndex="-1" {% if form.fx_tsp_engr_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="tsp_engr_name" placeholder="TSP Engineer" data-ti="6" autocomplete="off"
+                                <input type="text" class="form-control input-sm" name="tsp_engr_name" placeholder="* TSP Engineer" data-ti="6" autocomplete="off"
                                        value="{{ form.tsp_engr_name.value|default:"" }}" tabIndex="6" title="TSP Engineer" />
                             </div>
                         </div>
@@ -70,26 +72,26 @@
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.feeder_name.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_feeder_name" tabIndex="-1" {% if form.fx_feeder_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="feeder_name" placeholder="Feeder" data-ti="7" autocomplete="off"
+                                <input type="text" class="form-control input-sm" name="feeder_name" placeholder="* Feeder" data-ti="7" autocomplete="off"
                                        value="{{ form.feeder_name.value|default:"" }}" tabIndex="7" title="Feeder" />
                             </div>
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.station_name.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_station_name" tabIndex="-1" {% if form.fx_station_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="station_name" placeholder="Station/Transformer" data-ti="8" autocomplete="off" 
+                                <input type="text" class="form-control input-sm" name="station_name" placeholder="* Station/Transformer" data-ti="8" autocomplete="off" 
                                        value="{{ form.station_name.value|default:"" }}" tabIndex="8" title="Station/Transformer" />
                             </div>
                         </div>
                         <div class="col-sm-2 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.upriser_no.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_upriser_no" tabIndex="-1" {% if form.fx_upriser_no.value %}checked{% endif %} /></span>
-                                <input type="number" class="form-control input-sm" name="upriser_no" placeholder="Upriser" min="1" max="6" data-ti="9"
+                                <input type="number" class="form-control input-sm" name="upriser_no" placeholder="* Upriser" min="1" max="6" data-ti="9"
                                        value="{{ form.upriser_no.value|default:"" }}" tabIndex="9" title="Upriser" />
                             </div>
                         </div>
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.pole_no.errors %}has-error{% endif %}">
-                            <input type="number" class="form-control input-sm" name="pole_no" placeholder="Pole #" min="0" max="999" data-ti="10"
+                            <input type="number" class="form-control input-sm" name="pole_no" placeholder="* Pole #" min="0" max="999" data-ti="10"
                                     value="{{ form.pole_no.value|default:"" }}" tabIndex="10" title="Pole No" />
                         </div>
                     </div>
@@ -99,18 +101,18 @@
                 <div class="panel-body">
                     <div class="form-group">{% if tab and tab == 'existing' %}
                         <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.acct_no.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="Account No" title="Account No" tabIndex="11"
+                            <input type="text" class="form-control input-sm" placeholder="* Account No" title="Account No" tabIndex="11"
                                    name="acct_no" value="{{ form.acct_no.value|default:"" }}" autocomplete="off" />
                         </div>{% else %}
                         <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.book_code.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="Book Code" title="Book Code" tabIndex="11"
+                            <input type="text" class="form-control input-sm" placeholder="* Book Code" title="Book Code" tabIndex="11"
                                    name="book_code" value="{{ form.book_code.value|default:"" }}" autocomplete="off" />
                         </div>{% endif %}
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.title.errors %}has-error{% endif %}">
                             {{ form.title|append_attr:"tabIndex:12" }}
                         </div>
                         <div class="col-sm-6 rd-l-pad rd-r-pad {% if form.cust_name.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="Customer Name" title="Customer Name" tabIndex="13"
+                            <input type="text" class="form-control input-sm" placeholder="* Customer Name" title="Customer Name" tabIndex="13"
                                    name="cust_name" value="{{ form.cust_name.value|default:"" }}" autocomplete="off" />
                         </div>
                     </div>
@@ -140,14 +142,14 @@
                             <div class="input-group ig2 {% if form.addr_street.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_street" tabIndex="-1" {% if form.fx_addr_street.value %}checked{% endif %} /></span>
                                 <input type="text" class="form-control input-sm" name="addr_street" title="Street/Area" data-ti="18" autocomplete="off"
-                                       placeholder="Street/Area" tabIndex="18"  value="{{ form.addr_street.value|default:'' }}" />
+                                       placeholder="* Street/Area" tabIndex="18"  value="{{ form.addr_street.value|default:'' }}" />
                             </div>
                         </div>
                         <div class="col-sm-3 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.addr_town.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_town" tabIndex="-1" {% if form.fx_addr_town.value %}checked{% endif %} /></span>
                                 <input type="text" class="form-control input-sm" name="addr_town" title="City/Town/Village" data-ti="19" autocomplete="off"
-                                       placeholder="City/Town/Village" tabIndex="19"  value="{{ form.addr_town.value|default:'' }}" />
+                                       placeholder="* City/Town/Village" tabIndex="19"  value="{{ form.addr_town.value|default:'' }}" />
                             </div>
                         </div>
                         <div class="col-sm-3 rd-l-pad rd-r-pad">
@@ -174,44 +176,7 @@
                     </div>
                 </div>
             </div>
-            <!--
-            <div class="panel panel-default panel-sqi">
-                <div class="panel-body">
-                    <div class="form-group">
-                        <div class="col-sm-4">
-                            <label class="checkbox-inline">
-                                &nbsp; <input type="checkbox" id=""  value=""> Remark 1
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                            <label class="checkbox-inline">
-                                &nbsp; <input type="checkbox" id=""  value=""> Remark 2
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                            <label class="checkbox-inline">
-                                &nbsp; <input type="checkbox" id=""  value=""> Remark 3
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                            <label class="checkbox-inline">
-                                &nbsp; <input type="checkbox" id=""  value=""> Remark 1
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                            <label class="checkbox-inline">
-                                &nbsp; <input type="checkbox" id=""  value=""> Remark 2
-                            </label>
-                        </div>
-                        <div class="col-sm-4">
-                            <label class="checkbox-inline">
-                                &nbsp; <input type="checkbox" id=""  value=""> Remark 3
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            -->
+
             {% with is_new_acct=form.acct_status.value|equal:'new' %}
             <div class="form-group" style="padding-top:5px">{% if is_new_acct %}{% if not form.instance or not form.instance.id %}
                 <button name="save_new" class="btn btn-default btn-sm">

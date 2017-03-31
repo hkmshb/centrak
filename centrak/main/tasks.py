@@ -30,3 +30,15 @@ def import_users(user_id, filepath):
         logging.error('Import users failed with errors: %s' % err_message)
         raise Exception(err_message)
     logging.info('Import users task completed successfully')
+
+
+@task(name='tasks.import-offices')
+def import_offices(user_id, filepath):
+    logging.info('Initializing task: import-offices')
+    ixhandler = handlers.OfficeIXHandler({'db': None, 'cache': None})
+    ixhandler.import_data(filepath)
+    if ixhandler.errors:
+        err_message = str(ixhandler.errors)
+        logging.error('Import offices failed with errors: %s' % err_message)
+        raise Exception(err_message)
+    logging.info('Import offices task completed successfully')

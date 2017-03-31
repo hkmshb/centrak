@@ -7,11 +7,12 @@ from django.conf import settings
 from django.db import connections, transaction
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from ezaddress.models import State
 
 from sqlalchemy import create_engine
 from dolfin.core import Storage
 from dolfin.data import XlSheet
-from core.models import UserProfile
+from core.models import UserProfile, BusinessOffice
 
 User = get_user_model()
 
@@ -401,12 +402,26 @@ class AccountIXHandler(IXlrdHandlerBase):
 
 
 class UserIXHandler(IPyXlHandlerBase):
+    cache = {}
     sheet_name = 'users'
-    headers = ('sn', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
+    headers = ('sn', 'email', 'first_name', 'last_name', 'is_active', 'is_staff',
+               'phone', 'location')
+    
+    def get_location_id(self, short_name):
+        if short_name and short_name not in self.cache:
+            office = BusinessOffice.objects.filter(short_name=short_name).first()
+            if office is not None:
+                self.cache[short_name] = office.id
+        return self.cache.get(short_name, None)
 
     def import_user(self, row, data):
         try:
-            profile = UserProfile(user=User.objects.create(**data))
+            phone = data.pop('phone')
+            location_id = self.get_location_id(data.pop('location'))
+            profile = UserProfile(
+                user=User.objects.create(**data),
+                phone=phone, location_id=location_id
+            )
             profile.save()
         except Exception as ex:
             message_fmt = "User could not be created. Err: %s"
@@ -420,13 +435,14 @@ class UserIXHandler(IPyXlHandlerBase):
         
         with transaction.atomic():
             for row in range(header_index + 1, sh.max_row + 1):
-                num_errors = len(self.errors)
                 data = Storage({
                     'email': self.get_required_text_from_cell(sh, row, 2),
                     'first_name': self.get_required_text_from_cell(sh, row, 3),
                     'last_name': self.get_required_text_from_cell(sh, row, 4),
                     'is_active': self.get_required_bool_from_cell(sh, row, 5),
-                    'is_staff': self.get_required_bool_from_cell(sh, row, 6)
+                    'is_staff': self.get_required_bool_from_cell(sh, row, 6),
+                    'phone': self.get_text_from_cell(sh, row, 7),
+                    'location': self.get_text_from_cell(sh, row, 8)
                 })
                 data.date_joined = datetime.today().isoformat(' ')[:19]
                 data.username = data.email
@@ -434,3 +450,74 @@ class UserIXHandler(IPyXlHandlerBase):
                 data.password = '!t3mp!'
                 self.import_user(row, data)
 
+
+class OfficeIXHandler(IPyXlHandlerBase):
+    cache = {}
+    sheet_name = 'offices'
+    headers = ('sn', 'code', 'short_name', 'name', 'level', 'parent', 'category',
+               'email', 'phone', 'website')
+    
+    def get_state_id(self, state_code):
+        if state_code not in self.cache:
+            state = State.objects.filter(code=state_code).first()
+            if state is not None:
+                self.cache[state_code] = state.id
+        return self.cache.get(state_code, None)
+    
+    def get_parent_id(self, short_name):
+        if short_name not in self.cache:
+            office = BusinessOffice.objects.filter(short_name=short_name).first()
+            if office is not None:
+                self.cache[short_name] = office.id
+        return self.cache.get(short_name, None)
+
+    def resolve_state(self, row, data):
+        state_code = data.pop('addr_state')
+        state_id = self.get_state_id(state_code)
+        data['addr_state_id'] = state_id
+    
+    def resolve_parent(self, row, data):
+        parent_id, parent_code = (None, data.pop('parent'))
+        if parent_code is not None:
+            parent_id = self.get_parent_id(parent_code)
+        data['parent_id'] = parent_id
+        
+    def import_office(self, row, data):
+        try:
+            # resolve addr_state
+            self.resolve_state(row, data)
+            self.resolve_parent(row, data)
+            office = BusinessOffice(**data)
+            office.save()
+        except Exception as ex:
+            message_fmt = "Office could not be created. Err: %s"
+            self.error(row, 0, message_fmt % str(ex))
+
+    def process(self):
+        sh = self.sheet
+        hdr_idx = self.find_headers(sh, self.headers)
+        if not hdr_idx:
+            raise ValidationError("Expected columns not found.")
+        
+        with transaction.atomic():
+            for row in range(hdr_idx + 1, sh.max_row + 1):
+                data = Storage({
+                    'code': self.get_required_text_from_cell(sh, row, 2),
+                    'short_name': self.get_required_text_from_cell(sh, row, 3),
+                    'name': self.get_required_text_from_cell(sh, row, 4),
+                    'level_id': self.get_required_text_from_cell(sh, row, 5),
+                    'parent': self.get_id_from_cell(sh, row, 6) or None,
+                    'category': self.get_text_from_cell(sh, row, 7),
+                    'email': self.get_text_from_cell(sh, row, 8),
+                    'phone': self.get_text_from_cell(sh, row, 9),
+                    'website': self.get_text_from_cell(sh, row, 10),
+                    'addr_street': self.get_text_from_cell(sh, row, 11),
+                    'addr_town': self.get_required_text_from_cell(sh, row, 12),
+                    'addr_state': self.get_required_id_from_cell(sh, row, 13),
+                    'postal_code': self.get_text_from_cell(sh, row, 14),
+                    'longitude': self.get_float_from_cell(sh, row, 15),
+                    'latitude': self.get_float_from_cell(sh, row, 16),
+                    'altitude': self.get_float_from_cell(sh, row, 17),
+                    'gps_error': self.get_int_from_cell(sh, row, 18)
+                })
+                self.import_office(row, data)

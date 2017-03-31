@@ -25,7 +25,7 @@ def get_org_or_create_default():
     org = Organisation.objects.first()
     if not org:
         org = Organisation.objects.create(
-                name='CENTrak', email='<info@centrak>',
+                name='CENTrak', short_name='CENTrak', email='<info@centrak>',
                 phone='<080-0000-0000>', website='<http://centrak>',
                 addr_street='<Address Street>', addr_town='<Address Town>')
     return org

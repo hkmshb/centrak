@@ -54,17 +54,19 @@
             {% if not regions %}
             <div class="action-notice">
                 No Regions found <br/>
-                <a class="btn btn-default btn-sm" href="{% url 'admin-region-add' %}">Create a new Region</a>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-region-add' %}">Create a new Region</a> &nbsp;
+                <a class="btn btn-primary btn-sm" href="{% url 'admin-import' "offices" %}">Bulk Import Offices</a>
             </div>
             {% else %}
             <table class="table table-stripped table-condensed">
                 <thead>
-                    <tr><th>Code</th><th>Name</th><th>Contact Phone</th>
+                    <tr><th>Code</th><th>Short Name</th><th>Name</th><th>Contact Phone</th>
                         <th title="Service Points">SPs</td><th></th></tr>
                 </thead>
                 <tbody>
                     {% for r in regions %}
-                    <tr><td><a href="{% url 'admin-region-info' r.code %}">{{ r.code }}</a></td><td>{{ r.name }}</td>
+                    <tr><td><a href="{% url 'admin-region-info' r.code %}">{{ r.code }}</a></td>
+                        <td>{{ r.short_name }}</td><td>{{ r.name }}</td>
                         <td>{{ r.phone|default:"-" }}</td><td>{{ r.num_points }}</td>
                         <td><i class="fa fa-fw fa-trash"></i></tr>
                     {% endfor %}

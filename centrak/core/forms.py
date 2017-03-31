@@ -172,11 +172,12 @@ class BusinessEntityForm(BaseModelForm):
 
     class Meta:
         abstract = True
-        fields = ('name', 'phone', 'email', 'website', 'addr_street',
-                  'addr_town', 'postal_code', 'addr_state')
+        fields = ('name', 'short_name', 'phone', 'email', 'website', 
+                  'addr_street', 'addr_town', 'postal_code', 'addr_state')
         attrs_ = {'class': 'form-control input-sm'}
         widgets = {
             'name': forms.TextInput(attrs=attrs_),
+            'short_name': forms.TextInput(attrs=attrs_),
             'phone': forms.TextInput(attrs=attrs_),
             'email': forms.EmailInput(attrs=attrs_),
             'website': forms.URLInput(attrs=attrs_),
@@ -190,13 +191,8 @@ class BusinessEntityForm(BaseModelForm):
 class OrganisationForm(BusinessEntityForm):
     """Form for managing organisation model object."""
 
-    def __init__(self, *args, **kwargs):
-        super(BusinessEntityForm, self).__init__(*args, **kwargs)
-        self.fields['short_name'].widget.attrs = {'class': 'form-control input-sm'}
-
     class Meta(BusinessEntityForm.Meta):
         model = Organisation
-        fields = ('short_name',) + BusinessEntityForm.Meta.fields
 
 
 class OfficeForm(BusinessEntityForm):

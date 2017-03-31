@@ -1,3 +1,4 @@
+import uuid
 from collections import OrderedDict
 
 from django.utils.translation import ugettext_lazy as _
@@ -118,7 +119,9 @@ class BusinessEntity(TimeStampedModel, Addressable, GPSLocatable):
     """
     Abstract base class which represents a Business entity.
     """
+    uuid    = models.UUIDField(_('UUID'), default=uuid.uuid4, editable=False)
     name    = models.CharField(_('Name'), max_length=40, unique=True)
+    short_name = models.CharField(_('Short Name'), max_length=20, unique=True)
     email   = models.EmailField(_('Email'), max_length=100, blank=True)
     phone   = models.CharField(_('Phone'), max_length=20, blank=True)
     website = models.URLField(_('Website'), max_length=100, blank=True)
@@ -167,8 +170,6 @@ class Organisation(BusinessEntity):
         'multiple-records': _('Multiple records cannot be stored for Organisation.'),
     }
     
-    short_name = models.CharField(_('Short Name'), max_length=20, blank=True)
-
     class Meta:
         db_table = 'organisation'
     
@@ -303,6 +304,7 @@ class NetworkEntity(TimeStampedModel):
     """
     Abstract base class for network model objects.
     """
+    uuid  = models.UUIDField(_('UUID'), default=uuid.uuid4, editable=False)
     code  = models.CharField(_('Code'), max_length=20, unique=True)
     altcode = models.CharField(_('Alternative Code'), max_length=20, 
                 unique=True, blank=True)

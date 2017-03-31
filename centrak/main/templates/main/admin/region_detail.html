@@ -14,7 +14,7 @@
             <div class="data-card col-sm-offset-4 col-sm-8 rd-l-pad rd-r-pad">
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Code</span><label>{{ region.code }}</label>
+                        <span>Code / Short Name</span><label>{{ region.code }} / {{ region.short_name }}</label>
                     </div>
                     <div class="col-sm-6 rd-l-pad">
                         <span>Name</span><label>{{ region.name }} </label>
@@ -22,15 +22,15 @@
                 </div>
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Phone</span> <label> {{ region.phone }}</label>
+                        <span>Phone</span> <label> {{ region.phone|default:'-' }}</label>
                     </div>
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Email</span> <label>{{ region.email }}</label>
+                        <span>Email</span> <label>{{ region.email|default:'-' }}</label>
                     </div>
                 </div>
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Address</span> <label>{{ region.addr_street}} {{ region.addr_town }}</label>
+                        <span>Address</span> <label>{{ region.addr_street|default:'-'}} {{ region.addr_town|default:'-' }}</label>
                     </div>
                 </div>
             </div>
@@ -55,16 +55,19 @@
             {% if not offices.exists %}
             <div class="action-notice">
                 No Service Points found <br/>
-                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">Add a new Service Point</a>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">Add a new Service Point</a> &nbsp;
+                <a class="btn btn-primary btn-sm" href="{% url 'admin-import' "offices" %}">Bulk Import Offices</a>
             </div>
             {% else %}
             <table class="table table-stripped table-condensed">
                 <thead>
-                    <tr><th>Code</th><th>Name</th><th>Category</th><th>Contact Phone</th><th></th></tr>
+                    <tr><th>Code</th><th>Short Name</th><th>Name</th><th>Category</th><th>Contact Phone</th><th></th></tr>
                 </thead>
                 <tbody>
                     {% for o in offices %}
-                    <tr><td><a href="{% url 'admin-office-info' o.code %}">{{ o.code }}</a></td><td>{{ o.name }}</td>
+                    <tr><td><a href="{% url 'admin-office-info' o.code %}">{{ o.code }}</a></td>
+                        <td>{{ o.short_name }}</td>
+                        <td>{{ o.name }}</td>
                         <td>{{ o.category }}</td>
                         <td>{{ o.phone|default:"-" }}</td>
                         <td><i class="fa fa-fw fa-trash"></i></tr>
