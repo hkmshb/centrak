@@ -329,6 +329,13 @@ def powerline_list(request, tab=None):
 
 @admin_with_permission()
 def manage_imports(request, type):
+    def get_task(name):
+        task_name = 'import_%s' % name
+        if not hasattr(tasks, task_name):
+            message_fmt = "Task handler for `%s` import not found."
+            raise ValueError(message_fmt % name.title())
+        return getattr(tasks, task_name)
+
     form = forms.UploadFileForm()
     if request.method == 'POST':
         form = forms.UploadFileForm(request.POST, request.FILES)
@@ -340,7 +347,10 @@ def manage_imports(request, type):
                 messages.error(request, message, extra_tags='danger')
                 return redirect(reverse('admin-import', args=[type]))
             
-            tasks.import_accounts.delay(request.user.id, filepath)
+            # tasks.import_accounts.delay(request.user.id, filepath)
+            task = get_task(request.POST.get('tag'))
+            task.delay(request.user.id, filepath)
+
             message = "Upload complete and import in progress. Check " \
                     + "notifications for resulting task status."
             messages.success(request, message, extra_tags='success')

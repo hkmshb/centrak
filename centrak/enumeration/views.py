@@ -50,27 +50,6 @@ def manage_xform(request, object_id):
 
 
 @admin_with_permission()
-def x__manage_xform(request, object_id):
-    xform = XForm.objects.get(object_id=object_id)
-    if request.method == 'POST':
-        try:
-            form = XFormForm(data=request.POST, instance=xform)
-            if form.is_valid():
-                form.save()
-
-                message = "XForm updated successfully"
-                messages.success(request, message, extra_tags='success')
-                return redirect(reverse('admin-xform-info', args=[form.object_id]))
-        except Exception as ex:
-            messages.error(request, str(ex), extra_tags='danger')
-    else:
-        form = XFormForm(instance=xform)
-    return render(request, 'enumeration/admin/xform_form.html', {
-        'form': form
-    })
-
-
-@admin_with_permission()
 def accounts_list(request):
     page = paginate(request, Account.objects.all())
     return render(request, 'enumeration/admin/account_list.html', {

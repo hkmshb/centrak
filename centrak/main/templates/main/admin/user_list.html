@@ -5,6 +5,9 @@
     <div class="panel-heading">
         <i class="fa fa-fw fa-users"></i> Users
         <div class="buttons pull-right">
+            <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-import' "users" %}">
+                <i class="fa fa-fw fa-download"></i> Import
+            </a>
             <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-user-add' %}">
                 <i class="fa fa-fw fa-user-plus"></i> Create
             </a>

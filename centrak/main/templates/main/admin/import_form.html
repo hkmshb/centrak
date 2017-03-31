@@ -22,6 +22,7 @@
                     <div class="form-group">
                         <button class="btn btn-primary btn-sm import">Import Data</button>
                     </div>
+                    <input type="hidden" name="tag" value="{{ type|lower }}" />
                     {% csrf_token %}
                 </form>
             </div>
