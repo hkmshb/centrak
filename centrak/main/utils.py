@@ -1,3 +1,4 @@
+import re
 from collections import namedtuple
 
 from django.utils.translation import ugettext_lazy as _
@@ -6,14 +7,27 @@ from django.conf import settings
 
 
 
-# string const ::
+# string consts ::
 MSG_FMT_SUCCESS_ADD = '%s added successfully.'
 MSG_FMT_SUCCESS_UPD = '%s updated successfully.'
 
+# pattern consts ::
+PATTERN_ACCT1 = r'\d{2}/\d{2}/\d{2}/\d{4}-01'
+PATTERN_ACCT2 = r'\d{10}-01'
+PATTERN_MTRNO = r'\d{11}'
+
+
+def is_acct_no(value):
+    return re.match(PATTERN_ACCT1, value) is not None \
+        or re.match(PATTERN_ACCT2, value) is not None
+
+
+def is_meter_no(value):
+    return re.match(PATTERN_MTRNO, value) is not None
 
 
 def expand_acct_no(acct_no):
-    if len(acct_no) == 13 and acct_no.endswith('-01') and '/' not in acct_no:
+    if re.match(PATTERN_ACCT2, acct_no):
         chunks = (acct_no[:2], acct_no[2:4], acct_no[4:6], acct_no[6:])
         return "%s/%s/%s/%s" % chunks
     return acct_no

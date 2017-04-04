@@ -51,7 +51,7 @@ def manage_xform(request, object_id):
 
 @admin_with_permission()
 def accounts_list(request):
-    page = paginate(request, Account.objects.all())
+    page = paginate(request, Account.objects.all().order_by('acct_no'))
     return render(request, 'enumeration/admin/account_list.html', {
         'accts': page
     })

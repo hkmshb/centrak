@@ -7,7 +7,7 @@
     <div class="col-sm-9 rd-r-pad">
         <div class="clearfix">
             <ul class="nav nav-tabs nav-flattabs">
-                <li{% if not tab %} class="active"{% endif %}><a href="{% url 'capture-list' %}"><i class="fa fa-fw fa-check-circle text-success2"></i> Valiated</a></li>
+                <li{% if not tab %} class="active"{% endif %}><a href="{% url 'capture-list' %}"><i class="fa fa-fw fa-check-circle text-success2"></i> Validated</a></li>
                 <li{% if tab == 'new' %} class="active"{% endif %}><a href="{% url 'capture-list' %}new/"><i class="fa fa-fw fa-star text-warning"></i> New</a></li>
 
                 <li class="pull-right">
@@ -41,8 +41,8 @@
                             <span class="text-primary">Now Perform a Quick Validation!</span>
                         </div>
                         <div class="form-group col-xs-9 rd-r-pad rd-l-pad">
-                            <input type="text" name="acct_no" class="form-control input-sm" autocomplete="off"
-                                   placeholder="Enter Account Number to Validate" />
+                            <input type="text" name="lookup" class="form-control input-sm" autocomplete="off"
+                                   placeholder="Enter Account or Meter Number to Validate" />
                         </div>
                         <button type="submit" class="btn btn-primary btn-sm" style="margin-top:0;">
                             <i class="fa fa-fw fa-check"></i> Validate #
@@ -61,17 +61,17 @@
                 <table class="table table-striped scroll-body">
                     <thead>
                         <tr><th>{% if tab == 'new' %}Book Code{% else %}Account #{% endif %}</th>
-                            <th>Tariff</th><th>Customer Name</th>
+                            <th>Meter #</th><th>Tariff</th><th>Customer Name</th>
                             <th>Feeder</th><th>Station</th><th>LT Routh</th>
-                            <th>Meter #</th><th></th></tr>
+                            <th></th></tr>
                     <tbody>{% for c in captures %}{% with t=tab|add:"/" %}
                         <tr><td><a href="{% url 'capture-upd' t c.id %}">{% if tab == 'new' %}{{ c.book_code }}{% else %}{{ c.acct_no }}{% endif %}</a></td>
+                            <td>{{ c.meter_no|default:'-' }}</td>
                             <td>{{ c.tariff }}</td>
                             <td>{{ c.cust_name }}</td>
                             <td>{{ c.feeder_name }}</td>
                             <td>{{ c.station_name }}</td>
                             <td>{{ c.upriser_no }}/{{ c.pole_no }}</td>
-                            <td>{{ c.meter_no|default:'-' }}</td>
                             <td></td></tr>{% endwith %}{% endfor %}
                     </tbody>
                 </table>

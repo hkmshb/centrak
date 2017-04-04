@@ -1,8 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.conf import settings
 from django import forms
 
 from core import models, utils as core_utils, forms as core_forms

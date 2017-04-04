@@ -5,6 +5,7 @@ from django.template.response import TemplateResponse
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.db.models import Q as dQ
 from mongoengine.queryset import Q
 
 from enumeration.forms import PaperCaptureForm
@@ -16,11 +17,13 @@ from .. import utils
 
 
 
+
+
 @login_required
 def capture_index(request, tab=None):
     # clear fixed entry session
     request.session['paper_capture_fixed_entries'] = None
-    
+
     ## step 1: data filtering
     # filter by current date if no date filter exists
     qs_GET = request.GET.copy()
@@ -31,16 +34,16 @@ def capture_index(request, tab=None):
     # retrieve paper captures
     status = Capture.EXISTING if not tab else Capture.NEW
     query = Q(medium=Capture.MEDIUM_PAPER) & Q(acct_status=status)
-    
+
     if not request.user.is_superuser:
         p = request.user.profile
         region_name = p.location.name if p and p.location else ""
         query = query & Q(region_name=region_name) \
               & Q(user_email=request.user.username)
-    
+
     captures = Capture.objects(query).order_by('-date_digitized')
-    filter = CaptureFilter(qs_GET, queryset=captures)
-    page = paginate(request, filter)
+    filter_ = CaptureFilter(qs_GET, queryset=captures)
+    page = paginate(request, filter_)
 
     ## step 2: stats composition
     stats = {'summary':[], 'history':[]}
@@ -50,18 +53,26 @@ def capture_index(request, tab=None):
 
 
 @login_required
-def validate_capture(request):    
-    acct_no = request.POST.get('acct_no', None)
-    if not acct_no or not request.method == 'POST':
+def validate_capture(request):
+    lookup = request.POST.get('lookup', '').strip()
+    if not lookup or not request.method == 'POST':
         return redirect(reverse('capture-list'))
-
-    acct_no = acct_no.replace('/', '').replace('-', '_')
-    if not acct_no.endswith('_01') or len(acct_no) != 13:
-        messages.error(request, 'Invalid account number.', extra_tags='danger')
+    
+    if not utils.is_acct_no(lookup) and not utils.is_meter_no(lookup):
+        err_message = 'Invalid account or meter number.'
+        messages.error(request, err_message, extra_tags='danger')
         return redirect(reverse('capture-list'))
-
-    # TODO: validate acct_no format before bringing up form
-    return redirect(reverse('capture-upd', args=[acct_no.replace('-','_')]))
+    
+    # check if record with acct/meter no has been validated before
+    predicate = Q(acct_no=utils.expand_acct_no(lookup)) | Q(meter_no=lookup)
+    found = Capture.objects.filter(predicate).first()
+    if found is not None:
+        message = "Record with account or meter number '%s' has been validated before."
+        messages.warning(request, message % lookup, extra_tags='warning')
+        return redirect(reverse('capture-upd', args=[found.id]))
+    
+    lookup = lookup.replace('/', '').replace('-', '_')
+    return redirect(reverse('capture-upd', args=[lookup]))
 
 
 @login_required
@@ -73,14 +84,15 @@ def manage_capture(request, tab=None, ident=None):
     return _manage_capture_exist(request, ident)
 
 
-def _manage_capture_new(request, id=None):
-    capture = None if not id else Capture.objects.get(id=id)
+def _manage_capture_new(request, capture_id=None):
+    capture = None if not capture_id else Capture.objects.get(id=capture_id)
     form = PaperCaptureForm(request.user, Capture.NEW, instance=capture)
     session_key = 'paper_capture_fixed_entries'
     
     if request.method == 'POST':
         try:
-            form = PaperCaptureForm(request.user, Capture.NEW, instance=capture, data=request.POST)
+            form = PaperCaptureForm(request.user, Capture.NEW, instance=capture, 
+                                    data=request.POST)
             if form.is_valid():
                 form.save()
 
@@ -100,51 +112,44 @@ def _manage_capture_new(request, id=None):
     else:
         fixed_entries = request.session.get(session_key, None)
         if fixed_entries:
-            form = PaperCaptureForm(request.user, Capture.NEW, instance=capture, initial=fixed_entries)
+            form = PaperCaptureForm(request.user, Capture.NEW, instance=capture, 
+                                    initial=fixed_entries)
 
     return render(request, 'enumeration/capture_form.html', {
         'form': form, 'tab': 'new'
     })
 
 
-def _manage_capture_exist(request, ident):
-    ident = 'f@k3#!' if not ident else ident.replace('_', '-')
-    form, instance, acct, initial = (None, None, None, dict())
-
-    # check if account has been validated before
-    if ident.endswith('-01'):
-        ident = utils.expand_acct_no(ident)
-        instance = Capture.objects.filter(acct_no=ident)
-        if instance:
-            obj_id = str(instance.first().id)
-            message = "The Account with number '%s' has been validated before."
-            messages.warning(request, message % ident, extra_tags='warning')
-            return redirect(reverse('capture-upd', args=[obj_id]))
-
-    if ident.endswith('-01'):
-        match = Account.objects.filter(acct_no=ident)
-        if not match:
-            message = "Account does not exists for '%s'." % ident
-            messages.error(request, message, extra_tags='danger')
+def _manage_capture_exist(request, lookup):
+    # hint: lookup can be capture acct_no, meter_no or id
+    form, instance, account, initial = (None, None, None, dict())
+    args = [request.user, Capture.EXISTING]
+    lookup = str(lookup).replace('_', '-')
+    if utils.is_acct_no(lookup) or utils.is_meter_no(lookup):
+        predicate = dQ(acct_no=utils.expand_acct_no(lookup)) | dQ(meter_no=lookup)
+        account = Account.objects.filter(predicate).first()
+        if account is None:
+            message = "Record with account or meter number '%s' not found."
+            messages.error(request, message % lookup, extra_tags='danger')
             return redirect(reverse('capture-list'))
         
-        acct = match.first()
-        for f in acct._meta.fields:
-            initial[f.name] = getattr(acct, f.name)
+        for field in account._meta.fields:
+            initial[field.name] = getattr(account, field.name)
         
         # normalize entries: acct_no & acct_status
         initial['acct_status'] = Capture.EXISTING
-        initial['acct_no'] = utils.expand_acct_no(ident)
-        form = PaperCaptureForm(request.user, Capture.EXISTING, initial=initial)
+        if utils.is_acct_no(lookup):
+            initial['acct_no'] = utils.expand_acct_no(lookup)
+        form = PaperCaptureForm(*args, initial=initial)
     else:
-        instance = Capture.objects.get(id=ident)
+        instance = Capture.objects.get(id=lookup)
         if not instance:
             return redirect(reverse('capture-list'))
-        form = PaperCaptureForm(request.user, Capture.EXISTING, instance=instance)
-    
+        form = PaperCaptureForm(*args, instance=instance)
+        
     if request.method == 'POST':
         try:
-            form = PaperCaptureForm(request.user, Capture.EXISTING, instance=instance, data=request.POST)
+            form = PaperCaptureForm(*args, instance=instance, data=request.POST)
             if form.is_valid():
                 form.save()
 
@@ -155,6 +160,6 @@ def _manage_capture_exist(request, ident):
             messages.error(request, str(ex), extra_tags='danger')
 
     return render(request, 'enumeration/capture_form.html', {
-        'form': form, 'acct': acct, 'tab': 'existing'
+        'form': form, 'acct': account, 'tab': 'existing'
     })
     
