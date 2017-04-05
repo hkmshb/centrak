@@ -11,8 +11,10 @@ instance
 *.py[co]
 *.todo
 *.log
+*.bak
 .*
 
 
 local_settings.py
+settings.py
 tags

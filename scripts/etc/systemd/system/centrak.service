@@ -4,9 +4,16 @@ After=network.target
 
 [Service]
 User=<usr>
+Group=<usr>
 ExecStart=/opt/webapps/<site>/venv/bin/uwsgi \
-          -- ini /opt/webapps/<site>/source/scripts/uwsgi.ini \
+          --ini /opt/webapps/<site>/source/scripts/uwsgi.ini \
           --env DJANGO_SETTINGS_MODULE=centrak.settings
+
+ExecStop=/opt/webapps/<site>/venv/bin/uwsgi \
+         --stop /opt/webapps/<site>/instance/var/centrak.pid
+
+ExecReload=/opt/webapps/<site>/venv/bin/uwsgi \
+           --reload /opt/webapps/<site>/instance/var/centrak.pid
 
 [Install]
 WantedBy=multi-user.target

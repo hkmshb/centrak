@@ -9,7 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 import os
-import mongoengine
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))
@@ -19,9 +19,6 @@ INST_DIR = os.path.join(ROOT_DIR, '..', 'instance')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = None
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'on') == 'on'
@@ -107,6 +104,15 @@ DATABASES = {
 }
 
 
+## MUST OVERRIDE ALL OF THESE IN `settings.py`
+##: ==+: mongo-engine settings
+#_MONGODB_NAME = 'centrak'
+#_MONGODB_USR  = 'centrak'
+#_MONGODB_PWD  = ''
+# mongoengine.connect(host='mongodb://{}:{}@localhost/{}'.format(
+#    _MONGODB_USR, _MONGODB_PWD, _NAME))
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -135,58 +141,6 @@ STATICFILES_FINDERS = (
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PUBL_DIR, 'media')
-
-# logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'simple': {
-            'format': '[%(asctime)s]:  %(levelname)s %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-        'verbose': {
-            'format': '[%(asctime)s]:  %(levelname)s [%(name)s:: %(module)s.%(funcName)s:%(lineno)d] %(message)s',
-	        'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-    },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'formatter': 'simple',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-        },
-        'file': {
-            'level': 'ERROR',
-            'formatter': 'simple',
-            'filters': ['require_debug_false'],
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(INST_DIR, 'log', 'centrak-error.log')
-        }
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file']
-        },
-        'centrak': {
-            'handlers': ['console', 'file']
-        }
-    }
-}
-
-
-##: ==+: mongo-engine settings
-#_MONGODB_NAME = 'centrak'
-# mongoengine.connect(_MONGODB_NAME)
 
 
 ##: ==+: Celery
@@ -221,11 +175,57 @@ CENTRAK_QS_PARAM_PAGE      = 'page'
 CENTRAK_QS_PARAM_PAGE_SIZE = 'pageSize'
 
 
-# alter local_settings to change settings herein
-from .local_settings import *
-
-
 ##: debug toolbar inclusion
 if DEBUG:
     INSTALLED_APPS = list(INSTALLED_APPS) + ['debug_toolbar']
-    MIDDLEWARE_CLASSES = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + list(MIDDLEWARE_CLASSES)
+    MIDDLEWARE_CLASSES = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware'
+    ] + list(MIDDLEWARE_CLASSES)
+
+
+# logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s]:  %(levelname)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'verbose': {
+            'format': '[%(asctime)s]:  %(levelname)s [%(name)s:: %(module)s.%(funcName)s:%(lineno)d] %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'formatter': 'simple',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'level': 'ERROR',
+            'formatter': 'simple',
+            'filters': ['require_debug_false'],
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(INST_DIR, 'log', 'centrak-error.log')
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file']
+        },
+        'centrak': {
+            'handlers': ['console', 'file']
+        }
+    }
+}

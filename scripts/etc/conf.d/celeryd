@@ -1,0 +1,21 @@
+# name of nodes to start
+CELERYD_NODES="<site>1"
+
+# path to celery command
+CELERY_BIN="/opt/webapps/<site>/venv/bin/celery"
+
+# app instance to use
+CELERY_APP="<project>"
+
+# how to call multi
+CELERYD_MULTI="multi"
+
+# extra command-line args to the worker
+CELERYD_OPTS="--time-limit=300 --concurrency=8"
+
+# - %n will be replaced with the first part of the node name
+# - %I will be replaced with the current child process index
+# and is important when using the prefork pool to avoid race condition
+CELERYD_PID_FILE="/opt/webapps/<site>/instance/var/celeryd-%n.pid"
+CELERYD_LOG_FILE="/opt/webapps/<site>/instance/log/celeryd-%n-%I.log"
+CELERYD_LOG_LEVEL="INFO"
