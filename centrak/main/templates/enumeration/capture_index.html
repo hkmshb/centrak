@@ -13,8 +13,8 @@
                 <li class="pull-right">
                     <form method="post" action="{% url 'capture-val' %}" class="form-inline">{% if captures %}{% if not tab %}
                         <div class="form-group">
-                            <input type="text" class="form-control input-sm" name="acct_no" autocomplete="off"
-                                   placeholder="Account Number" />
+                            <input type="text" class="form-control input-sm" name="lookup" autocomplete="off"
+                                   placeholder="Account/Meter Number" />
                         </div>
                         <button type="submit" name="validate" class="btn btn-default btn-sm">
                             <i class="fa fa-fw fa-check"></i> Validate

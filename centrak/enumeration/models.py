@@ -157,8 +157,8 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     date_digitized = fields.DateTimeField(verbose_name='Date Digitized')
 
     # organization
-    region_name = fields.StringField(max_length=20, blank=False, verbose_name='Region Name')
     region_code = fields.StringField(max_length=12, blank=False, verbose_name='Region Code')
+    region_name = fields.StringField(max_length=50, blank=False, verbose_name='Region Name')
     csp_code    = fields.StringField(max_length=20, blank=True, verbose_name='CSP Code')
     csp_name    = fields.StringField(max_length=50, blank=False, verbose_name='CSP Name')
 

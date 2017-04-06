@@ -1,20 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, forms as auth_forms
-from django.utils.safestring import mark_safe
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
 from django.contrib import messages
-from celery import uuid
 
-from ezaddress.models import State
 from core.models import UserProfile, BusinessLevel, BusinessOffice, \
-        Organisation, Voltage, Station, Powerline, ApiServiceInfo, \
-        Notification
+        Organisation, Voltage, Station, Powerline, ApiServiceInfo
 from core.forms import OrganisationForm, OfficeForm, UserProfileForm, \
         ApiServiceInfoForm
-from core.utils import admin_with_permission, has_object_permission
-from .. import utils, models, forms
-from .. import handlers, tasks
+from core.utils import admin_with_permission, has_object_permission, paginate
+from .. import forms, handlers, tasks, utils
 
 
 
@@ -45,9 +40,9 @@ def admin_home(request):
 
 @admin_with_permission()
 def user_list(request):
-    users = User.objects.all()
+    page = paginate(request, User.objects.all().order_by('last_name'))
     return render(request, 'main/admin/user_list.html', {
-        'users': users
+        'users': page
     })
 
 

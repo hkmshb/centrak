@@ -68,12 +68,12 @@ class PaperCaptureForm(forms.Form):
     @staticmethod
     def get_region_choices():
         regions = BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1).order_by('code')
-        return [(r.name, r.name) for r in regions]
+        return [(r.short_name, r.name) for r in regions]
     
     @staticmethod
     def get_state_choices():
         states = State.objects.all().order_by('id')
-        return [(s.name, s.name) for s in states]
+        return [(s.code, s.name) for s in states]
 
     def __init__(self, user, status, *args, **kwargs):
         instance, data, initial = (kwargs.get('instance'), kwargs.get('data'), dict())

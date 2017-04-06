@@ -2,8 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 
-from core.utils import admin_with_permission, has_object_permission, \
-        paginate
+from core.utils import admin_with_permission, paginate
 from core.models import ApiServiceInfo
 from .forms import XFormForm
 from .models import XForm, Account

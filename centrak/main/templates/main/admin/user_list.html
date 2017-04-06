@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="panel-body">
-    {% if not users.exists %}
+    {% if not users %}
         <div class="action-notice">
             <h3>Hmmm!</h3> 
             This is odd. You shouldn't be accessing any part of the <br/>
@@ -46,5 +46,6 @@
         </table>
     {% endif %}
     </div>
+    {% include 'snippets/panel_pager.html' with page=users %}
 </div>
 {% endblock %}
