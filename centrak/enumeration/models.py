@@ -183,6 +183,7 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     addr_street   = fields.StringField(max_length=50, verbose_name='Address Street')
     addr_town     = fields.StringField(max_length=20, verbose_name='Address Town')
     addr_state    = fields.StringField(max_length=20, verbose_name='Address State')
+    addr_state_code = fields.StringField(max_length=3, verbose_name='Address State Code')
 
     meta = {
         'collection': 'captures',

@@ -24,8 +24,9 @@ class PaperCaptureForm(forms.Form):
     """
     Form to validate entries from paper-based data gathering.
     """
+    # fields used to indicate if associated entries are fixed
     fx_date_captured   = forms.BooleanField(required=False)
-    fx_region_name     = forms.BooleanField(required=False)
+    fx_region_code     = forms.BooleanField(required=False)
     fx_csp_name        = forms.BooleanField(required=False)
     fx_sales_repr_name = forms.BooleanField(required=False)
     fx_csp_supr_name   = forms.BooleanField(required=False)
@@ -36,15 +37,18 @@ class PaperCaptureForm(forms.Form):
     fx_addr_landmark   = forms.BooleanField(required=False)
     fx_addr_street     = forms.BooleanField(required=False)
     fx_addr_town       = forms.BooleanField(required=False)
-    fx_addr_state      = forms.BooleanField(required=False)
+    fx_addr_state_code = forms.BooleanField(required=False)
 
     id              = forms.CharField(required=False)
-    date_captured   = forms.DateField(required=True, label="Date Captured", input_formats=['%d/%m/%Y'])
-    date_digitized  = forms.DateField(required=True, label="Date Digitized", input_formats=['%d/%m/%Y'])
+    date_captured   = forms.DateField(required=True, label="Date Captured", 
+                        input_formats=['%d/%m/%Y'])
+    date_digitized  = forms.DateField(required=True, label="Date Digitized", 
+                        input_formats=['%d/%m/%Y'])
     csp_name        = forms.CharField(required=True, label="CSP")
     sales_repr_name = forms.CharField(required=True, label="Sales Representative")
     csp_supr_name   = forms.CharField(required=True, label="CSP Supervisor")
     tsp_engr_name   = forms.CharField(required=True, label="TSP Engineer")
+    region_name     = forms.CharField(required=True, label="Region")
     feeder_name     = forms.CharField(required=True, label="Feeder")
     station_name    = forms.CharField(required=True, label="Station")
     upriser_no      = forms.IntegerField(required=True, label="Upriser #")
@@ -61,13 +65,15 @@ class PaperCaptureForm(forms.Form):
     addr_landmark   = forms.CharField(required=False, label="Closest Landmark")
     addr_no         = forms.CharField(required=False, label="House No") 
     addr_street     = forms.CharField(required=True, label="House No")
+    addr_state      = forms.CharField(required=True, label="State")
     addr_town       = forms.CharField(required=True, label="City/Town/Village")
     tariff          = forms.ChoiceField(required=True, label="Tariff", choices=Tariff.CHOICES)
 
     
     @staticmethod
     def get_region_choices():
-        regions = BusinessOffice.objects.filter(level=BusinessLevel.LEVEL1).order_by('code')
+        manager = BusinessOffice.objects
+        regions = manager.filter(level=BusinessLevel.LEVEL1).order_by('code')
         return [(r.short_name, r.name) for r in regions]
     
     @staticmethod
@@ -100,9 +106,9 @@ class PaperCaptureForm(forms.Form):
     
     def _init_fields(self):
         # add more fields
-        self.fields['region_name'] = forms.ChoiceField(required=True, label="Region", 
+        self.fields['region_code'] = forms.ChoiceField(required=True, label="Region Code", 
                 choices=PaperCaptureForm.get_region_choices())
-        self.fields['addr_state'] = forms.ChoiceField(required=True, label="State", 
+        self.fields['addr_state_code'] = forms.ChoiceField(required=True, label="State Code", 
                 choices=PaperCaptureForm.get_state_choices())
 
         # set field attributes
@@ -110,11 +116,12 @@ class PaperCaptureForm(forms.Form):
         attrs_ = {'class': 'form-control input-sm'}
 
         if self.user.profile and self.user.profile.location:
+            self.fields['region_code'].initial = self.user.profile.location.code
             self.fields['region_name'].initial = self.user.profile.location.name
 
         self.fields['date_digitized'].initial = datetime.today().strftime("%d/%m/%Y")
         self.fields['acct_status'].initial = self.status
-        for field_name in ('title', 'tariff', 'region_name', 'addr_state'):
+        for field_name in ('title', 'tariff', 'region_code', 'addr_state_code'):
             f = self.fields[field_name]
             f.widget.attrs = attrs_.copy()
             f.widget.attrs['title'] = f.label
@@ -194,7 +201,6 @@ class PaperCaptureForm(forms.Form):
             entries[f2] = value2
             if f == 'fx_date_captured':
                 entries[f2] = value2.strftime('%d/%m/%Y')
-
         return entries
 
     def save(self):

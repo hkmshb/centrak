@@ -20,8 +20,6 @@ def queryset_to_values(qs, *fields):
         method = qs.only
         qset = (method() if not fields else method(*fields))
         return list(qset.as_pymongo())
-    
-    # else
     return None
 
 
@@ -61,7 +59,7 @@ def stats_count_group_items(source, *grouping):
 
 ## DASHBOARD FUNCS
 
-def stats_dash_capture_summary(source, region_name=None):
+def stats_dash_capture_summary(source, region_code=None):
     if not isinstance(source, pd.DataFrame):
         source = queryset_to_dataframe(source)
     
@@ -79,11 +77,11 @@ def stats_dash_capture_summary(source, region_name=None):
     result['new'] = counts.get('new', 0)
 
     # get region total
-    if region_name:
-        counts = stats_count_group_items(source, 'region_name')
-        if not counts or region_name not in counts:
+    if region_code:
+        counts = stats_count_group_items(source, 'region_code')
+        if not counts or region_code not in counts:
             return result
-        result['total:region'] = counts[region_name]
+        result['total:region'] = counts[region_code]
     return result
 
 
@@ -96,14 +94,14 @@ def stats_dash_capture_analytics(source, date_crnt=None):
         return result
     
     # calculate stats for ever
-    grouping = ['region_name', 'acct_status']
+    grouping = ['region_code', 'acct_status']
     counts = stats_count_group_items(source, *grouping)
     result.ever = Storage(counts)
 
     # calculate stats for today
     if not date_crnt:
         date_crnt = date.today()
-    grouping = ['region_name', 'acct_status']
+    grouping = ['region_code', 'acct_status']
     df = source[source['date_created'] == date_crnt]
     counts = stats_count_group_items(df, *grouping)
     result.today = Storage(counts)

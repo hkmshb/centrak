@@ -361,9 +361,17 @@
             });
         },
         handleSelectChange: function(e) {
-            // var fx = 'input[name=fx_' + e.target.name + ']';
-            // if ($(fx, this.$el).is(':checked')) {
-            // }
+            var targetNames = ['region_code', 'addr_state_code'];
+            if (targetNames.indexOf(e.target.name) !== -1) {
+                var source = $('select[name=' + e.target.name + '] option:selected')
+                  , name = e.target.name.replace('_code', '');
+                
+                if (name !== 'addr_state') name += '_name';
+                var hiddenElem = $('input[name=' + name + ']');
+                if (hiddenElem.length == 1) {
+                    hiddenElem.val(source.text());
+                }
+            }
         },
         toggleInputFreeze: function(e) {
             var checked = $(e.target).is(':checked')

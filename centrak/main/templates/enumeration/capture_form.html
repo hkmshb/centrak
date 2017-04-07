@@ -29,12 +29,14 @@
                             </div>
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">{% if request.user|can_change_region %}
-                            <div class="input-group ig2 {% if form.region_name.errors %}has-error{% endif %}">
-                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_region_name"  tabIndex="-1" {% if form.fx_region_name.value %}checked{% endif %} /></span>
-                                {{ form.region_name|append_attr:"tabIndex:2"|set_data:"ti:2" }}
-                            </div>{% else %}
+                            <div class="input-group ig2 {% if form.region_code.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_region_code"  tabIndex="-1" {% if form.fx_region_code.value %}checked{% endif %} /></span>
+                                {{ form.region_code|append_attr:"tabIndex:2"|set_data:"ti:2" }}
+                            </div>
+                            <input type="hidden" name="region_name" value="{{ form.region_name.value|default:"" }}" required />{% else %}
                             <input type="text" class="form-control input-sm" name="region_name" placeholder="* Region" tabIndex="2" title="Region"
-                                    value="{{ form.region_name.value|default:"" }}" readonly />
+                                   value="{{ form.region_name.value|default:"" }}" readonly />
+                            <input type="hidden" name="region_code" value="{{ form.region_code.value|default:"" }}" required />
                             {% endif %}
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
@@ -134,7 +136,7 @@
                         </div>
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.addr_no.errors %}has-error{% endif %}">
                             <input type="text" class="form-control input-sm" placeholder="House No" title="House No" tabIndex="17"
-                                   name="addr_no" value="{{ form.addr_no.value|default:'' }}" autocomplete="off" />
+                                   name="addr_no" value="{{ form.addr_no.value|default:"" }}" autocomplete="off" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -153,10 +155,11 @@
                             </div>
                         </div>
                         <div class="col-sm-3 rd-l-pad rd-r-pad">
-                            <div class="input-group ig2 {% if form.addr_state.errors %}has-error{% endif %}">
-                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_state" tabIndex="-1" {% if form.fx_addr_state.value %}checked{% endif %}  /></span>
-                                {{ form.addr_state|append_attr:"tabIndex:20"|set_data:"ti:20" }}
+                            <div class="input-group ig2 {% if form.addr_state_code.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_state_code" tabIndex="-1" {% if form.fx_addr_state_code.value %}checked{% endif %}  /></span>
+                                {{ form.addr_state_code|append_attr:"tabIndex:20"|set_data:"ti:20" }}
                             </div>
+                            <input type="hidden" name="addr_state" value="{{ form.addr_state.value|default:"" }}" required />
                         </div>
                     </div>{% if form.acct_status.value == 'existing' %}
                     <div class="form-group">
@@ -199,9 +202,6 @@
 {% endblock %}
 {% block script-extra %}
     {{ block.super }}
-    <script src="{% static 'js/models.js' %}"></script>
-    <script src="{% static 'js/collections.js' %}"></script>
-    <script src="{% static 'js/views.js' %}"></script>
     <script type="text/javascript">
         $(document).ready(function(){
             $('.datepicker-inline').datepicker({    

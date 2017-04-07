@@ -65,7 +65,7 @@ def index(request):
     
     ### authenticated user
     ## stats: computation for stats on dashboard
-    fields = ['region_name', 'acct_status', 'date_created']
+    fields = ['region_code', 'acct_status', 'date_created']
     captures_qs = Capture.objects.only(*fields)
     df = stcore.queryset_to_dataframe(captures_qs)
     summary = stcore.stats_dash_capture_summary(df)
@@ -96,8 +96,7 @@ def index(request):
             for k, store in figures:
                 store.append(stats_data[label].get(k, 0))
         analytics_entries[key] = [labels, figures]
-
-    analytics_entries['today'] = analytics_entries['ever']
+        
     return TemplateResponse(request, 'main/index.html', {
         'stats': {'summary': summary_entries, 'analytics': analytics_entries}
     })
