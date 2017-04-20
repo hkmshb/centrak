@@ -209,8 +209,8 @@ class BusinessOffice(BusinessEntity):
         (TECHNICAL_SERVICE_POINT, 'Technical Service Point'),
     )
 
-    code   = models.CharField(_('Code'), max_length=12, unique=True)
-    level  = models.ForeignKey(BusinessLevel, verbose_name=_('Level'), 
+    code = models.CharField(_('Code'), max_length=12, unique=True)
+    level = models.ForeignKey(BusinessLevel, verbose_name=_('Level'), 
                 null=True, on_delete=models.SET_NULL)
     parent = models.ForeignKey('self', verbose_name=_('Parent Office'),
                 blank=True, null=True, on_delete=models.SET_NULL)
@@ -308,11 +308,10 @@ class NetworkEntity(TimeStampedModel):
     code  = models.CharField(_('Code'), max_length=20, unique=True)
     altcode = models.CharField(_('Alternative Code'), max_length=20, 
                 unique=True, blank=True)
-    name = models.CharField(_('Name'), max_length=100, unique=True)
     is_public = models.BooleanField(_('Is Public'), default=True)
     last_synced = models.DateTimeField(_('Last Synced'), null=True)
-    ext_id = models.IntegerField(null=False, unique=True)
     date_commissioned = models.DateField(null=True)
+    region = models.ForeignKey('BusinessOffice', blank=True, null=True)
     
     class Meta:
         abstract = True
@@ -334,11 +333,14 @@ class Station(NetworkEntity, Addressable, GPSLocatable):
         (INJECTION,    'Injection'),
         (DISTRIBUTION, 'Distribution')
     )
+    name = models.CharField(_('Name'), max_length=100)
     type = models.PositiveSmallIntegerField(_('Type'), choices=STATION_CHOICES)
     voltage_ratio = models.PositiveSmallIntegerField(_('Voltage Ratio'), 
                         choices=Voltage.Ratio.ALL_CHOICES)
     source_powerline = models.ForeignKey('Powerline', blank=True, null=True)
-    source_powerline_ext_id = models.IntegerField(blank=True, null=True)
+    
+    class Meta:
+        unique_together = ('name', 'type')
 
 
 class Powerline(NetworkEntity):
@@ -351,9 +353,12 @@ class Powerline(NetworkEntity):
         (FEEDER,  'Feeder'),
         (UPRISER, 'Upriser')
     )
+    name = models.CharField(_('Name'), max_length=100)
     type = models.PositiveSmallIntegerField(_('Type'), choices=POWERLINE_CHOICES)
     voltage = models.PositiveSmallIntegerField(_('Voltage'), choices=Voltage.ALL_CHOICES)
     source_station = models.ForeignKey(Station, blank=True, null=True)
     line_length = models.IntegerField(_('Line Length'), blank=True, null=True)
     pole_count = models.IntegerField(_('Pole Count'), blank=True, null=True)
-    source_station_ext_id = models.IntegerField(blank=True, null=True)
+    
+    class Meta:
+        unique_together = ('name', 'type')

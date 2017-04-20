@@ -205,7 +205,7 @@ def manage_org(request):
 def offices_home(request):
     offices = BusinessOffice.objects.all().order_by('level', 'code')
     return render(request, 'main/admin/offices_home.html', {
-        'offices': offices
+        'offices': paginate(request, offices)
     })
 
 
@@ -240,17 +240,24 @@ def manage_region(request, region_code=None):
 @admin_with_permission()
 def region_detail(request, region_code, tab=None):
     region = get_object_or_404(BusinessOffice, code=region_code)
-    offices, powerlines = (None, None)
+    offices, stations, powerlines = (None, None, None)
 
     if not tab or tab == 'points':
-        query = Q(level=BusinessLevel.LEVEL2, parent=region.id)
-        offices = BusinessOffice.objects.filter(query).order_by('code')
+        criteria = Q(level=BusinessLevel.LEVEL2, parent=region.id)
+        query = BusinessOffice.objects.filter(criteria).order_by('code')
+        offices = paginate(request, query)
+    elif tab == 'stations':
+        criteria = Q(region=region.id)
+        query = Station.objects.filter(criteria).order_by('type', 'code')
+        stations = paginate(request, query)
     elif tab == 'powerlines':
-        pass
-
+        criteria = Q(region=region.id)
+        query = Powerline.objects.filter(criteria).order_by('-voltage', 'code')
+        powerlines = paginate(request, query)
+    
     return render(request, 'main/admin/region_detail.html', {
-        'region': region, 'tab': tab,
-        'offices': offices, 'powerlines': powerlines
+        'region': region, 'tab': tab, 'offices': offices, 
+        'stations': stations, 'powerlines': powerlines
     })
 
 
@@ -306,8 +313,9 @@ def office_detail(request, office_code=None):
 def powerstation_list(request, tab=None):
     station_type = get_station_type_id(tab)
     stations = Station.objects.filter(type=station_type).order_by('code')
+    page = paginate(request, stations)
     return render(request, 'main/admin/station_list.html', {
-        'stations': stations, 'tab': tab
+        'stations': page, 'tab': tab
     })
 
 
@@ -315,17 +323,17 @@ def powerstation_list(request, tab=None):
 def powerline_list(request, tab=None):
     powerline_type = Powerline.FEEDER
     voltage = Voltage.MVOLTL if tab == '11' else Voltage.MVOLTH
-    powerlines = Powerline.objects.filter(type=powerline_type, voltage=voltage)\
-                          .order_by('code')
+    powerlines = Powerline.objects.filter(type=powerline_type, voltage=voltage)
+    page = paginate(request, powerlines.order_by('code'))
     return render(request, 'main/admin/powerline_list.html', {
-        'powerlines': powerlines, 'tab': tab
+        'powerlines': page, 'tab': tab
     })
 
 
 @admin_with_permission()
 def manage_imports(request, type):
     def get_task(name):
-        task_name = 'import_%s' % name
+        task_name = 'import_%s' % name.replace('-','_')
         if not hasattr(tasks, task_name):
             message_fmt = "Task handler for `%s` import not found."
             raise ValueError(message_fmt % name.title())
@@ -342,7 +350,6 @@ def manage_imports(request, type):
                 messages.error(request, message, extra_tags='danger')
                 return redirect(reverse('admin-import', args=[type]))
             
-            # tasks.import_accounts.delay(request.user.id, filepath)
             task = get_task(request.POST.get('tag'))
             task.delay(request.user.id, filepath)
 

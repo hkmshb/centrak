@@ -42,3 +42,15 @@ def import_offices(user_id, filepath):
         logging.error('Import offices failed with errors: %s' % err_message)
         raise Exception(err_message)
     logging.info('Import offices task completed successfully')
+
+
+@task(name='task.import-station-powerlines')
+def import_stations_lines(user_id, filepath):
+    logging.info('Initializing task: import-station-powerlines')
+    ixhandler = handlers.StationPowerlineIXHandler({'db': None, 'cache': None})
+    ixhandler.import_data(filepath)
+    if ixhandler.errors:
+        err_message = str(ixhandler.errors)
+        logging.error('Import stations & powerlines failed with errors: %s' % err_message)
+        raise Exception(err_message)
+    logging.info('Import stations & powerlines completed successfully')

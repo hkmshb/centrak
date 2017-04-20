@@ -6,22 +6,19 @@
                 <li{% if tab != '11' %} class="active"{% endif %}><a href="{% url 'admin-powerline-list' %}"><i class="fa fa-fw fa-flash"></i> 33KV Feeders</a></li>
                 <li{% if tab == '11' %} class="active"{% endif %}><a href="{% url 'admin-powerline-list' %}11/"><i class="fa fa-fw fa-flash"></i> 11KV Feeders</a></li>
             </ul>
-            {% if stations.exists %}
             <div class="buttons pull-right">
-                <a class="btn btn-default btn-sm btn-slim" href="{# url #}">
-                    <i class="fa fa-fw fa-download"></i> Import
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-import' "stations-lines" %}">
+                    <i class="fa fa-fw fa-download"></i> Import Assets
                 </a>
             </div>
-            {% endif %}            
         </div>
         <div class="panel-body">
-        {% if not powerlines.exists %}
+        {% if not powerlines %}
             <div class="action-notice">{% with label=tab|default:"33"|title %}
-                No {{ label }}KV Feeder found <br/>
-                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}">Import {{ label }}KV Feeders</a>{% endwith %}
+                No {{ label }}KV Feeder found <br/>{% endwith %}
             </div>
         {% else %}
-            <table class="table table-stripped table-condensed">
+            <table class="table table-striped table-condensed">
                 <thead>
                     <tr><th>Code</th><th>AltCode</th><th>Name</th><th>Voltage</th>
                         <th>Is Public</th><th></th></tr>
@@ -37,5 +34,6 @@
             </table>
         {% endif %}
         </div>
+        {% include 'snippets/panel_pager.html' with page=powerlines %}
     </div>
 {% endblock %}

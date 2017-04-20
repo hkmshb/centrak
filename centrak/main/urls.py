@@ -43,14 +43,14 @@ urlpatterns = [
 
             url(r'^offices/', include([
                 url(r'^$', adm_views.offices_home, name='admin-offices'),
-
                 url(r'^regions/create$', adm_views.manage_region, 
                     name='admin-region-add'),
-                url(r'^regions/(?P<region_code>[0-9]+)/((?P<tab>powerlines)/)?$', 
-                    adm_views.region_detail, name='admin-region-info'),
-                url(r'^regions/(?P<region_code>[0-9]+)/update',
-                    adm_views.manage_region, name='admin-region-upd'),
-
+                url(r'^regions/(?P<region_code>[0-9]+)/', include([
+                    url(r'^update', adm_views.manage_region, name='admin-region-upd'),
+                    url(r'^((?P<tab>(stations|powerlines))/)?$',
+                        adm_views.region_detail, name='admin-region-info')
+                ])),
+                
                 url(r'^spoints/create$', adm_views.manage_office,
                     name='admin-office-add'),
                 url(r'^spoints/(?P<office_code>[0-9]+)/$', adm_views.office_detail,
@@ -64,11 +64,10 @@ urlpatterns = [
             url(r'^powerlines/((?P<tab>(33|11))/)?$', adm_views.powerline_list,
                 name='admin-powerline-list'),
             
-            url(r'^import/(?P<type>\w+)$', adm_views.manage_imports, name='admin-import'),
+            url(r'^import/(?P<type>\w+(?:-\w+)?)$', adm_views.manage_imports, name='admin-import'),
         ])
     ),
-
-
+    
     #: ==+: main urls
     url(r'^$', def_views.index, name='home-page'),
     url(r'^profile/$', def_views.profile_manage_passwd, name='profile-upd'),

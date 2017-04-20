@@ -12,7 +12,8 @@ from ezaddress.models import State
 from sqlalchemy import create_engine
 from dolfin.core import Storage
 from dolfin.data import XlSheet
-from core.models import UserProfile, BusinessOffice
+from core.models import UserProfile, BusinessOffice, Station, Powerline, \
+        Voltage
 
 User = get_user_model()
 
@@ -121,6 +122,7 @@ class IXlrdHandlerBase(object):
 
 
 class IPyXlHandlerBase(object):
+    sheet_name = None
 
     def __init__(self, context, progress_callback=None):
         assert 'db' in context
@@ -146,7 +148,7 @@ class IPyXlHandlerBase(object):
             try:
                 if sheet.cell(row=row, column=col).value:
                     return False
-            except ValueError:
+            except (ValueError, IndexError):
                 break
         return True
     
@@ -357,8 +359,8 @@ class IPyXlHandlerBase(object):
         return None
 
     def import_data(self, source):
-        wb = source if type(source) is openpyxl.Workbook else None
-        if not wb and type(source) is str:
+        wb = source if isinstance(source, openpyxl.Workbook) else None
+        if not wb and isinstance(source, str):
             if os.path.isfile(source):
                 wb = openpyxl.load_workbook(source, read_only=True)
         
@@ -368,6 +370,60 @@ class IPyXlHandlerBase(object):
         self.wb = wb
         if self.sheet:
             self.process()
+
+
+class IXCacheMixin(object):
+    cache = {}
+    def get_office_id(self, short_name):
+        if short_name and short_name not in self.cache:
+            office = BusinessOffice.objects.filter(short_name=short_name).first()
+            if office is not None:
+                self.cache[short_name] = office.id
+        return self.cache.get(short_name, None)
+    
+    def get_state_id(self, state_code):
+        if state_code not in self.cache:
+            state = State.objects.filter(code=state_code).first()
+            if state is not None:
+                self.cache[state_code] = state.id
+        return self.cache.get(state_code, None)
+    
+    def get_station_id(self, station_code):
+        if station_code not in self.cache:
+            station = Station.objects.filter(code=station_code).first()
+            if station is not None:
+                self.cache[station_code] = station.id
+        return self.cache.get(station_code, None)
+    
+    def get_powerline_id(self, powerline_code):
+        if powerline_code not in self.cache:
+            powerline = Powerline.objects.filter(code=powerline_code).first()
+            if powerline is not None:
+                self.cache[powerline_code] = powerline.id
+        return self.cache.get(powerline_code, None)
+    
+    def resolve_office(self, data, field):
+        office_id, office_code = (None, data.pop(field))
+        if office_code is not None:
+            office_id = self.get_office_id(office_code)
+        data[field] = office_id
+    
+    def resolve_state(self, data, field='addr_state_id'):
+        state_code = data.pop(field)
+        state_id = self.get_state_id(state_code)
+        data[field] = state_id
+    
+    def resolve_station(self, data, field='source_station_id'):
+        station_code = data.pop(field)
+        if station_code is not None:
+            station_id = self.get_station_id(station_code)
+        data[field] = station_id
+    
+    def resolve_powerline(self, data, field='source_powerline_id'):
+        powerline_code = data.pop(field)
+        if powerline_code is not None:
+            powerline_id = self.get_powerline_id(powerline_code)
+        data[field] = powerline_id
 
 
 class AccountIXHandler(IXlrdHandlerBase):
@@ -401,23 +457,15 @@ class AccountIXHandler(IXlrdHandlerBase):
         self.process()
 
 
-class UserIXHandler(IPyXlHandlerBase):
-    cache = {}
+class UserIXHandler(IPyXlHandlerBase, IXCacheMixin):
     sheet_name = 'users'
     headers = ('sn', 'email', 'first_name', 'last_name', 'is_active', 'is_staff',
                'phone', 'location')
     
-    def get_location_id(self, short_name):
-        if short_name and short_name not in self.cache:
-            office = BusinessOffice.objects.filter(short_name=short_name).first()
-            if office is not None:
-                self.cache[short_name] = office.id
-        return self.cache.get(short_name, None)
-
     def import_user(self, row, data):
         try:
             phone = data.pop('phone')
-            location_id = self.get_location_id(data.pop('location'))
+            location_id = self.get_office_id(data.pop('location'))
             profile = UserProfile(
                 user=User.objects.create(**data),
                 phone=phone, location_id=location_id
@@ -451,42 +499,16 @@ class UserIXHandler(IPyXlHandlerBase):
                 self.import_user(row, data)
 
 
-class OfficeIXHandler(IPyXlHandlerBase):
-    cache = {}
+class OfficeIXHandler(IPyXlHandlerBase, IXCacheMixin):
     sheet_name = 'offices'
     headers = ('sn', 'code', 'short_name', 'name', 'level', 'parent', 'category',
                'email', 'phone', 'website')
-    
-    def get_state_id(self, state_code):
-        if state_code not in self.cache:
-            state = State.objects.filter(code=state_code).first()
-            if state is not None:
-                self.cache[state_code] = state.id
-        return self.cache.get(state_code, None)
-    
-    def get_parent_id(self, short_name):
-        if short_name not in self.cache:
-            office = BusinessOffice.objects.filter(short_name=short_name).first()
-            if office is not None:
-                self.cache[short_name] = office.id
-        return self.cache.get(short_name, None)
-
-    def resolve_state(self, row, data):
-        state_code = data.pop('addr_state')
-        state_id = self.get_state_id(state_code)
-        data['addr_state_id'] = state_id
-    
-    def resolve_parent(self, row, data):
-        parent_id, parent_code = (None, data.pop('parent'))
-        if parent_code is not None:
-            parent_id = self.get_parent_id(parent_code)
-        data['parent_id'] = parent_id
         
     def import_office(self, row, data):
         try:
             # resolve addr_state
-            self.resolve_state(row, data)
-            self.resolve_parent(row, data)
+            self.resolve_state(data)
+            self.resolve_office(data, 'parent_id')
             office = BusinessOffice(**data)
             office.save()
         except Exception as ex:
@@ -506,14 +528,14 @@ class OfficeIXHandler(IPyXlHandlerBase):
                     'short_name': self.get_required_text_from_cell(sh, row, 3),
                     'name': self.get_required_text_from_cell(sh, row, 4),
                     'level_id': self.get_required_text_from_cell(sh, row, 5),
-                    'parent': self.get_id_from_cell(sh, row, 6) or None,
+                    'parent_id': self.get_id_from_cell(sh, row, 6) or None,
                     'category': self.get_text_from_cell(sh, row, 7),
                     'email': self.get_text_from_cell(sh, row, 8),
                     'phone': self.get_text_from_cell(sh, row, 9),
                     'website': self.get_text_from_cell(sh, row, 10),
                     'addr_street': self.get_text_from_cell(sh, row, 11),
                     'addr_town': self.get_required_text_from_cell(sh, row, 12),
-                    'addr_state': self.get_required_id_from_cell(sh, row, 13),
+                    'addr_state_id': self.get_required_id_from_cell(sh, row, 13),
                     'postal_code': self.get_text_from_cell(sh, row, 14),
                     'longitude': self.get_float_from_cell(sh, row, 15),
                     'latitude': self.get_float_from_cell(sh, row, 16),
@@ -521,3 +543,153 @@ class OfficeIXHandler(IPyXlHandlerBase):
                     'gps_error': self.get_int_from_cell(sh, row, 18)
                 })
                 self.import_office(row, data)
+
+
+class StationPowerlineIXHandler(IPyXlHandlerBase, IXCacheMixin):
+    sheet_name = 'stations-lines'
+
+    def _get_station_type(self, sh, row, column):
+        value = self.get_required_text_from_cell(sh, row, column).title()
+        for (code, name) in Station.STATION_CHOICES:
+            if value == name:
+                return code
+        self.error(row, column, "Invalid station type encountered: %s" % value)
+        return None
+    
+    def _get_line_type(self, sh, row, column):
+        value = self.get_required_text_from_cell(sh, row, column).title()
+        for (code, name) in Powerline.POWERLINE_CHOICES:
+            if value == name:
+                return code
+        self.error(row, column, "Invalid powerline type encountered: %s" % value)
+        return None
+    
+    def _get_voltage(self, sh, row, column):
+        value = str(self.get_int_from_cell(sh, row, column) // 1000) + "KV"
+        for (code, name) in Voltage.ALL_CHOICES:
+            if value == name:
+                return code
+        self.error(row, column, "Invalid voltage value encountered: %s" % value)
+        return None
+    
+    def _get_voltage_ratio(self, station_type):
+        if station_type == Station.TRANSMISSION:
+            return Voltage.Ratio.HVOLTL_MVOLTH
+        elif station_type == Station.INJECTION:
+            return Voltage.Ratio.MVOLTH_MVOLTL
+        return Voltage.Ratio.MVOLTH_LVOLT
+    
+    def create_powerline(self, row, data):
+        try:
+            # a powerline can belong to multiple regions however in
+            # CENTrak, they can only be assigned to one region
+            field = 'region_id'
+            data[field] = data[field][0] if data[field] else ''
+            self.resolve_office(data, field)
+            self.resolve_station(data)
+            powerline = Powerline(**data)
+            powerline.save()
+        except Exception as ex:
+            message_fmt = 'Powerline could not be created. Err: %s'
+            self.error(row, 0, message_fmt % str(ex))
+        
+    def create_station(self, row, data):
+        try:
+            if data['type'] != Station.TRANSMISSION:
+                self.resolve_powerline(data)
+            self.resolve_office(data, 'region_id')
+            self.resolve_state(data)
+            station = Station(**data)
+            station.save()
+        except Exception as ex:
+            message_fmt = 'Station could not be created. Err: %s'
+            self.error(row, 0, message_fmt % str(ex))
+    
+    def import_powerline(self, sh, row):
+        num_errors = len(self.errors)
+        line_type = self._get_line_type(sh, row, 2)
+        if num_errors < len(self.errors):
+            return (row + 1)
+        
+        voltage = self._get_voltage(sh, row + 1, 2)
+        if num_errors < len(self.errors):
+            return (row + 1)
+        
+        row += 3
+        num_errors = len(self.errors)
+        while row <= sh.max_row:
+            if self.is_empty_row(sh, row):
+                break
+            data = {'type': line_type, 'voltage': voltage}
+            data['source_station_id'] = self.get_required_id_from_cell(sh, row, 1)
+            data['code'] = self.get_required_id_from_cell(sh, row, 2)
+            data['altcode'] = self.get_required_id_from_cell(sh, row, 3)
+            data['region_id'] = self.get_ids_from_cell(sh, row, 4)
+            data['name'] = self.get_required_text_from_cell(sh, row, 5)
+            data['is_public'] = self.get_required_bool_from_cell(sh, row, 6)
+            data['date_commissioned'] = self.get_date_from_cell(sh, row, 8)
+            if num_errors < len(self.errors):
+                break
+            self.create_powerline(row, data)
+            row += 1
+        return row + 1
+
+    def import_station(self, sh, row):
+        num_errors = len(self.errors)
+        station_type = self._get_station_type(sh, row, 2)
+        voltage_ratio = self._get_voltage_ratio(station_type)
+        if num_errors < len(self.errors):
+            return row + 1
+        row += 2
+        num_errors = len(self.errors)
+        while row <= sh.max_row:
+            if self.is_empty_row(sh, row):
+                break
+            data = {'type': station_type, 'voltage_ratio': voltage_ratio}
+            if station_type != Station.TRANSMISSION:
+                data['source_powerline_id'] = self.get_required_id_from_cell(sh, row, 1)
+            data['code'] = self.get_required_id_from_cell(sh, row, 2)
+            data['altcode'] = self.get_required_id_from_cell(sh, row, 3)
+            data['region_id'] = self.get_required_id_from_cell(sh, row, 4)
+            data['name'] = self.get_required_text_from_cell(sh, row, 5)
+            data['is_public'] = self.get_required_bool_from_cell(sh, row, 6)
+            data['addr_state_id'] = self.get_required_text_from_cell(sh, row, 9)
+            data['addr_street'] = self.get_text_from_cell(sh, row, 10)
+            data['addr_town'] = self.get_text_from_cell(sh, row, 11)
+            data['longitude'] = self.get_float_from_cell(sh, row, 13, None)
+            data['latitude'] = self.get_float_from_cell(sh, row, 14, None)
+            data['altitude'] = self.get_float_from_cell(sh, row, 15, None)
+            data['gps_error'] = self.get_int_from_cell(sh, row, 16, None)
+            data['date_commissioned'] = self.get_date_from_cell(sh, row, 17)
+            if num_errors < len(self.errors):
+                break
+            self.create_station(row, data)
+            row += 1
+        return (row + 1)
+
+    def process(self):
+        sh, row, nrows = (self.sheet, 1, self.sheet.max_row)
+        flags = ['lines', 'stations']   # provided in reverse bcos of pop
+        with transaction.atomic():
+            while row <= nrows:
+                if not flags: break
+                if self.is_empty_row(sh, row):
+                    row += 1
+                    continue
+                
+                value = sh.cell(row=row, column=1).value
+                if value not in flags:
+                    row += 1
+                    continue
+                
+                while value != flags.pop():
+                    pass    # keep popping ;-)
+                
+                if value == 'stations':
+                    row = self.import_station(sh, row)
+                elif value == 'lines':
+                    row = self.import_powerline(sh, row)
+                
+                if self.errors:
+                    transaction.rollback()
+                    break
