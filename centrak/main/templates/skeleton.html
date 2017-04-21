@@ -12,7 +12,8 @@
     {% compress css %}
     <link rel="stylesheet" href="{% static 'libs/css/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'libs/css/font-awesome.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'libs/css/bootstrap-datepicker3.min.css' %}"></script>
+    <link rel="stylesheet" href="{% static 'libs/css/bootstrap-datepicker3.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'libs/css/bootstrap-select.min.css' %}" />
     {% endcompress %}{% compress css %}
     {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}{% endcompress %}
     {% block head-extra %}{% endblock %}
@@ -56,6 +57,7 @@
     <script src="{% static 'libs/js/backbone-min.js' %}"></script>
     <script src="{% static 'libs/js/moment.min.js' %}"></script>
     <script src="{% static 'libs/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'libs/js/bootstrap-select.min.js' %}"></script>
     {% endcompress %}{% compress js %}
     {% block script-extra %}{% endblock %}{% endcompress %}
     {% include 'session_security/all.html' %}

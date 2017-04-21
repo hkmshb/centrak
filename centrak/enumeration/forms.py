@@ -5,7 +5,7 @@ from django.utils.safestring import mark_safe
 from django import forms
 
 from ezaddress.models import State
-from core.models import BusinessOffice, BusinessLevel
+from core.models import BusinessOffice, BusinessLevel, Powerline
 from .models import XForm, Capture
 from .constants import Title, Tariff
 
@@ -31,7 +31,7 @@ class PaperCaptureForm(forms.Form):
     fx_sales_repr_name = forms.BooleanField(required=False)
     fx_csp_supr_name   = forms.BooleanField(required=False)
     fx_tsp_engr_name   = forms.BooleanField(required=False)
-    fx_feeder_name     = forms.BooleanField(required=False)
+    fx_feeder_code     = forms.BooleanField(required=False)
     fx_station_name    = forms.BooleanField(required=False)
     fx_upriser_no      = forms.BooleanField(required=False)
     fx_addr_landmark   = forms.BooleanField(required=False)
@@ -41,9 +41,9 @@ class PaperCaptureForm(forms.Form):
 
     id              = forms.CharField(required=False)
     date_captured   = forms.DateField(required=True, label="Date Captured", 
-                        input_formats=['%d/%m/%Y'])
+                                      input_formats=['%d/%m/%Y'])
     date_digitized  = forms.DateField(required=True, label="Date Digitized", 
-                        input_formats=['%d/%m/%Y'])
+                                      input_formats=['%d/%m/%Y'])
     csp_name        = forms.CharField(required=True, label="CSP")
     sales_repr_name = forms.CharField(required=True, label="Sales Representative")
     csp_supr_name   = forms.CharField(required=True, label="CSP Supervisor")
@@ -80,6 +80,11 @@ class PaperCaptureForm(forms.Form):
     def get_state_choices():
         states = State.objects.all().order_by('id')
         return [(s.code, s.name) for s in states]
+    
+    @staticmethod
+    def get_feeder_choices():
+        plines = Powerline.objects.all().order_by('voltage', 'code')
+        return [(m.code, "(%s) %s" % (m.get_voltage_display(), m.name)) for m in plines]
 
     def __init__(self, user, status, *args, **kwargs):
         instance, data, initial = (kwargs.get('instance'), kwargs.get('data'), dict())
@@ -92,29 +97,35 @@ class PaperCaptureForm(forms.Form):
                         initial['date_captured'] = instance[f].strftime(fmt_date)
                     else:
                         initial[f] = instance[f].strftime(fmt_date)
-
             kwargs['initial'] = initial
             self.instance = instance
         
         if 'instance' in kwargs:
             del kwargs['instance']
-
         super(PaperCaptureForm, self).__init__(*args, **kwargs)
         self.user, self.status = (user, status)
         self._init_fields()
 
     
     def _init_fields(self):
+        # inner func
+        def mk_select_choices(label, choices):
+            text = "&laquo; {} &raquo;".format(label.title())
+            return [("", mark_safe(text))] + choices
+        
         # add more fields
-        self.fields['region_code'] = forms.ChoiceField(required=True, label="Region Code", 
-                choices=PaperCaptureForm.get_region_choices())
-        self.fields['addr_state_code'] = forms.ChoiceField(required=True, label="State Code", 
-                choices=PaperCaptureForm.get_state_choices())
+        self.fields['feeder_code'] = forms.ChoiceField(
+            required=True, label="Feeder",
+            choices=PaperCaptureForm.get_feeder_choices())
+        self.fields['region_code'] = forms.ChoiceField(
+            required=True, label="Region", 
+            choices=PaperCaptureForm.get_region_choices())
+        self.fields['addr_state_code'] = forms.ChoiceField(
+            required=True, label="State", 
+            choices=PaperCaptureForm.get_state_choices())
 
         # set field attributes
-        choice = [("", mark_safe("&laquo; select &raquo;"))]
         attrs_ = {'class': 'form-control input-sm'}
-
         if self.user.profile and self.user.profile.location:
             self.fields['region_code'].initial = self.user.profile.location.code
             self.fields['region_name'].initial = self.user.profile.location.name
@@ -125,8 +136,11 @@ class PaperCaptureForm(forms.Form):
             f = self.fields[field_name]
             f.widget.attrs = attrs_.copy()
             f.widget.attrs['title'] = f.label
-            f.widget.choices = choice + f.widget.choices
-
+            f.widget.choices = mk_select_choices(f.label, f.widget.choices)
+        
+        ff = self.fields['feeder_code']
+        ff.widget.choices = mk_select_choices(ff.label, ff.widget.choices)
+        
     def clean_book_code(self):
         value = self.cleaned_data.get('book_code', '').strip()
         if self.status == Capture.NEW:

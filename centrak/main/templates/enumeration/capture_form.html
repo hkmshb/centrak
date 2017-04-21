@@ -29,9 +29,9 @@
                             </div>
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">{% if request.user|can_change_region %}
-                            <div class="input-group ig2 {% if form.region_code.errors %}has-error{% endif %}">
+                            <div class="input-group ig2 region_code {% if form.region_code.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_region_code"  tabIndex="-1" {% if form.fx_region_code.value %}checked{% endif %} /></span>
-                                {{ form.region_code|append_attr:"tabIndex:2"|set_data:"ti:2" }}
+                                {{ form.region_code|append_attr:"tabIndex:2"|set_data:"ti:2"|set_data:"live-search:true"|add_class:"selectpicker" }}
                             </div>
                             <input type="hidden" name="region_name" value="{{ form.region_name.value|default:"" }}" required />{% else %}
                             <input type="text" class="form-control input-sm" name="region_name" placeholder="* Region" tabIndex="2" title="Region"
@@ -72,11 +72,11 @@
                     </div>
                     <div class="form-group sub-panel">
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
-                            <div class="input-group ig2 {% if form.feeder_name.errors %}has-error{% endif %}">
-                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_feeder_name" tabIndex="-1" {% if form.fx_feeder_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="feeder_name" placeholder="* Feeder" data-ti="7" autocomplete="off"
-                                       value="{{ form.feeder_name.value|default:"" }}" tabIndex="7" title="Feeder" />
+                            <div class="input-group ig2 feeder_code {% if form.feeder_code.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_feeder_code" tabIndex="-1" {% if form.fx_feeder_code.value %}checked{% endif %} /></span>
+                                {{ form.feeder_code|append_attr:"tabIndex:7"|set_data:"ti:7"|set_data:"live-search:true"|set_data:"width:auto"|add_class:"selectpicker" }}
                             </div>
+                            <input type="hidden" name="feeder_name" value="{{ form.feeder_name.value|default:"" }}" required />
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.station_name.errors %}has-error{% endif %}">
@@ -111,7 +111,7 @@
                                    name="book_code" value="{{ form.book_code.value|default:"" }}" autocomplete="off" />
                         </div>{% endif %}
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.title.errors %}has-error{% endif %}">
-                            {{ form.title|append_attr:"tabIndex:12" }}
+                            {{ form.title|append_attr:"tabIndex:12"|set_data:"live-search:true"|add_class:"selectpicker" }}
                         </div>
                         <div class="col-sm-6 rd-l-pad rd-r-pad {% if form.cust_name.errors %}has-error{% endif %}">
                             <input type="text" class="form-control input-sm" placeholder="* Customer Name" title="Customer Name" tabIndex="13"
@@ -155,9 +155,9 @@
                             </div>
                         </div>
                         <div class="col-sm-3 rd-l-pad rd-r-pad">
-                            <div class="input-group ig2 {% if form.addr_state_code.errors %}has-error{% endif %}">
+                            <div class="input-group ig2 addr_state_code {% if form.addr_state_code.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_state_code" tabIndex="-1" {% if form.fx_addr_state_code.value %}checked{% endif %}  /></span>
-                                {{ form.addr_state_code|append_attr:"tabIndex:20"|set_data:"ti:20" }}
+                                {{ form.addr_state_code|append_attr:"tabIndex:20"|set_data:"ti:20"|set_data:"live-search:true"|add_class:"selectpicker" }}
                             </div>
                             <input type="hidden" name="addr_state" value="{{ form.addr_state.value|default:"" }}" required />
                         </div>
@@ -170,7 +170,7 @@
                     </div>{% endif %}
                     <div class="form-group sub-panel">
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.tariff.errors %}has-error{% endif %}">
-                            {{ form.tariff|append_attr:"tabIndex:21" }}
+                            {{ form.tariff|append_attr:"tabIndex:21"|set_data:"live-search:true"|add_class:"selectpicker" }}
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.meter_no.errors %}has-error{% endif %}">
                             <input type="text" class="form-control input-sm" name="meter_no" tabIndex="22" autocomplete="off" 

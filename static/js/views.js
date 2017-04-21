@@ -355,13 +355,15 @@
             TemplateView.prototype.initialize.apply(this, arguments);
             var self = this;
             $(document).ready(function() {
-                _($('input.fx:checked')).each(function(e) {
-                    self.toggleInputFreeze({target: e});
+                $('select[name=tariff]').on('loaded.bs.select', function(e) {
+                    _($('input.fx:checked')).each(function(e) {
+                        self.toggleInputFreeze({target: e});
+                    });
                 });
             });
         },
         handleSelectChange: function(e) {
-            var targetNames = ['region_code', 'addr_state_code'];
+            var targetNames = ['region_code', 'feeder_code', 'addr_state_code'];
             if (targetNames.indexOf(e.target.name) !== -1) {
                 var source = $('select[name=' + e.target.name + '] option:selected')
                   , name = e.target.name.replace('_code', '');
@@ -377,18 +379,28 @@
             var checked = $(e.target).is(':checked')
               , name = e.target.name.replace('fx_', '')
               , ctrl = $('input[name=' + name + ']')
-              , attr = 'readonly';
+              , attr = 'readonly', attr2 = 'disabled'
+              , bctrl = null;
             
             if (ctrl.length === 0) {
+                bctrl = $('.ig2.' + name + ' button.btn.dropdown-toggle');
                 ctrl = $('select[name=' + name + ']');
             }
             if (checked) {
                 ctrl.attr(attr, attr);
                 ctrl.attr('tabIndex', '-1');
+                if (bctrl !== null) {
+                    bctrl.attr(attr2, attr2);
+                    bctrl.attr('tabIndex', '-1');
+                }
             } else if (name !== 'date_captured') {
                 ctrl.removeAttr(attr);
                 ctrl.attr('tabIndex', ctrl.data('ti'));
                 ctrl.focus();
+                if (bctrl !== null) {
+                    bctrl.removeAttr(attr2).removeClass(attr2);
+                    bctrl.attr('tabIndex', bctrl.data('ti'));
+                }
             }
         }
     }),

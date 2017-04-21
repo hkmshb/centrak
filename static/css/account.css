@@ -692,9 +692,29 @@ a.dourow:hover {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
 .input-group.ig2 select,
+.input-group.ig2 select.selectpicker,
 .input-group.ig2 input[type=text],
 .input-group.ig2 input[type=number] {
   border-left: none;
+}
+.input-group.ig2 .bootstrap-select button {
+  border-left: none;
+  font-size: 12px;
+  padding: 5px 10px 6px;
+}
+.input-group.ig2 .bs-searchbox input[type=text] {
+  height: 24px;
+  font-size: 12px;
+  padding: 5px 10px;
+}
+.bootstrap-select button {
+  font-size: 12px;
+  padding: 5px 10px 6px;
+}
+.bootstrap-select .bs-searchbox input[type=text] {
+  height: 24px;
+  font-size: 12px;
+  padding: 5px 10px;
 }
 .form-compact .panel {
   margin-bottom: 5px;
