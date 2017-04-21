@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
+from django.db.models import Q
 from django import forms
 
 from ezaddress.models import State
@@ -27,7 +28,7 @@ class PaperCaptureForm(forms.Form):
     # fields used to indicate if associated entries are fixed
     fx_date_captured   = forms.BooleanField(required=False)
     fx_region_code     = forms.BooleanField(required=False)
-    fx_csp_name        = forms.BooleanField(required=False)
+    fx_csp_code        = forms.BooleanField(required=False)
     fx_sales_repr_name = forms.BooleanField(required=False)
     fx_csp_supr_name   = forms.BooleanField(required=False)
     fx_tsp_engr_name   = forms.BooleanField(required=False)
@@ -85,7 +86,16 @@ class PaperCaptureForm(forms.Form):
     def get_feeder_choices():
         plines = Powerline.objects.all().order_by('voltage', 'code')
         return [(m.code, "(%s) %s" % (m.get_voltage_display(), m.name)) for m in plines]
-
+    
+    @staticmethod
+    def get_csp_choices(region):
+        criteria = Q(level=BusinessLevel.LEVEL2) \
+                 & Q(category=BusinessOffice.CUSTOMER_SERVICE_POINT)
+        if region is not None:
+            criteria &= Q(parent=region)
+        csps = BusinessOffice.objects.filter(criteria).order_by('code')
+        return [(o.short_name, o.name) for o in csps]
+        
     def __init__(self, user, status, *args, **kwargs):
         instance, data, initial = (kwargs.get('instance'), kwargs.get('data'), dict())
         if instance and not data:
@@ -110,13 +120,17 @@ class PaperCaptureForm(forms.Form):
     def _init_fields(self):
         # inner func
         def mk_select_choices(label, choices):
-            text = "&laquo; {} &raquo;".format(label.title())
+            text = "&laquo; {} &raquo;".format(label)
             return [("", mark_safe(text))] + choices
         
         # add more fields
+        user_location = self.user.profile.location
         self.fields['feeder_code'] = forms.ChoiceField(
             required=True, label="Feeder",
             choices=PaperCaptureForm.get_feeder_choices())
+        self.fields['csp_code'] = forms.ChoiceField(
+            required=True, label="CSP",
+            choices=PaperCaptureForm.get_csp_choices(user_location))
         self.fields['region_code'] = forms.ChoiceField(
             required=True, label="Region", 
             choices=PaperCaptureForm.get_region_choices())
@@ -127,19 +141,20 @@ class PaperCaptureForm(forms.Form):
         # set field attributes
         attrs_ = {'class': 'form-control input-sm'}
         if self.user.profile and self.user.profile.location:
-            self.fields['region_code'].initial = self.user.profile.location.code
-            self.fields['region_name'].initial = self.user.profile.location.name
+            self.fields['region_code'].initial = user_location.code
+            self.fields['region_name'].initial = user_location.name
 
         self.fields['date_digitized'].initial = datetime.today().strftime("%d/%m/%Y")
         self.fields['acct_status'].initial = self.status
-        for field_name in ('title', 'tariff', 'region_code', 'addr_state_code'):
+        for field_name in ['title', 'tariff', 'region_code', 'addr_state_code',
+                           'feeder_code', 'csp_code']:
             f = self.fields[field_name]
             f.widget.attrs = attrs_.copy()
             f.widget.attrs['title'] = f.label
             f.widget.choices = mk_select_choices(f.label, f.widget.choices)
         
-        ff = self.fields['feeder_code']
-        ff.widget.choices = mk_select_choices(ff.label, ff.widget.choices)
+        #ff = self.fields['feeder_code']
+        #ff.widget.choices = mk_select_choices(ff.label, ff.widget.choices)
         
     def clean_book_code(self):
         value = self.cleaned_data.get('book_code', '').strip()

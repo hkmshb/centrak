@@ -67,7 +67,6 @@ def user_detail(request, user_id):
             label = 'Confirm password' if '2' in fn else field.label
             attrs_['placeholder'] = label
             field.widget.attrs = attrs_.copy()
-    
     return render(request, 'main/admin/user_detail.html', {
         'user': user, 'form_pwd': form_pwd
     })
@@ -84,13 +83,12 @@ def user_manage_passwd(request, user_id):
     form = form_class(user, data=request.POST)
     if form.is_valid():
         form.save()
-
         msg_fmt = 'Password has been %s successfully'
-        messages.success(request, msg_fmt % ('changed' if is_same_user else 'set'), 
-                         extra_tags='success')
+        messages.success(request, 
+            msg_fmt % ('changed' if is_same_user else 'set'), 
+            extra_tags='success')
     else:
         messages.error(request, form.errors.as_text(), extra_tags='danger')
-
     return redirect(reverse('admin-user-info', args=[user_id]))
 
 
@@ -111,18 +109,16 @@ def manage_user(request, user_id=None):
 
     if request.method == 'POST':
         try:
-            form = UserProfileForm(data=request.POST, **kwargs)
+            form = UserProfileForm(request, data=request.POST, **kwargs)
             if form.is_valid():
                 profile = form.save()
-                
                 message = (utils.MSG_FMT_SUCCESS_UPD if user_id else utils.MSG_FMT_SUCCESS_ADD)
                 messages.success(request, message % 'User', extra_tags='success')
                 return redirect(reverse('admin-user-info', args=[profile.user.id]))
         except Exception as ex:
             messages.error(request, str(ex), extra_tags='danger')
-            raise ex
     else:
-        form = UserProfileForm(**kwargs)
+        form = UserProfileForm(request, **kwargs)
     return render(request, 'main/admin/user_form.html', {
         'form': form
     })
@@ -303,9 +299,9 @@ def manage_office(request, office_code=None):
 @admin_with_permission()
 def office_detail(request, office_code=None):
     office = get_object_or_404(BusinessOffice, code=office_code)
-    stations = None
+    stations = Station.objects.filter(region=office).order_by('code')
     return render(request, 'main/admin/office_detail.html', {
-        'office': office, 'stations': stations 
+        'office': office, 'stations': paginate(request, stations)
     })
 
 

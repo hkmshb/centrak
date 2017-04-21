@@ -363,7 +363,7 @@
             });
         },
         handleSelectChange: function(e) {
-            var targetNames = ['region_code', 'feeder_code', 'addr_state_code'];
+            var targetNames = ['region_code', 'csp_code', 'feeder_code', 'addr_state_code'];
             if (targetNames.indexOf(e.target.name) !== -1) {
                 var source = $('select[name=' + e.target.name + '] option:selected')
                   , name = e.target.name.replace('_code', '');

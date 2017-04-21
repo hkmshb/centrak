@@ -40,9 +40,10 @@ class UserProfileForm(BaseModelForm):
     _error_messages = {
         'invalid-email-domain': _("KEDCO email address required."),
         'invalid-email-format': _(
-                "Invalid KEDCO email provided. It does not match expected "
-                "format. Contact the CENTrak administrator for help if in "
-                "fact the email is an officially assigned email."),
+            "Invalid KEDCO email provided. It does not match expected "
+            "format. Contact the CENTrak administrator for help if in "
+            "fact the email is an officially assigned email."),
+        'location-required': _("A user must be assigned a location."),
     }
 
     username = forms.EmailField(label=_('Username/Email'), max_length=50)
@@ -57,7 +58,8 @@ class UserProfileForm(BaseModelForm):
                     empty_label=mark_safe("&laquo; select &raquo;"), 
                     queryset=BusinessOffice.objects.filter(level='L2'))
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, request, *args, **kwargs):
+        self.request = request
         instance = kwargs.get('instance', None)
         if instance:
             kwargs['initial'] = kwargs.get('initial', dict())
@@ -98,7 +100,8 @@ class UserProfileForm(BaseModelForm):
     
     def clean(self):
         cleaned_data = super(UserProfileForm, self).clean()
-        if not self.instance.user.is_superuser:
+        profile, user = self.instance, self.instance.user
+        if not user.is_superuser:
             fname = cleaned_data.get('first_name')
             lname = cleaned_data.get('last_name')
             email = cleaned_data.get('username')
@@ -106,6 +109,14 @@ class UserProfileForm(BaseModelForm):
             if not utils.is_valid_official_email_format(email, fname, lname):
                 msg = self._error_messages['invalid-email-format']
                 raise forms.ValidationError(msg)
+            
+            if not self.request.user.is_superuser:
+                location = cleaned_data.get('location')
+                location1 = cleaned_data.get('location1')
+                if not location and not location1:
+                    if profile.location is not None:
+                        message = self._error_messages['location-required']
+                        raise forms.ValidationError(message)
         return cleaned_data
 
     def save(self, commit=True):
@@ -116,11 +127,16 @@ class UserProfileForm(BaseModelForm):
         user.last_name = self.cleaned_data.get('last_name')
         user.is_active = self.cleaned_data.get('is_active')
         
+        location = self.cleaned_data.get('location')
         location1 = self.cleaned_data.get('location1')
-        if hasattr(profile, 'location') and location1:
-            profile.location = location1
-        
-        is_new_user = profile.user.id == None
+        if location is not None:
+            profile.location = location
+            if location1 is not None:
+                profile.location = location1
+        elif self.request.user.is_superuser:
+            profile.location = location
+            
+        is_new_user = profile.user.id is None
         try:
             profile.user.save()
             if is_new_user:
@@ -131,6 +147,7 @@ class UserProfileForm(BaseModelForm):
             if is_new_user and profile.user.id:
                 profile.user.delete()
             raise ex
+
 
 class ApiServiceInfoForm(BaseModelForm):
     class Meta:

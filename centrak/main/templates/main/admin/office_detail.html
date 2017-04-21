@@ -22,7 +22,7 @@
                 </div>
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Code</span><label>{{ office.code }}</label>
+                        <span>Code / Short Name</span><label>{{ office.code }} / {{ office.short_name }}</label>
                     </div>
                     <div class="col-sm-6 rd-l-pad">
                         <span>Name</span><label>{{ office.name }} </label>
@@ -30,15 +30,15 @@
                 </div>
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Phone</span> <label> {{ office.phone }}</label>
+                        <span>Phone</span> <label> {{ office.phone|default:'-' }}</label>
                     </div>
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Email</span> <label>{{ office.email }}</label>
+                        <span>Email</span> <label>{{ office.email|default:'-' }}</label>
                     </div>
                 </div>
                 <div class="data-row">
                     <div class="col-sm-6 rd-l-pad">
-                        <span>Address</span> <label>{{ office.addr_street}} {{ office.addr_town }}</label>
+                        <span>Address</span> <label>{{ office.addr_street|default:'-' }} {{ office.addr_town|default:'-' }}</label>
                     </div>
                 </div>
             </div>
@@ -49,19 +49,19 @@
             <ul class="nav nav-tabs nav-flattabs">
                 <li class="active"><a href="{# url 'admin-region-info' office.code #}"><i class="fa fa-fw fa-adjust"></i> Distribution Stations</a></li>
             </ul>
-            {% if stations.exists %}
+            {% if stations %}
             <div class="buttons pull-right">
-                <a class="btn btn-default btn-sm btn-slim" href="{# url 'admin-office-add' #}?for={{ office.code }}">
-                    <i class="fa fa-fw fa-plus"></i> Add
+                <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-import' "stations-lines" %}">
+                    <i class="fa fa-fw fa-plus"></i> Import Assets
                 </a>
             </div>
-            {% endif %}            
+            {% endif %}
         </div>
         <div class="panel-body">
-            {% if not stations.exists %}
+            {% if not stations %}
             <div class="action-notice">
                 No Distribution Stations found <br/>
-                <a class="btn btn-default btn-sm" href="{% url 'admin-office-add' %}?for={{ office.code }}">Add a new Distribution Station</a>
+                <a class="btn btn-default btn-sm" href="{% url 'admin-import' "stations-lines" %}">Import Station Assets</a>
             </div>
             {% else %}
             <table class="table table-striped table-condensed">
@@ -77,6 +77,7 @@
             </table>
             {% endif %}
         </div>
+        {% include 'snippets/panel_pager.html' with page=stations %}
     </div>
 </div>
 {% endblock %}

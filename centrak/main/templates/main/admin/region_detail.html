@@ -43,13 +43,13 @@
                 <li{% if tab == 'stations' %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}stations/"><i class="fa fa-fw fa-shield"></i> Stations</a></li>
                 <li{% if tab == 'powerlines' %} class="active"{% endif %}><a href="{% url 'admin-region-info' region.code %}powerlines/"><i class="fa fa-fw fa-flash"></i> Powerlines</a></li>
             </ul>
-            {% if offices.exists %}
             <div class="buttons pull-right">
+            {% if offices %}
                 <a class="btn btn-default btn-sm btn-slim" href="{% url 'admin-office-add' %}?for={{ region.code }}&@next={% url 'admin-region-info' region.code %}">
                     <i class="fa fa-fw fa-plus"></i> Add
                 </a>
-            </div>
             {% endif %}
+            </div>
         </div>
         <div class="panel-body">
         {% if not tab or tab == 'offices' %}

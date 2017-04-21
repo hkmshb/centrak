@@ -40,11 +40,11 @@
                             {% endif %}
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
-                            <div class="input-group ig2 {% if form.csp_name.errors %}has-error{% endif %}">
-                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_csp_name"  tabIndex="-1" {% if form.fx_csp_name.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm body" name="csp_name" placeholder="* CSP" data-ti="3" autocomplete="off"
-                                       value="{{ form.csp_name.value|default:"" }}" tabIndex="3" title="CSP" />
+                            <div class="input-group ig2 csp_code {% if form.csp_code.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_csp_code"  tabIndex="-1" {% if form.fx_csp_code.value %}checked{% endif %} /></span>
+                                {{ form.csp_code|append_attr:"tabIndex:3"|set_data:"ti:3"|set_data:"live-search:true"|add_class:"selectpicker" }}
                             </div>
+                            <input type="hidden" name="csp_name" value="{{ form.csp_name.value|default:"" }}" required />
                         </div>
                     </div>
                     <div class="form-group">
@@ -74,7 +74,7 @@
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 feeder_code {% if form.feeder_code.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_feeder_code" tabIndex="-1" {% if form.fx_feeder_code.value %}checked{% endif %} /></span>
-                                {{ form.feeder_code|append_attr:"tabIndex:7"|set_data:"ti:7"|set_data:"live-search:true"|set_data:"width:auto"|add_class:"selectpicker" }}
+                                {{ form.feeder_code|append_attr:"tabIndex:7"|set_data:"ti:7"|set_data:"live-search:true"|add_class:"selectpicker" }}
                             </div>
                             <input type="hidden" name="feeder_name" value="{{ form.feeder_name.value|default:"" }}" required />
                         </div>
