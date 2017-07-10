@@ -1,9 +1,11 @@
+import logging
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
+from django.utils.html import mark_safe
 from django.contrib import messages
 from django.db.models import Q as dQ
 from mongoengine.queryset import Q
@@ -17,6 +19,23 @@ from .. import utils
 
 
 
+
+def _format_field_errors(form):
+    err_summary = {}
+    if form.errors:
+        for field, err_msg in form.errors.items():
+            errs = err_summary.setdefault(err_msg[0], set())
+            errs.add(form.fields[field].label)
+    
+    for err_msg, err_fields in err_summary.items():
+        if len(err_fields) > 1:
+            if 'required' in err_msg:
+                err_msg = 'These fields are required'
+            if 'Invalid' in err_msg:
+                err_msg = 'Invalid values'
+
+        line = mark_safe("<b>%s</b>: %s" % (err_msg, ', '.join(err_fields)))
+        form.add_error(None, line)
 
 
 @login_required
@@ -107,8 +126,11 @@ def _manage_capture_new(request, capture_id=None):
                 else:
                     request.session[session_key] = None
                     return redirect(reverse('capture-list', args=['new/']))
+            else:
+                _format_field_errors(form)
         except Exception as ex:
             messages.error(request, str(ex), extra_tags='danger')
+            logging.error(str(ex))
     else:
         fixed_entries = request.session.get(session_key, None)
         if fixed_entries:
@@ -150,15 +172,19 @@ def _manage_capture_exist(request, lookup):
     if request.method == 'POST':
         try:
             form = PaperCaptureForm(*args, instance=instance, data=request.POST)
+            assert form.instance.id is not None
             if form.is_valid():
                 form.save()
 
                 message = 'Capture updated successfully'
                 messages.success(request, message, extra_tags='success')
                 return redirect(reverse('capture-list'))
+            else:
+                _format_field_errors(form)
         except Exception as ex:
             messages.error(request, str(ex), extra_tags='danger')
 
+    assert form.instance.id is not None
     return render(request, 'enumeration/capture_form.html', {
         'form': form, 'acct': account, 'tab': 'existing'
     })

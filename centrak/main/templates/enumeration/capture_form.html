@@ -99,43 +99,63 @@
                     </div>
                 </div>
             </div>
+            
             <div class="panel panel-default panel-sqi">
                 <div class="panel-body">
-                    <div class="form-group">{% if tab and tab == 'existing' %}
-                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.acct_no.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="* Account No" title="Account No" tabIndex="11"
-                                   name="acct_no" value="{{ form.acct_no.value|default:"" }}" autocomplete="off" />
-                        </div>{% else %}
-                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.book_code.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="* Book Code" title="Book Code" tabIndex="11"
-                                   name="book_code" value="{{ form.book_code.value|default:"" }}" autocomplete="off" />
-                        </div>{% endif %}
-                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.title.errors %}has-error{% endif %}">
-                            {{ form.title|append_attr:"tabIndex:12"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                    <div class="form-group">
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.pole_type.errors %}has-error{% endif %}">
+                            {{ form.pole_type|append_attr:"tabIndex:11"|set_data:"live-search:true"|add_class:"selectpicker" }}
                         </div>
-                        <div class="col-sm-6 rd-l-pad rd-r-pad {% if form.cust_name.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="* Customer Name" title="Customer Name" tabIndex="13"
-                                   name="cust_name" value="{{ form.cust_name.value|default:"" }}" autocomplete="off" />
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.pole_condition.errors %}has-error{% endif %}">
+                            {{ form.pole_condition|append_attr:"tabIndex:12"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.swire_type.errors %}has-error{% endif %}">
+                            {{ form.swire_type|append_attr:"tabIndex:13"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.swire_condition.errors %}has-error{% endif %}">
+                            {{ form.swire_condition|append_attr:"tabIndex:14"|set_data:"live-search:true"|add_class:"selectpicker" }}
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.cust_mobile.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="Mobile No" title="Mobile No" tabIndex="14"
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.property_type.errors %}has-error{% endif %}">
+                            {{ form.property_type|append_attr:"tabIndex:15"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.title.errors %}has-error{% endif %}">
+                            {{ form.title|append_attr:"tabIndex:16"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
+                        <div class="col-sm-6 rd-l-pad rd-r-pad {% if form.cust_name.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="* Customer Name" title="Customer Name" tabIndex="17"
+                                   name="cust_name" value="{{ form.cust_name.value|default:"" }}" autocomplete="off" />
+                        </div>
+                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.cust_mobile.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="Mobile No" title="Mobile No" tabIndex="18"
                                    name="cust_mobile" value="{{ form.cust_mobile.value|default:"" }}" autocomplete="off" />
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.cust_status.errors %}has-error{% endif %}">
+                            {{ form.cust_status|append_attr:"tabIndex:19"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.cust_email.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="E-mail" title="E-mail" tabIndex="15"
+                            <input type="text" class="form-control input-sm" placeholder="E-mail" title="E-mail" tabIndex="20"
                                    name="cust_email" value="{{ form.cust_email.value|default:"" }}" autocomplete="off" />
                         </div>
                         <div class="col-sm-4 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.addr_landmark.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_landmark" tabIndex="-1" {% if form.fx_addr_landmark.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" placeholder="Closest Landmark" title="Closest Landmark" data-ti="16"  
-                                        name="addr_landmark" value="{{ form.addr_landmark.value|default:'' }}" tabIndex="16" autocomplete="off" />
+                                <input type="text" class="form-control input-sm" placeholder="Closest Landmark" title="Closest Landmark" data-ti="21"  
+                                        name="addr_landmark" value="{{ form.addr_landmark.value|default:'' }}" tabIndex="21" autocomplete="off" />
                             </div>
                         </div>
                         <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.addr_no.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" placeholder="House No" title="House No" tabIndex="17"
+                            <input type="text" class="form-control input-sm" placeholder="House No" title="House No" tabIndex="22"
                                    name="addr_no" value="{{ form.addr_no.value|default:"" }}" autocomplete="off" />
                         </div>
                     </div>
@@ -143,38 +163,87 @@
                         <div class="col-sm-6 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.addr_street.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_street" tabIndex="-1" {% if form.fx_addr_street.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="addr_street" title="Street/Area" data-ti="18" autocomplete="off"
-                                       placeholder="* Street/Area" tabIndex="18"  value="{{ form.addr_street.value|default:'' }}" />
+                                <input type="text" class="form-control input-sm" name="addr_street" title="Street/Area" data-ti="23" autocomplete="off"
+                                       placeholder="* Street/Area" tabIndex="23"  value="{{ form.addr_street.value|default:'' }}" />
                             </div>
                         </div>
                         <div class="col-sm-3 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 {% if form.addr_town.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_town" tabIndex="-1" {% if form.fx_addr_town.value %}checked{% endif %} /></span>
-                                <input type="text" class="form-control input-sm" name="addr_town" title="City/Town/Village" data-ti="19" autocomplete="off"
-                                       placeholder="* City/Town/Village" tabIndex="19"  value="{{ form.addr_town.value|default:'' }}" />
+                                <input type="text" class="form-control input-sm" name="addr_town" title="City/Town" data-ti="24" autocomplete="off"
+                                       placeholder="City/Town" tabIndex="24"  value="{{ form.addr_town.value|default:'' }}" />
                             </div>
                         </div>
                         <div class="col-sm-3 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.addr_village.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_village" tabIndex="-1" {% if form.fx_addr_village.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="addr_village" title="Village/Ward" data-ti="25" autocomplete="off"
+                                       placeholder="Village/Ward" tabIndex="25"  value="{{ form.addr_village.value|default:'' }}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 rd-l-pad rd-r-pad">
+                            <div class="input-group ig2 {% if form.addr_lga.errors %}has-error{% endif %}">
+                                <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_lga" tabIndex="-1" {% if form.fx_addr_lga.value %}checked{% endif %} /></span>
+                                <input type="text" class="form-control input-sm" name="addr_lga" title="LGA" data-ti="26" autocomplete="off"
+                                       placeholder="LGA" tabIndex="26"  value="{{ form.addr_lga.value|default:'' }}" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2 rd-l-pad rd-r-pad">
                             <div class="input-group ig2 addr_state_code {% if form.addr_state_code.errors %}has-error{% endif %}">
                                 <span class="input-group-addon"><input type="checkbox" class="fx" name="fx_addr_state_code" tabIndex="-1" {% if form.fx_addr_state_code.value %}checked{% endif %}  /></span>
-                                {{ form.addr_state_code|append_attr:"tabIndex:20"|set_data:"ti:20"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                                {{ form.addr_state_code|append_attr:"tabIndex:27"|set_data:"ti:27"|set_data:"live-search:true"|add_class:"selectpicker" }}
                             </div>
                             <input type="hidden" name="addr_state" value="{{ form.addr_state.value|default:"" }}" required />
                         </div>
                     </div>{% if form.acct_status.value == 'existing' %}
                     <div class="form-group">
                         <div class="col-sm-12 rd-l-pad rd-r-pad">
-                            <input type="text" class="form-control input-sm" title="Service Address" readonly
-                                   value="Service Address: {{ acct.service_addr|default:'-'}}" />
+                            <input type="text" class="form-control input-sm" title="Address on Record" readonly
+                                   value="SERVICE ADDRESS: {{ acct.service_addr|default:'-'}}" />
                         </div>
                     </div>{% endif %}
+                </div>
+            </div>
+
+            <div class="panel panel-default panel-sqi">
+                <div class="panel-body">
+                    <div class="form-group">{% if tab and tab == 'existing' %}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.acct_no.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="* Account No" title="Account No" tabIndex="26"
+                                   name="acct_no" value="{{ form.acct_no.value|default:"" }}" autocomplete="off" />
+                        </div>{% else %}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.book_code.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" placeholder="* Book Code" title="Book Code" tabIndex="27"
+                                   name="book_code" value="{{ form.book_code.value|default:"" }}" autocomplete="off" />
+                        </div>{% endif %}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.tariff.errors %}has-error{% endif %}">
+                            {{ form.tariff|append_attr:"tabIndex:28"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>{% if form.acct_status.value == 'new' %}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.amount_to_bill.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" name="amount_to_bill" tabIndex="29" autocomplete="off" 
+                                placeholder="Amount to bill" value="{{ form.amount_to_bill.value|default:'' }}" />
+                        </div>{% endif %}
+                    </div>
                     <div class="form-group sub-panel">
-                        <div class="col-sm-2 rd-l-pad rd-r-pad {% if form.tariff.errors %}has-error{% endif %}">
-                            {{ form.tariff|append_attr:"tabIndex:21"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.meter_type.errors %}has-error{% endif %}">
+                            {{ form.meter_type|append_attr:"tabIndex:30"|set_data:"live-search:true"|add_class:"selectpicker" }}
                         </div>
-                        <div class="col-sm-4 rd-l-pad rd-r-pad {% if form.meter_no.errors %}has-error{% endif %}">
-                            <input type="text" class="form-control input-sm" name="meter_no" tabIndex="22" autocomplete="off" 
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.meter_no.errors %}has-error{% endif %}">
+                            <input type="text" class="form-control input-sm" name="meter_no" tabIndex="31" autocomplete="off" 
                                 placeholder="Meter No" value="{{ form.meter_no.value|default:'' }}" />
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.meter_model.errors %}has-error{% endif %}">
+                            {{ form.meter_model|append_attr:"tabIndex:32"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.meter_status.errors %}has-error{% endif %}">
+                            {{ form.meter_status|append_attr:"tabIndex:33"|set_data:"live-search:true"|add_class:"selectpicker" }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 rd-l-pad rd-r-pad {% if form.meter_phase.errors %}has-error{% endif %}">
+                            {{ form.meter_phase|append_attr:"tabIndex:34"|set_data:"live-search:true"|add_class:"selectpicker" }}
                         </div>
                     </div>
                 </div>
@@ -196,6 +265,7 @@
                 <input type="hidden" name="id" value="{{ form.instance.id }}" />
                 {% csrf_token %}
             </div>{% endwith %}
+            <br/><br/><br/>
         </form>
     </div>
 </div>

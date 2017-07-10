@@ -89,8 +89,8 @@ class AccountMixin(object):
 
     acct_no     = fields.StringField(max_length=16, verbose_name='Account No')
     book_code   = fields.StringField(max_length=8, verbose_name='Book Code')
-    title       = fields.StringField(max_length=12, choices=constants.Title.CHOICES,
-                        verbose_name='Title')
+    title       = fields.StringField(max_length=12, verbose_name='Title',
+                        choices=list(constants.Title.choices()))
     cust_name   = fields.StringField(max_length=100, required=True, 
                         verbose_name='Customer Name')
     cust_mobile = fields.StringField(max_length=15, verbose_name='Customer Mobile')
@@ -175,15 +175,34 @@ class Capture(TimestampedDocument, AccountMixin, AddressMixin):
     station_name = fields.StringField(max_length=50, blank=False, verbose_name='Station')
     upriser_no   = fields.IntField(min_value=1, max_value=8, verbose_name='Upriser No')
     pole_no      = fields.IntField(min_value=1, verbose_name='Pole No')
-    wire_no      = fields.IntField(min_value=1, verbose_name='Wire No')
+    swire_no      = fields.IntField(min_value=1, verbose_name='Wire No')
+
+    # pole & wire extra info
+    pole_type = fields.StringField(max_length=15, blank=False, verbose_name='Pole Type')
+    pole_condition = fields.StringField(max_length=15, blank=True, verbose_name='Pole Condition')
+    swire_type = fields.StringField(max_length=15, blank=False, verbose_name='Service Wire Type')
+    swire_condition = fields.StringField(max_length=15, blank=True, verbose_name='Service Wire Conditin')
+    property_type = fields.StringField(max_length=25, blank=False, verbose_name='Property Type')
+
+    #
+    cust_status = fields.StringField(max_length=15, blank=False, verbose_name='Customer Status')
+    amount_to_bill = fields.FloatField(min_value=1, blank=True, verbose_name='Amount to Bill')
 
     # address info
-    addr_landmark = fields.StringField(max_length=50, verbose_name='Closest Landmark')
-    addr_no       = fields.StringField(max_length=20, verbose_name='Address No')
-    addr_street   = fields.StringField(max_length=50, verbose_name='Address Street')
-    addr_town     = fields.StringField(max_length=20, verbose_name='Address Town')
-    addr_state    = fields.StringField(max_length=20, verbose_name='Address State')
-    addr_state_code = fields.StringField(max_length=3, verbose_name='Address State Code')
+    addr_landmark = fields.StringField(max_length=50, blank=True, verbose_name='Closest Landmark')
+    addr_no = fields.StringField(max_length=20, blank=True, verbose_name='Address No')
+    addr_street = fields.StringField(max_length=50, blank=False, verbose_name='Address Street')
+    addr_town = fields.StringField(max_length=20, blank=True, verbose_name='Address Town')
+    addr_state = fields.StringField(max_length=20, blank=False, verbose_name='Address State')
+    addr_state_code = fields.StringField(max_length=3, blank=False, verbose_name='Address State Code')
+    addr_village = fields.StringField(max_length=20, blank=True, verbose_name='Address Village')
+    addr_lga = fields.StringField(max_length=20, blank=True, verbose_name='Address LGA')
+
+    meter_type = fields.StringField(max_length=15, blank=False, verbose_name='Meter Type')
+    meter_model = fields.StringField(max_length=15, blank=True, verbose_name='Meter Model')
+    meter_phase = fields.StringField(max_length=15, blank=False, verbose_name='Meter Phase')
+    meter_status = fields.StringField(max_length=25, blank=True, verbose_name='Meter Status')
+    meter_condition = fields.StringField(max_length=25, blank=True, verbose_name='Meter Condition')
 
     meta = {
         'collection': 'captures',
