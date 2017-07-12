@@ -10,7 +10,10 @@ from main.views import enum_views
 @pytest.fixture
 def auth_request():
     request = MagicMock()
+    request.user.is_anonymous.return_value = False
     request.user.is_authenticated.return_value = True
+    request.user.profile.location.short_name = 'KNI'
+    request.user.username = 'abdulhakeem.shaibu@kedco.ng'
     return request
 
 
@@ -65,20 +68,15 @@ class TestCaptureView(object):
     def test_response_context_has_stats_data(self, auth_request):
         response = enum_views.capture_index(auth_request)
         context = response.context_data
-        assert 'stats' in context \
-           and len(context['stats']) == 2 \
-           and 'summary' in context['stats'] \
-           and 'history' in context['stats']
+        assert 'stats' in context
+        assert len(context['stats']) == 2
+        assert 'summary' in context['stats']
+        assert 'history' in context['stats']
     
     def test_response_summary_stats_adequate_for_side_pane(self, auth_request):
         response = enum_views.capture_index(auth_request)
         stats = response.context_data['stats']['summary']
-        valid_entries_found = sum([1 for e in stats if len(e) == 4])
-        assert stats and len(stats) == 4 \
-           and valid_entries_found == 4
-    
-    def test_response_history_stats_adequate_for_side_pane(self, auth_request):
-        response = enum_views.capture_index(auth_request)
-        stats = response.context_data['stats']['history']
-        assert stats and len(stats) >= 2
+        valid_entries_found = sum([1 for e in stats if len(e) == 2])
+        assert stats and len(stats) == 4
+        assert valid_entries_found == 4
     

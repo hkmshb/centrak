@@ -392,6 +392,21 @@ form .data-row,
   padding: 10px;
   width: 200px;
 }
+.widget .lg {
+  font-size: 16pt;
+}
+.widget .sm {
+  font-size: 12pt;
+}
+.widget .xs {
+  font-size: 9pt;
+}
+.widget .xx {
+  font-size: 8pt;
+}
+.widget .bottom {
+  border-top: dotted 1px #ddd;
+}
 .widget.widget-stats-strip {
   color: #333;
   margin-bottom: 0;
@@ -402,17 +417,10 @@ form .data-row,
   color: #999;
   text-transform: uppercase;
 }
-.widget.widget-stats-strip .strip-numbers.bottom {
-  border-top: dotted 1px #ddd;
-}
-.widget.widget-stats-strip .strip-text.lg {
-  font-size: 16pt;
-}
-.widget.widget-stats-strip .strip-text.sm {
-  font-size: 12pt;
-}
-.widget.widget-stats-strip .strip-text.xs {
-  font-size: 9pt;
+.widget.strip-notice {
+  margin: 0;
+  padding: 3px 10px 0;
+  color: #999;
 }
 /* ==============================+
  |  bootstrap overrides

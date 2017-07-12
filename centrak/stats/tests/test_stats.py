@@ -11,6 +11,7 @@ from core.models import BusinessLevel
 from enumeration.models import Capture
 
 
+
 class MockDocQuerySet(object):
     def only(self, *fields):
         pass
@@ -28,19 +29,40 @@ class MockBusinessLevel(Document):
         return self.name
 
 
-def make_captures(date, region_infos, counts_list):
+def make_captures(date, region_infos, counts_list, email=None):
+    print('input: %s' % [date, region_infos, counts_list, email])
     status_list = ['new', 'existing', 'no-supply', 'unknown']
     usr_email, usr_name, counter = 'usr%s@ma.il', 'usr%s', 0
     captures = []
 
+    dt = date if not hasattr(date, 'date') else date.date()
     for (ridx, info) in enumerate(region_infos):
         for (cidx, count) in enumerate(counts_list[ridx]):
             status = status_list[cidx]
             for _ in range(count):
                 counter += counter
-                Capture.objects.create(date_created=date, date_digitized=date, 
-                    user_email=usr_email % counter, cust_name=usr_name % counter, 
-                    region_code=info[0], region_name=info[1], acct_status=status)
+                Capture.objects.create(
+                    date_created=dt, date_digitized=dt,
+                    cust_name=usr_name % counter, region_code=info[0], 
+                    region_name=info[1], acct_status=status,
+                    user_email= email or usr_email % counter,
+                    medium=Capture.MEDIUM_PAPER
+                )
+
+
+def make_test_pack():
+    dy, wk = date.today(), date.today() - timedelta(days=8)
+    mt = dy - timedelta(days=dy.day + 7)
+    countlist, batches = [3, 2, 1, 0], [
+        ('abdulhakeem.shaibu@kedco.ng', ('KNI', 'KN Industrial')),
+        ('abdulrahman.shehu@kedco.ng', ('KNI', 'KN Industrial')),
+        ('itdevelop@kedco.ng', ('JIS', 'JI South')),
+        ('itdevelop@kedco.ng', ('JIN', 'JI North'))
+    ]
+    for username, region in batches:
+        for dt in (dy, wk, mt):
+            make_captures(dt, [region], [countlist], username)
+            countlist = countlist[-1:] + countlist[:-1]
 
 
 @pytest.fixture(scope="module")
@@ -57,10 +79,16 @@ def level_qs():
 
 @pytest.fixture
 def capture_qs():
+    # empty existing data
+    Capture.objects.delete()
+
     # setup: create objects
-    make_captures(date.today(), [('0901', 'KNI')], [(2,0,0,0)])
+    # note: the counts list eg (2,0,0,0) rep (new,existing,no-supply,unknown)
+    # to be created ...
+    make_captures(date.today(), [('KNI', 'KN Industrial')], [(2,0,0,0)])
     make_captures(date.today() + timedelta(days=1),
-        [('0901', 'KNI'), ('0903', 'KNE'), ('0902', 'KTC'), ('0908', 'JGS')], 
+        [('KNI', 'KN Industrial'), ('KNE', 'KN East'), 
+         ('KTC', 'KT Central'), ('JGS', 'JG South')], 
         [(0,0,1,1), (1,0,0,0), (0,1,0,0), (0,1,0,0)])
     yield Capture.objects
     
@@ -70,20 +98,29 @@ def capture_qs():
 
 @pytest.fixture
 def capture_qs2():
+    # clear existing data
+    Capture.objects.delete()
+
     # setup:
     date_today = date(2017, 2, 7)
-    make_captures(date_today, ['KNI','KNC'], [(3,3,4,2), (0,3,2,0)])
+    make_captures(date_today, [('KNI', 'KN Industrial'),('KNC', 'KN Central')], 
+                  [(3,3,4,2), (0,3,2,0)])
     
     date_ystdy = date_today - timedelta(days=1)
-    make_captures(date_ystdy, ['KNI', 'KNC'], [(4,2,1,5), (2,3,4,4)])
+    make_captures(date_ystdy, [('KNI', 'KN Industrial'), ('KNC', 'KN Central')], 
+                  [(4,2,1,5), (2,3,4,4)])
     
     date_first = date(2017, 2, 1)
-    make_captures(date_first, ['KNI', 'KNC'], [(2,5,4,1), (2,4,1,2)])
+    make_captures(date_first, [('KNI', 'KN Industrial'), ('KNC', 'KN Central')], 
+                  [(2,5,4,1), (2,4,1,2)])
     yield Capture.objects
 
     # teardown:
     Capture.objects.delete()
 
+
+class TestDateRange(object):
+    pass
 
 @pytest.mark.django_db
 class TestQuerySetToValues(object):
@@ -187,7 +224,8 @@ class TestStatsCountGroupItems(object):
                and entry[1] == out[entry[0]]
     
     def test_multi_grouping_accuracy(self, capture_qs):
-        result = (('JGS', 1), ('KNI', 4), ('KTC', 1), ('KNE', 1), ('_total_', 7))
+        result = (('JG South', 1), ('KN Industrial', 4), ('KT Central', 1),
+                  ('KN East', 1), ('_total_', 7))
         grouping = ['region_name', 'acct_status']
         out = stcore.stats_count_group_items(capture_qs.all(), *grouping)
         assert out and isinstance(out, Storage)
@@ -240,29 +278,52 @@ class TestStatsDashFuncs(object):
 class TestStatsCapturePaneFuncs(object):
 
     def test_capture_pane_summary_has_2x4_parts(self, capture_qs2):
-        df = stcore.queryset_to_dataframe(capture_qs2.all())
-        st = stcore.stats_pane_capture_summary(df, current_region='KNI')
-        assert st and isinstance(st, Storage) \
-           and len(st) == 2 \
-           and 'all' in st  and len(st['all']) == 4 \
-           and 'region' in st and len(st['region']) == 4
+        # mock user
+        user = MagicMock()
+        user.username = 'usr0@ma.il'
+
+        # filter down to KNI
+        source = capture_qs2(region_code='KNI').all()
+        df = stcore.queryset_to_dataframe(source)
+        st = stcore.stats_pane_capture_summary(user, df, date(2017, 2, 7))
+
+        assert st and isinstance(st, Storage)
+        assert len(st) == 1 and 'summary' in st
+        assert 'total' in st.summary[0]
+        assert 'this day' in st.summary[1]
+        assert 'this week' in st.summary[2]
+        assert 'this month' in st.summary[3]
     
     def test_capture_pane_summary_accuracy(self, capture_qs2):
-        df = stcore.queryset_to_dataframe(capture_qs2.all())
-        st = stcore.stats_pane_capture_summary(df, curren_region='KNI')
-        assert st.all._total_ == 80 \
-           and st.all.existing == 25 \
-           and st.all.new == 17
-        assert st.region.total._total_ == 44 \
-           and st.region.total.existing == 12 \
-           and st.region.total.new == 11
-        assert st.region.today._total_ == 12 \
-           and st.region.today.existing == 3 \
-           and st.region.today.new == 3
-        assert st.region.week._total_ == 28 \
-           and st.region.week.existing == 5 \
-           and st.region.week.new == 7
-        assert st.region.month._total_ == 36 \
-           and st.region.month.existing == 10 \
-           and st.region.month.new == 9
+        # mock user
+        user = MagicMock()
+        user.username = 'usr0@ma.il'
 
+        # filter down to KNI
+        source = capture_qs2(region_code='KNI').all()
+        df = stcore.queryset_to_dataframe(source)
+        st = stcore.stats_pane_capture_summary(user, df, date(2017, 2, 7))
+        
+        stat = st.summary[0][1]
+        assert stat.total == 36
+        assert stat.new == 9
+        assert stat.existing == 10
+        assert stat.unknown == 8
+
+        stat = st.summary[1][1]
+        assert stat.total == 12
+        assert stat.new == 3
+        assert stat.existing == 3
+        assert stat.unknown == 2
+
+        stat = st.summary[2][1]
+        assert stat.total == 24
+        assert stat.new == 7
+        assert stat.existing == 5
+        assert stat.unknown == 7
+
+        stat = st.summary[3][1]
+        assert stat.total == 36
+        assert stat.new == 9
+        assert stat.existing == 10
+        assert stat.unknown == 8

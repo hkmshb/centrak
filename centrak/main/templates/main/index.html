@@ -3,7 +3,7 @@
 {% block header-title %}{% endblock %}
 
 {% block content %}
-{% if not request.user.is_authenticated %}
+{% if not user.is_authenticated or user.is_anonymous %}
     <h1>Welcome to CENTrak</h1>
     <p>
         Kano Electricity Distribution Company's Customer Enumeration Activity Tracking Portal.
@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block script-extra %}
-{% if request.user.is_authenticated %}
+{% if user.is_authenticated %}
     <script src="{% static 'libs/js/Chart.min.js' %}"></script>
     {{ block.super }}
     <script type="text/javascript">

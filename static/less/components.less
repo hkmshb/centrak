@@ -221,11 +221,17 @@ form, .data-card {
     }
 }
 
-.widget.widget-stats-strip { color: #333; margin-bottom: 0; padding: 10px 10px 0; }
-.widget.widget-stats-strip {
-    .strip-title { font-size: 9pt; color: #999; text-transform: uppercase; }
-    .strip-numbers.bottom { border-top: dotted 1px #ddd; }
-    .strip-text.lg { font-size: 16pt; }
-    .strip-text.sm { font-size: 12pt; }
-    .strip-text.xs { font-size: 9pt; }
+.widget {
+    .lg { font-size: 16pt; }
+    .sm { font-size: 12pt; }
+    .xs { font-size: 9pt; }
+    .xx { font-size: 8pt; }
+    .bottom { border-top: dotted 1px #ddd; }
+    &.widget-stats-strip {
+        color: #333; margin-bottom: 0; padding: 10px 10px 0;
+        .strip-title {
+            font-size: 9pt; color: #999; text-transform: uppercase;
+        }
+    }
+    &.strip-notice { margin: 0; padding: 3px 10px 0; color: #999; }
 }

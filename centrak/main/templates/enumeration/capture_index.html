@@ -60,12 +60,15 @@
             {% else %}
                 <table class="table table-striped scroll-body">
                     <thead>
-                        <tr><th>{% if tab == 'new' %}Book Code{% else %}Account #{% endif %}</th>
+                        <tr>{% if tab != 'new' %}
+                            <th>Status</th><th>Book Code</th>{% else %}
+                            <th>Account #</th>{% endif %}
                             <th>Meter #</th><th>Tariff</th><th>Customer Name</th>
                             <th>Feeder</th><th>Station</th><th>LT Routh</th>
                             <th></th></tr>
                     <tbody>{% for c in captures %}{% with t=tab|add:"/" %}
-                        <tr><td><a href="{% url 'capture-upd' t c.id %}">{% if tab == 'new' %}{{ c.book_code }}{% else %}{{ c.acct_no }}{% endif %}</a></td>
+                        <tr>{% if tab != 'new' %}<td>{{ c.acct_status }}</td>{% endif %}
+                            <td><a href="{% url 'capture-upd' t c.id %}">{% if tab == 'new' %}{{ c.book_code }}{% else %}{{ c.acct_no }}{% endif %}</a></td>
                             <td>{{ c.meter_no|default:'-' }}</td>
                             <td>{{ c.tariff }}</td>
                             <td>{{ c.cust_name }}</td>

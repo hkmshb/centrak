@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{% static 'libs/css/bootstrap-datepicker3.min.css' %}" />
     <link rel="stylesheet" href="{% static 'libs/css/bootstrap-select.min.css' %}" />
     {% endcompress %}{% compress css %}
-    {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}" />{% endblock %}{% endcompress %}
+    {% block style-extra %}<link rel="stylesheet" href="{% static 'css/site.css' %}?d" />{% endblock %}{% endcompress %}
     {% block head-extra %}{% endblock %}
 </head>
 <body id="{% block body-id %}{% endblock %}" class="{% block body-class %}{% endblock %}">

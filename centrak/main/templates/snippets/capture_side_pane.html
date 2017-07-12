@@ -1,3 +1,4 @@
+    {% load humanize %}
     <div class="col-sm-3 rd-l-pad">
         <form method="post">
             <div class="search-panel">
@@ -23,68 +24,33 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active tab-summary">
+                    <div class="widget strip-notice">
+                        <div class="strip-text xx text-right">Total / Existing / New</div>
+                    </div>
+                {% for stat in stats.summary %}
                     <div class="widget widget-stats-strip">
-                        <div class="strip-title">Total</div>
+                        <div class="strip-title {% ifequal stat.0 'this day' %}blue{% endifequal %}">{{ stat.0 }}</div>
                         <div class="strip-numbers">
-                            <span class="strip-text lg">0,000</span>
-                            <span class="strip-text xs pull-right">95%</span>
+                            <span class="strip-text lg" title="(Regional) Total">{{ stat.1.region|default:0|intcomma }}</span>
+                            <span class="strip-text xs pull-right" title="User's Percentage In Total">{{ stat.1.perc|default:0 }}%</span>
                         </div>
                         <div class="strip-numbers bottom">
-                            <span class="strip-text sm b">000,000</span> /
-                            <span class="strip-text xs">000,000</span> /
-                            <span class="strip-text xs">000,000</span>
+                            <span class="strip-text sm b" title="(User Entries) Total">{{ stat.1.total|default:0|intcomma }}</span> /
+                            <span class="strip-text xs" title="(User Entries) Existing">{{ stat.1.existing|default:0|intcomma }}</span> /
+                            <span class="strip-text xs" title="(User Entries) New">{{ stat.1.new|default:0|intcomma }}</span>
                         </div>
                     </div>
-                    <div class="widget widget-stats-strip">
-                        <div class="strip-title blue">Today</div>
-                        <div class="strip-numbers">
-                            <span class="strip-text lg">0,000</span>
-                            <span class="strip-text xs pull-right">95%</span>
-                        </div>
-                        <div class="strip-numbers bottom">
-                            <span class="strip-text sm b">000,000</span> /
-                            <span class="strip-text xs">000,000</span> /
-                            <span class="strip-text xs">000,000</span>
-                        </div>
-                    </div>
-                    <div class="widget widget-stats-strip">
-                        <div class="strip-title">This Week</div>
-                        <div class="strip-numbers">
-                            <span class="strip-text lg">0,000</span>
-                            <span class="strip-text xs pull-right">95%</span>
-                        </div>
-                        <div class="strip-numbers bottom">
-                            <span class="strip-text sm b">000,000</span> /
-                            <span class="strip-text xs">000,000</span> /
-                            <span class="strip-text xs">000,000</span>
-                        </div>
-                    </div>
-                    <div class="widget widget-stats-strip">
-                        <div class="strip-title">This Month</div>
-                        <div class="strip-numbers">
-                            <span class="strip-text lg">0,000</span>
-                            <span class="strip-text xs pull-right">95%</span>
-                        </div>
-                        <div class="strip-numbers bottom">
-                            <span class="strip-text sm b">000,000</span> /
-                            <span class="strip-text xs">000,000</span> /
-                            <span class="strip-text xs">000,000</span>
-                        </div>
-                    </div>                
+                {% endfor %}
                 </div>
                 <div class="tab-pane tab-history">
                     <table class="table table-striped table-condensed">
                         <tbody>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> Yesterday</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 2 Days Ago</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 3 Days Ago</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 4 Days Ago</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 20 Jan, 2017</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 19 Jan, 2017</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 18 Jan, 2017</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 17 Jan, 2017</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 16 Jan, 2017</td><td>0,000</td></tr>
-                            <tr><td><i class="fa fa-fw fa-clock-o"></i> 13 Jan, 2017</td><td>0,000</td></tr>
+                        {% for row in stats.history %}
+                            <tr><td><i class="fa fa-fw fa-clock-o"></i>{{ row.0|naturalday}}</td>
+                                <td>{{ row.1|default:0|intcomma}}</td></tr>
+                        {% empty %}
+                            <tr><td>No records found!</td></tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div>

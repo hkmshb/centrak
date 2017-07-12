@@ -60,15 +60,19 @@ def handle_server_error(request):
 #: ==+: main view functions
 def index(request):
     ### non authenticated user
-    if request.user and not request.user.is_authenticated:
+    user = request.user
+    if user is None or not user.is_authenticated or user.is_anonymous():
         return TemplateResponse(request, 'main/index.html', {})
-    
+
     ### authenticated user
+    ## collect location
+    loc = user.profile.location
+
     ## stats: computation for stats on dashboard
     fields = ['region_code', 'acct_status', 'date_created']
     captures_qs = Capture.objects.only(*fields)
     df = stcore.queryset_to_dataframe(captures_qs)
-    summary = stcore.stats_dash_capture_summary(df)
+    summary = stcore.stats_dash_capture_summary(df, loc and loc.short_name)
     analytics = stcore.stats_dash_capture_analytics(df)
 
     # inline func
@@ -77,17 +81,19 @@ def index(request):
     # TODO: retrive target from settings
     target = 10000
 
-    # stats processing: summary
+    ## stats processing: summary
+    # company wide
     summary_entries = []
     for key in ['total', 'existing', 'new']:
         entry = (key, target, summary[key], mp(summary[key], target))
         summary_entries.append(entry)
     
-    tkey, total = 'total:region', (summary['total'] or 1)
-    entry = ('total', total, summary[tkey], mp(summary[tkey], total))
-    summary_entries.append(entry)
+    # region
+    key, total = 'total:region', summary['total:region']
+    summary_entries.append((key, target, total, mp(total, target)))
 
-    # stats processing: analytics
+    ## stats processing: analytics
+    # company wide
     analytics_entries = {}
     for key, stats_data in analytics.items():
         labels = [lbl for lbl in sorted(analytics[key].keys()) if lbl != '_total_']

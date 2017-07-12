@@ -73,8 +73,9 @@ class TestBusinessOffice(object):
         
         assert BusinessOffice.objects.count() == 0
         office = BusinessOffice(
-            code='BO1', 
-            name='Office', 
+            code='BO1',
+            name='Office',
+            short_name='OFF',
             level=self._level2,
             category=BusinessOffice.CUSTOMER_SERVICE_POINT
         )
@@ -91,12 +92,14 @@ class TestBusinessOffice(object):
         office = BusinessOffice.objects.create(
             code='BO1',
             name='Office',
+            short_name='OFF',
             level=self._level1
         )
         
         sub_office = BusinessOffice(
             code='BO1-1',
             name='Sub Office',
+            short_name='OFF_1',
             level=self._level2,
             parent=office,
             category=BusinessOffice.CUSTOMER_SERVICE_POINT
@@ -196,6 +199,7 @@ class TestBusinessOffice(object):
             code='B01S01',
             name='Sub Office 1',
             level=self._level2,
+            short_name='OFF',
             category=BusinessOffice.CUSTOMER_SERVICE_POINT
         )
 

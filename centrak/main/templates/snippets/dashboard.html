@@ -46,8 +46,8 @@
             <div class="stats-number">{{ stat.2|intcomma }}</div>
             <div class="stats-progress progress">
                 <div class="progress-bar" style="width:{{ stat.3 }}%;"></div>
-            </div>
-            <div class="stats-desc">REGION: ? <span class="scale">({{ stat.3 }}% of {{ stat.1|intcomma }})</span></div>
+            </div>{% with loc=request.user.profile.location %}
+            <div class="stats-desc">REGION: {{ loc.short_name|default:'[?]' }} <span class="scale">({{ stat.3 }}% of {{ stat.1|intcomma }})</span></div>{% endwith %}
         </div>{% endwith %}
     </div>
 </div>

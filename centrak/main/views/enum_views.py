@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
+from dolfin.core import Storage
 
+from dateutil.relativedelta import relativedelta as rdelta
 from django.contrib.auth.decorators import login_required
 from django.template.response import TemplateResponse
 from django.shortcuts import render, redirect
@@ -14,9 +16,11 @@ from enumeration.forms import PaperCaptureForm
 from enumeration.models import Account, Capture
 from core.utils import paginate
 
+from stats.core import stats_dash_capture_summary, queryset_to_dataframe, \
+     stats_count_group_items, stats_pane_capture_summary, \
+     stats_pane_capture_history, DateRange
 from ..filters import CaptureFilter
 from .. import utils
-
 
 
 
@@ -51,23 +55,35 @@ def capture_index(request, tab=None):
         qs_GET['date_digitized'] = datetime.today().strftime('%Y-%m-%d')
 
     # retrieve paper captures
-    status = Capture.EXISTING if not tab else Capture.NEW
-    query = Q(medium=Capture.MEDIUM_PAPER) & Q(acct_status=status)
+    query = Q(medium=Capture.MEDIUM_PAPER)
+    if not tab:
+        query &= Q(acct_status__ne=Capture.NEW)
+    else:
+        query &= Q(acct_status=Capture.NEW)
 
     if not request.user.is_superuser:
         p = request.user.profile
-        region_name = p.location.name if p and p.location else ""
-        query = query & Q(region_name=region_name) \
-              & Q(user_email=request.user.username)
+        region_code = p.location.short_name if p and p.location else ""
+        query = query & Q(region_code=region_code) \
+                      & Q(user_email=request.user.username)
 
     captures = Capture.objects(query).order_by('-date_digitized')
-    filter_ = CaptureFilter(qs_GET, queryset=captures)
-    page = paginate(request, filter_)
+    filtr = CaptureFilter(qs_GET, queryset=captures)
+    page = paginate(request, filtr)
 
     ## step 2: stats composition
-    stats = {'summary':[], 'history':[]}
+    loc, query = request.user.profile.location, Capture.objects
+    fields = ['region_code', 'acct_status', 'date_created', 'date_digitized',
+              'user_email']
+
+    if loc is not None:
+        query = query(region_code=loc.short_name)
+
+    source = query.only(*fields)
+    stats = stats_pane_capture_summary(request.user, source)
+    stats.history = stats_pane_capture_history(request.user, Capture)
     return TemplateResponse(request, 'enumeration/capture_index.html', {
-        'tab': tab, 'captures': page, 'filter': filter, 'stats': stats
+        'tab': tab, 'captures': page, 'filter': filtr, 'stats': stats
     })
 
 
@@ -172,7 +188,6 @@ def _manage_capture_exist(request, lookup):
     if request.method == 'POST':
         try:
             form = PaperCaptureForm(*args, instance=instance, data=request.POST)
-            assert form.instance.id is not None
             if form.is_valid():
                 form.save()
 
@@ -184,7 +199,6 @@ def _manage_capture_exist(request, lookup):
         except Exception as ex:
             messages.error(request, str(ex), extra_tags='danger')
 
-    assert form.instance.id is not None
     return render(request, 'enumeration/capture_form.html', {
         'form': form, 'acct': account, 'tab': 'existing'
     })
